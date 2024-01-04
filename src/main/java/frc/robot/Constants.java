@@ -5,29 +5,29 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI;
-import frc.lib.swerveutil.COTSFalconSwerveConstants;
+import frc.lib.swerveutil.COTSSwerveConstants;
 import frc.lib.swerveutil.SwerveModuleConstants;
 
 public final class Constants {
     public static final double stickDeadband = 0.1;
 
-    public static final class Swerve {
-        public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
-        public static final SPI.Port gyroPort = SPI.Port.kMXP;//TODO check port
+    public static final int driveControllerPort = 0;
 
-        public static final COTSFalconSwerveConstants chosenModule = 
-            COTSFalconSwerveConstants.SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L2);
+    public static final class Swerve {
+        public static final boolean invertGyro = false; //TODO ensure Gyro is CCW+ CW-
+        public static final SPI.Port gyroPort = SPI.Port.kMXP;
+
+        public static final COTSSwerveConstants chosenModule = COTSSwerveConstants.SDSMK4i(COTSSwerveConstants.driveGearRatios.SDSMK4i_L2);
 
         /* Drivetrain Constants */
         public static final double trackWidth = Units.inchesToMeters(21.73); //TODO: This must be tuned to specific robot
         public static final double wheelBase = Units.inchesToMeters(21.73); //TODO: This must be tuned to specific robot
+        public static final double driveRadius = Units.inchesToMeters(2);//TODO Distance from the center of the robot to the furthest module
         public static final double wheelCircumference = chosenModule.wheelCircumference;
 
-        /* Swerve Kinematics 
-         * No need to ever change this unless you are not doing a traditional rectangular/square 4 module swerve */
+        /* Swerve Kinematics */
          public static final SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(
             new Translation2d(wheelBase / 2.0, trackWidth / 2.0),
             new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
@@ -49,16 +49,11 @@ public final class Constants {
         public static final double voltageComp = 12.0;
 
         /* Swerve Current Limiting */
-        public static final int angleContinuousCurrentLimit = 20;//TODO tune?
+        public static final int angleContinuousCurrentLimit = 20;//TODO tune if needed
         public static final int driveContinuousCurrentLimit = 80;
 
-        /* These values are used to ramp in open loop and closed loop driving.
-         * We found a small open loop ramp (0.25) helps with tread wear, tipping, etc */
-        // public static final double openLoopRamp = 0.25;//TODO maybe dont tune?
-        // public static final double closedLoopRamp = 0.0;
-
         /* Angle Motor PID Values */
-        public static final double angleKP = 0;//TODO Tune
+        public static final double angleKP = 0.3;//TODO Tune
         public static final double angleKI = 0;
         public static final double angleKD = 0;
         public static final double angleKF = 0;
@@ -94,7 +89,7 @@ public final class Constants {
         public static final class Mod0 { //TODO: This must be tuned to specific robot
             public static final int driveMotorID = 1;
             public static final int angleMotorID = 2;
-            public static final int canCoderID = 1;
+            public static final int canCoderID = 9;
             public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0.0);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -104,7 +99,7 @@ public final class Constants {
         public static final class Mod1 { //TODO: This must be tuned to specific robot
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
-            public static final int canCoderID = 2;
+            public static final int canCoderID = 10;
             public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0.0);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -114,7 +109,7 @@ public final class Constants {
         public static final class Mod2 { //TODO: This must be tuned to specific robot
             public static final int driveMotorID = 5;
             public static final int angleMotorID = 6;
-            public static final int canCoderID = 3;
+            public static final int canCoderID = 11;
             public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0.0);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -124,26 +119,19 @@ public final class Constants {
         public static final class Mod3 { //TODO: This must be tuned to specific robot
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
-            public static final int canCoderID = 4;
+            public static final int canCoderID = 12;
             public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0.0);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
     }
 
-    public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
-        public static final double kMaxSpeedMetersPerSecond = 3;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-        public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-        public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
-    
-        public static final double kPXController = 1;
-        public static final double kPYController = 1;
-        public static final double kPThetaController = 1;
-    
-        /* Constraint for the motion profilied robot angle controller */
-        public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-            new TrapezoidProfile.Constraints(
-                kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+    public static final class AutoConstants { 
+        /* PID Constants for path following */
+        public static final double kPTranslation = 1; // TODO: TUNE for auto pathplanner
+        public static final double kDTranslation = 0;
+
+        public static final double kPRotation = 1;
+        public static final double kDRotation = 0;
     }
 }

@@ -18,7 +18,8 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class SwerveModule {
-    public int moduleNumber;
+    private int moduleNumber;
+
     private Rotation2d angleOffset;
     private Rotation2d lastAngle;
 
@@ -32,9 +33,10 @@ public class SwerveModule {
     private final SparkMaxPIDController driveController;
     private final SparkMaxPIDController angleController;
 
-    SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.Swerve.driveKS, Constants.Swerve.driveKV, Constants.Swerve.driveKA);
+    private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
+        Constants.Swerve.driveKS, Constants.Swerve.driveKV, Constants.Swerve.driveKA);
 
-    public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants){
+    public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants) {
         this.moduleNumber = moduleNumber;
         this.angleOffset = moduleConstants.angleOffset;
         
@@ -57,19 +59,28 @@ public class SwerveModule {
         lastAngle = getState().angle;
     }
 
-    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop){
+    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
+        SwerveModuleState currentState = getState();
         /* This is a custom optimize function, since default WPILib optimize assumes continuous controller which CTRE and Rev onboard is not */
-        desiredState = CTREModuleState.optimize(desiredState, getState().angle); 
+        desiredState = CTREModuleState.optimize(desiredState, currentState.angle); 
+
         setAngle(desiredState);
-        setSpeed(desiredState, isOpenLoop);
+        setSpeed(desiredState, currentState, isOpenLoop);
     }
 
-    private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop){
+    private void setSpeed(SwerveModuleState desiredState, SwerveModuleState currentState, boolean isOpenLoop) {
         if (isOpenLoop) {
+            /* Scale speed by cosine of angle error, which slows down movement perpendicular to the desired direction of travel
+             * Smoothes driving when modules change directions
+             * Stolen from: https://github.com/wpilibsuite/allwpilib/pull/5758
+             */
+            desiredState.speedMetersPerSecond *= desiredState.angle.minus(currentState.angle).getCos();//TODO does this help or hurt??
+
             double percentOutput = desiredState.speedMetersPerSecond / Constants.Swerve.maxSpeed;
+
             driveMotor.set(percentOutput);
         } else {
-            driveController.setReference(
+            driveController.setReference(//Set the closed loop velocity controller with a feedforward component
                     desiredState.speedMetersPerSecond,
                     ControlType.kVelocity,
                     0,
@@ -77,8 +88,12 @@ public class SwerveModule {
         }
     }
 
-    private void setAngle(SwerveModuleState desiredState){
-        // Prevent rotating module if speed is less then 1%. Prevents jittering.
+    public int getNumber() {
+        return moduleNumber;
+    }
+
+    private void setAngle(SwerveModuleState desiredState) {
+        //Prevent rotating module if speed is less then 1% to prevent jittering.
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.Swerve.maxSpeed * 0.01))
                 ? lastAngle
                 : desiredState.angle;
@@ -87,11 +102,11 @@ public class SwerveModule {
         lastAngle = angle;
     }
 
-    private Rotation2d getAngle(){
+    private Rotation2d getAngle() {
         return Rotation2d.fromDegrees(integratedAngleEncoder.getPosition());
     }
 
-    public Rotation2d getCanCoder(){
+    public Rotation2d getCanCoder() {
         return Rotation2d.fromDegrees(angleEncoder.getAbsolutePosition());
     }
 
@@ -100,7 +115,7 @@ public class SwerveModule {
         integratedAngleEncoder.setPosition(absolutePosition);
     }
 
-    private void configAngleEncoder(){        
+    private void configAngleEncoder() {        
         angleEncoder.configFactoryDefault();
         angleEncoder.configAllSettings(Robot.ctreConfigs.swerveCanCoderConfig);
     }
@@ -118,10 +133,9 @@ public class SwerveModule {
         angleController.setFF(Constants.Swerve.angleKF);
         angleMotor.enableVoltageCompensation(Constants.Swerve.voltageComp);
         angleMotor.burnFlash();
-        resetToAbsolute();
     }
 
-    private void configDriveMotor(){        
+    private void configDriveMotor() {        
         driveMotor.restoreFactoryDefaults();
         CANSparkMaxUtil.setCANSparkMaxBusUsage(driveMotor, Usage.kAll);
         driveMotor.setSmartCurrentLimit(Constants.Swerve.driveContinuousCurrentLimit);
@@ -138,11 +152,11 @@ public class SwerveModule {
         driveEncoder.setPosition(0.0);
     }
 
-    public SwerveModuleState getState(){
+    public SwerveModuleState getState() {
         return new SwerveModuleState(driveEncoder.getVelocity(), getAngle());
     }
 
-    public SwerveModulePosition getPosition(){
+    public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(driveEncoder.getPosition(), getAngle());
     }
 }
