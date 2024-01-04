@@ -1,12 +1,12 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -18,36 +18,42 @@ import frc.robot.subsystems.*;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    /* Controllers */
-    private final Joystick driver = new Joystick(1);//TODO remap controls
+    private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
-    /* Drive Controls */
-    private final int translationAxis = XboxController.Axis.kLeftY.value;
-    private final int strafeAxis = XboxController.Axis.kLeftX.value;
-    private final int rotationAxis = XboxController.Axis.kRightX.value;
+    /* Controllers */
+    private final CommandXboxController driveController = new CommandXboxController(Constants.driveControllerPort);//TODO remap controls
 
     /* Driver Buttons */
-    private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
-    private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+    private final Trigger zeroGyroButton = driveController.a().debounce(0.1);
+    private final Trigger fieldCentricButton = driveController.x().debounce(0.1);
 
     /* Subsystems */
-    private final Swerve s_Swerve = new Swerve();
+    private final Swerve swerve = new Swerve();
 
+    private boolean isFieldCentric = false;
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
-        s_Swerve.setDefaultCommand(
+        swerve.setDefaultCommand(//Will run when there is no command set, such as during teleop
             new TeleopSwerve(
-                s_Swerve, 
-                () -> -driver.getRawAxis(translationAxis), 
-                () -> -driver.getRawAxis(strafeAxis), 
-                () -> -driver.getRawAxis(rotationAxis), 
-                () -> robotCentric.getAsBoolean()
+                swerve, 
+                driveController::getLeftY, 
+                () -> -driveController.getLeftX(),//The x axis is inverted by default on the xbox controller
+                driveController::getRightX,
+                this::isFieldCentric
             )
         );
 
-        // Configure the button bindings
+        //Configure the button bindings
         configureButtonBindings();
+
+        autoChooser.addOption("Test", new TestAuto());//TODO check pathplannerlib
+        autoChooser.addOption("Test2", new TestAuto());
+        SmartDashboard.putData("Choose an Auto:", autoChooser);//Let us choose autos through the dashboard
+    }
+
+    private boolean isFieldCentric() {
+        return isFieldCentric;
     }
 
     /**
@@ -57,8 +63,18 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        /* Driver Buttons */
-        zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+        /* 
+         * Current controls:
+         * 
+         * left stick controls strafing
+         * right stick controls 
+         * 
+         * a -> zero gyro
+         * x -> toggle field centric
+         * 
+        */
+        zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
+        fieldCentricButton.onTrue(new InstantCommand(() -> isFieldCentric = !isFieldCentric));//Toggle field centric
     }
 
     /**
@@ -67,7 +83,6 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // An ExampleCommand will run in autonomous
-        return new exampleAuto(s_Swerve);
+        return autoChooser.getSelected();
     }
 }
