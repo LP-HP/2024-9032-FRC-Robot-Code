@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -7,7 +8,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI;
-import frc.lib.swerveutil.COTSSwerveConstants;
 import frc.lib.swerveutil.SwerveModuleConstants;
 
 public final class Constants {
@@ -16,16 +16,14 @@ public final class Constants {
     public static final int driveControllerPort = 0;
 
     public static final class Swerve {
-        public static final boolean invertGyro = false; //TODO ensure Gyro is CCW+ CW-
+        public static final boolean invertGyro = false; //TODO ensure Gyro works
         public static final SPI.Port gyroPort = SPI.Port.kMXP;
-
-        public static final COTSSwerveConstants chosenModule = COTSSwerveConstants.SDSMK4i(COTSSwerveConstants.driveGearRatios.SDSMK4i_L2);
 
         /* Drivetrain Constants */
         public static final double trackWidth = Units.inchesToMeters(21.73); //TODO: This must be tuned to specific robot - needed for teleop
         public static final double wheelBase = Units.inchesToMeters(21.73); //TODO: This must be tuned to specific robot - needed for teleop
         public static final double driveRadius = Units.inchesToMeters(2);//TODO Distance from the center of the robot to the furthest module - needed for auto
-        public static final double wheelCircumference = chosenModule.wheelCircumference;
+        public static final double wheelCircumference = Units.inchesToMeters(4.0) * Math.PI;
 
         /* Swerve Kinematics */
          public static final SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(
@@ -35,15 +33,15 @@ public final class Constants {
             new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0));
 
         /* Module Gear Ratios */
-        public static final double driveGearRatio = chosenModule.driveGearRatio;
-        public static final double angleGearRatio = chosenModule.angleGearRatio;
+        public static final double driveGearRatio = 6.75;
+        public static final double angleGearRatio = 150.0 / 7.0;
 
         /* Motor Inverts */
-        public static final boolean angleMotorInvert = chosenModule.angleMotorInvert;
-        public static final boolean driveMotorInvert = chosenModule.driveMotorInvert;
+        public static final boolean angleMotorInvert = true;
+        public static final boolean driveMotorInvert = false;
 
         /* Angle Encoder Invert */
-        public static final boolean canCoderInvert = chosenModule.canCoderInvert;
+        public static final SensorDirectionValue canCoderInvert = SensorDirectionValue.CounterClockwise_Positive;
 
         /* Swerve Voltage Compensation */
         public static final double voltageComp = 12.0;
@@ -59,18 +57,18 @@ public final class Constants {
         public static final double angleKF = 0;
 
         /* Drive Motor PID Values */
-        public static final double driveKP = 0.05; //TODO: This must be tuned to specific robot - needed for auto
+        public static final double driveKP = 0.05; //TODO: This must be tuned to specific robot - needed for closed loop
         public static final double driveKI = 0.0;
         public static final double driveKD = 0.0;
         public static final double driveKF = 0.0;
 
         /* Drive Motor Characterization Values */
-        public static final double driveKS = (0.32 / 12); //TODO: This must be tuned to specific robot - needed for auto
-        public static final double driveKV = (1.51 / 12);
-        public static final double driveKA = (0.27 / 12);
+        public static final double driveKS = 0; //TODO: This must be tuned to specific robot - needed for auto
+        public static final double driveKV = 0;
+        public static final double driveKA = 0;
 
         /* Drive Motor Conversion Factors */
-        public static final double driveConversionPositionFactor = (chosenModule.wheelDiameter * Math.PI) / driveGearRatio;
+        public static final double driveConversionPositionFactor = wheelCircumference / driveGearRatio;
         public static final double driveConversionVelocityFactor = driveConversionPositionFactor / 60.0;
         public static final double angleConversionFactor = 360.0 / angleGearRatio;
 
