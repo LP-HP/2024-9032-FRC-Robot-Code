@@ -10,7 +10,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI;
 import frc.lib.swerveutil.SwerveModuleConstants;
 
-public final class Constants {//This line should be here!! yes
+public final class Constants {
     public static final double stickDeadband = 0.1;
 
     public static final int driveControllerPort = 0;
