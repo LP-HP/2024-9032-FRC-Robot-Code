@@ -25,16 +25,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
     private SwerveDriveOdometry swerveOdometry;
-    private SwerveModule[] mSwerveMods;
+    private SwerveModule[] swerveMods;
     private AHRS gyro;
 
     private final Field2d field = new Field2d();
 
     public Swerve() {
-        gyro = new AHRS(Constants.Swerve.gyroPort);
-        gyro.calibrate();
+        gyro = new AHRS(Constants.Swerve.gyroPort);//Automatically calibrates
 
-        mSwerveMods = new SwerveModule[] {
+        swerveMods = new SwerveModule[] {
             new SwerveModule(0, Constants.Swerve.Mod0.constants),
             new SwerveModule(1, Constants.Swerve.Mod1.constants),
             new SwerveModule(2, Constants.Swerve.Mod2.constants),
@@ -66,11 +65,6 @@ public class Swerve extends SubsystemBase {
 
         SmartDashboard.putData("Field", field);//Show field view
 
-        //Send pathplanner pose to field view
-        PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
-            field.setRobotPose(pose);
-        });
-
         //Send pathplanner target pose to field view
         PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
             field.getObject("target pose").setPose(pose);
@@ -87,7 +81,7 @@ public class Swerve extends SubsystemBase {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed);
 
-        for(SwerveModule mod : mSwerveMods){
+        for(SwerveModule mod : swerveMods){
             mod.setDesiredState(desiredStates[mod.getNumber()], false);
         }
     }
@@ -113,7 +107,7 @@ public class Swerve extends SubsystemBase {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed);
 
-        for(SwerveModule mod : mSwerveMods) {
+        for(SwerveModule mod : swerveMods) {
             mod.setDesiredState(desiredStates[mod.getNumber()], true);
         }
     }     
@@ -128,7 +122,7 @@ public class Swerve extends SubsystemBase {
 
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
-        for(SwerveModule mod : mSwerveMods){
+        for(SwerveModule mod : swerveMods){
             states[mod.getNumber()] = mod.getState();
         }
 
@@ -137,7 +131,7 @@ public class Swerve extends SubsystemBase {
 
     public SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
-        for(SwerveModule mod : mSwerveMods){
+        for(SwerveModule mod : swerveMods){
             positions[mod.getNumber()] = mod.getPosition();
         }
 
@@ -157,7 +151,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public void resetModulesToAbsolute() {
-        for(SwerveModule mod : mSwerveMods) {
+        for(SwerveModule mod : swerveMods) {
             mod.resetToAbsolute();
         }
     }
@@ -166,7 +160,7 @@ public class Swerve extends SubsystemBase {
     public void periodic() {//TODO change dashboard
         swerveOdometry.update(getGyroYaw(), getModulePositions());  
 
-        for(SwerveModule mod : mSwerveMods) {//Send swerve module telemetry
+        for(SwerveModule mod : swerveMods) {//Send swerve module telemetry
             int modNum = mod.getNumber();
 
             SmartDashboard.putNumber("Mod " + modNum + " Cancoder Angle", mod.getCanCoderAngle().getDegrees());
@@ -179,5 +173,7 @@ public class Swerve extends SubsystemBase {
         SmartDashboard.putNumber("Pose X", currentPose.getX());//Send odometry telemetry
         SmartDashboard.putNumber("Pose Y", currentPose.getY());
         SmartDashboard.putNumber("Pose Rot", currentPose.getRotation().getDegrees());
+
+        field.setRobotPose(currentPose);//Update field view
     }
 }
