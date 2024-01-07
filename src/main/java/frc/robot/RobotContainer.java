@@ -47,8 +47,8 @@ public class RobotContainer {
         //Configure the button bindings
         configureButtonBindings();
 
-        autoChooser.addOption("Test", new TestAuto());//TODO check pathplannerlib
-        autoChooser.addOption("Test2", new TestAuto());
+        autoChooser.addOption("Test Auto", new TestAuto());//TODO check pathplannerlib
+        autoChooser.addOption("Test Auto2", new TestAuto());
         SmartDashboard.putData("Choose an Auto:", autoChooser);//Let us choose autos through the dashboard
     }
 

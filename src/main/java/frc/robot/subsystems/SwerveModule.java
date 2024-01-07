@@ -10,12 +10,13 @@ import frc.lib.swerveutil.SwerveModuleConstants;
 import frc.lib.swerveutil.CANSparkMaxUtil.Usage;
 import frc.robot.Constants;
 import frc.robot.Robot;
-import com.ctre.phoenix.sensors.CANCoder;
+
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class SwerveModule {
     private int moduleNumber;
@@ -28,10 +29,10 @@ public class SwerveModule {
   
     private RelativeEncoder driveEncoder;
     private RelativeEncoder integratedAngleEncoder;
-    private CANCoder angleEncoder;
+    private CANcoder angleEncoder;
   
-    private final SparkMaxPIDController driveController;
-    private final SparkMaxPIDController angleController;
+    private final SparkPIDController driveController;
+    private final SparkPIDController angleController;
 
     private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
         Constants.Swerve.driveKS, Constants.Swerve.driveKV, Constants.Swerve.driveKA);
@@ -41,7 +42,7 @@ public class SwerveModule {
         this.angleOffset = moduleConstants.angleOffset;
         
         /* Angle Encoder Config */
-        angleEncoder = new CANCoder(moduleConstants.cancoderID);
+        angleEncoder = new CANcoder(moduleConstants.cancoderID);
         configAngleEncoder();
 
         /* Angle Motor Config */
@@ -102,22 +103,21 @@ public class SwerveModule {
         lastAngle = angle;
     }
 
-    private Rotation2d getAngle() {
+    private Rotation2d getIntegratedAngle() {
         return Rotation2d.fromDegrees(integratedAngleEncoder.getPosition());
     }
 
-    public Rotation2d getCanCoder() {
-        return Rotation2d.fromDegrees(angleEncoder.getAbsolutePosition());
+    public Rotation2d getCanCoderAngle() {
+        return Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getValue());
     }
 
     public void resetToAbsolute() {
-        double absolutePosition = getCanCoder().getDegrees() - angleOffset.getDegrees();
+        double absolutePosition = getCanCoderAngle().getDegrees() - angleOffset.getDegrees();
         integratedAngleEncoder.setPosition(absolutePosition);
     }
 
     private void configAngleEncoder() {        
-        angleEncoder.configFactoryDefault();
-        angleEncoder.configAllSettings(Robot.ctreConfigs.swerveCanCoderConfig);
+        angleEncoder.getConfigurator().apply(Robot.ctreConfigs.swerveCanCoderConfig);
     }
 
     private void configAngleMotor() {
@@ -153,10 +153,10 @@ public class SwerveModule {
     }
 
     public SwerveModuleState getState() {
-        return new SwerveModuleState(driveEncoder.getVelocity(), getAngle());
+        return new SwerveModuleState(driveEncoder.getVelocity(), getIntegratedAngle());
     }
 
     public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(driveEncoder.getPosition(), getAngle());
+        return new SwerveModulePosition(driveEncoder.getPosition(), getIntegratedAngle());
     }
 }
