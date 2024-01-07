@@ -22,9 +22,9 @@ public final class Constants {
         public static final COTSSwerveConstants chosenModule = COTSSwerveConstants.SDSMK4i(COTSSwerveConstants.driveGearRatios.SDSMK4i_L2);
 
         /* Drivetrain Constants */
-        public static final double trackWidth = Units.inchesToMeters(21.73); //TODO: This must be tuned to specific robot
-        public static final double wheelBase = Units.inchesToMeters(21.73); //TODO: This must be tuned to specific robot
-        public static final double driveRadius = Units.inchesToMeters(2);//TODO Distance from the center of the robot to the furthest module
+        public static final double trackWidth = Units.inchesToMeters(21.73); //TODO: This must be tuned to specific robot - needed for teleop
+        public static final double wheelBase = Units.inchesToMeters(21.73); //TODO: This must be tuned to specific robot - needed for teleop
+        public static final double driveRadius = Units.inchesToMeters(2);//TODO Distance from the center of the robot to the furthest module - needed for auto
         public static final double wheelCircumference = chosenModule.wheelCircumference;
 
         /* Swerve Kinematics */
@@ -49,23 +49,23 @@ public final class Constants {
         public static final double voltageComp = 12.0;
 
         /* Swerve Current Limiting */
-        public static final int angleContinuousCurrentLimit = 20;//TODO tune if needed
+        public static final int angleContinuousCurrentLimit = 20;//TODO tune if needed 
         public static final int driveContinuousCurrentLimit = 80;
 
         /* Angle Motor PID Values */
-        public static final double angleKP = 0.3;//TODO Tune
+        public static final double angleKP = 0.3;//TODO Tune - needed for teleop
         public static final double angleKI = 0;
         public static final double angleKD = 0;
         public static final double angleKF = 0;
 
         /* Drive Motor PID Values */
-        public static final double driveKP = 0.05; //TODO: This must be tuned to specific robot
+        public static final double driveKP = 0.05; //TODO: This must be tuned to specific robot - needed for auto
         public static final double driveKI = 0.0;
         public static final double driveKD = 0.0;
         public static final double driveKF = 0.0;
 
         /* Drive Motor Characterization Values */
-        public static final double driveKS = (0.32 / 12); //TODO: This must be tuned to specific robot
+        public static final double driveKS = (0.32 / 12); //TODO: This must be tuned to specific robot - needed for auto
         public static final double driveKV = (1.51 / 12);
         public static final double driveKA = (0.27 / 12);
 
@@ -76,9 +76,9 @@ public final class Constants {
 
         /* Swerve Profiling Values */
         /** Meters per Second */
-        public static final double maxSpeed = 4.5; //TODO: This must be tuned to specific robot
+        public static final double maxSpeed = 4.5; //TODO: This must be tuned to specific robot - needed for teleop
         /** Radians per Second */
-        public static final double maxAngularVelocity = 10.0; //TODO: This must be tuned to specific robot
+        public static final double maxAngularVelocity = 10.0; //TODO: This must be tuned to specific robot - needed for teleop
 
         /* Neutral Modes */
         public static final IdleMode angleNeutralMode = IdleMode.kBrake;
@@ -86,7 +86,7 @@ public final class Constants {
 
         /* Module Specific Constants */
         /* Front Left Module - Module 0 */
-        public static final class Mod0 { //TODO: This must be tuned to specific robot
+        public static final class Mod0 { //TODO: This must be tuned to specific robot - needed for teleop
             public static final int driveMotorID = 1;
             public static final int angleMotorID = 2;
             public static final int canCoderID = 9;
@@ -96,7 +96,7 @@ public final class Constants {
         }
 
         /* Front Right Module - Module 1 */
-        public static final class Mod1 { //TODO: This must be tuned to specific robot
+        public static final class Mod1 { //TODO: This must be tuned to specific robot - needed for teleop
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
             public static final int canCoderID = 10;
@@ -106,7 +106,7 @@ public final class Constants {
         }
         
         /* Back Left Module - Module 2 */
-        public static final class Mod2 { //TODO: This must be tuned to specific robot
+        public static final class Mod2 { //TODO: This must be tuned to specific robot - needed for teleop
             public static final int driveMotorID = 5;
             public static final int angleMotorID = 6;
             public static final int canCoderID = 11;
@@ -116,7 +116,7 @@ public final class Constants {
         }
 
         /* Back Right Module - Module 3 */
-        public static final class Mod3 { //TODO: This must be tuned to specific robot
+        public static final class Mod3 { //TODO: This must be tuned to specific robot - needed for teleop
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 12;
