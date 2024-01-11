@@ -29,6 +29,7 @@ public class RobotContainer {
 
     /* Subsystems */
     private final Swerve swerve = new Swerve();
+    private final LimelightVision limelight = new LimelightVision(Constants.VisionConstants.limelightName, true);
 
     private boolean isFieldCentric = false;
 
@@ -37,8 +38,8 @@ public class RobotContainer {
         swerve.setDefaultCommand(//Will run when there is no command set, such as during teleop
             new TeleopSwerve(
                 swerve, 
-                driveController::getLeftY, 
-                () -> -driveController.getLeftX(),//The x axis is inverted by default on the xbox controller
+                () -> -driveController.getLeftY(),//The y axis is inverted by default on the xbox controller
+                driveController::getLeftX,
                 driveController::getRightX,
                 this::isFieldCentric
             )
@@ -47,8 +48,8 @@ public class RobotContainer {
         //Configure the button bindings
         configureButtonBindings();
 
-        autoChooser.addOption("Test Auto", new TestAuto());//TODO check pathplannerlib
-        autoChooser.addOption("Test Auto2", new TestAuto());
+        autoChooser.addOption("Test Auto 1 ring", new TestAuto(swerve, limelight));
+        autoChooser.addOption("Test Auto 2 rings", new TestAuto(swerve, limelight));
         SmartDashboard.putData("Choose an Auto:", autoChooser);//Let us choose autos through the dashboard
     }
 

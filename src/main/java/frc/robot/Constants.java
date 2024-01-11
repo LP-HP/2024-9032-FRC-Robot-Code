@@ -15,6 +15,11 @@ public final class Constants {
 
     public static final int driveControllerPort = 0;
 
+    public static final class VisionConstants {
+        public static final double visionPoseTolerance = 1;//TODO tune for localization (in meters)
+        public static final String limelightName = "9032Limelight";//TODO set name
+    }
+
     public static final class Swerve {
         public static final boolean invertGyro = false; //TODO ensure Gyro works
         public static final SPI.Port gyroPort = SPI.Port.kMXP;
