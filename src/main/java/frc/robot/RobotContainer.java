@@ -28,8 +28,8 @@ public class RobotContainer {
     private final Trigger fieldCentricButton = driveController.x().debounce(0.1);
 
     /* Subsystems */
-    private final Swerve swerve = new Swerve();
     private final LimelightVision limelight = new LimelightVision(Constants.VisionConstants.limelightName, true);
+    private final Swerve swerve = new Swerve(() -> limelight.getPoseEstimate());
 
     private boolean isFieldCentric = false;
 

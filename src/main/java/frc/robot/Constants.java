@@ -17,7 +17,10 @@ public final class Constants {
 
     public static final class VisionConstants {
         public static final double visionPoseTolerance = 1;//TODO tune for localization (in meters)
+
         public static final String limelightName = "9032Limelight";//TODO set name
+        public static final int targetPipelineId = 1;
+         public static final int localizationPipelineId = 0;//TODO make sure this aligns with the limelight config
     }
 
     public static final class Swerve {

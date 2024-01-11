@@ -1,10 +1,13 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
-
+import frc.robot.subsystems.LimelightVision.VisionPoseMeasurement;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -32,7 +35,9 @@ public class Swerve extends SubsystemBase {
 
     private final Field2d field = new Field2d();
 
-    public Swerve() {
+    private Supplier<Optional<VisionPoseMeasurement>> visionSup;
+
+    public Swerve(Supplier<Optional<VisionPoseMeasurement>> optionalVisionSupplier) {
         gyro = new AHRS(Constants.Swerve.gyroPort);//Automatically calibrates
 
         swerveMods = new SwerveModule[] {
@@ -79,6 +84,8 @@ public class Swerve extends SubsystemBase {
         PathPlannerLogging.setLogActivePathCallback((poses) -> {
             field.getObject("path").setPoses(poses);
         });
+
+        visionSup = optionalVisionSupplier;
     }
 
     public void driveAuto(ChassisSpeeds speeds) {
@@ -161,7 +168,7 @@ public class Swerve extends SubsystemBase {
         }
     }
 
-    public void updateVisionLocalization(Pose2d visionPose, double time) {
+    private void updateVisionLocalization(Pose2d visionPose, double time) {
         Transform2d poseDifference = visionPose.minus(swerveOdometry.getEstimatedPosition());
 
         /* Only add the vision update if it is within the tolerance - prevents vision noise */
@@ -177,6 +184,12 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {//TODO change dashboard
         swerveOdometry.update(getGyroYaw(), getModulePositions());  
+
+        if(!visionSup.get().isEmpty()) {//Only update vision if an update is provided
+            VisionPoseMeasurement measurement = visionSup.get().get();
+
+            updateVisionLocalization(measurement.pose, measurement.measurementTime);
+        }
 
         for(SwerveModule mod : swerveMods) {//Send swerve module telemetry
             int modNum = mod.getNumber();

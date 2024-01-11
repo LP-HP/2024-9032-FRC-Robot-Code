@@ -8,7 +8,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.LimelightVision;
 import frc.robot.subsystems.Swerve;
@@ -19,23 +18,23 @@ public class TestAuto extends SequentialCommandGroup {
 
         Command first = AutoBuilder.followPath(paths.get(0));
         Command second = AutoBuilder.followPath(paths.get(1));
+        
+        beforeStarting(() -> init(swerve, limelight), swerve, limelight);//TODO does this allow enough time for the pose to be gotten before reset
 
         addCommands(
-            /* Reset starting pose to limelight pose */
-            new InstantCommand(() -> swerve.resetOdometry(limelight.getPoseEstimate()), swerve, limelight),
             first,
             Commands.waitSeconds(1),
             second
         );
 
-        //Updates vision every loop until the auto ends //FIXME will this work? it wont because of scheduler conlicts... HELP
-        deadlineWith(
-            new InstantCommand(
-            () -> swerve.updateVisionLocalization(limelight.getPoseEstimate(), limelight.getMeasurementTime()), swerve, limelight)
-            .repeatedly()
-        );
-
         //When we switch to teleop make sure we switch pipelines
         finallyDo(() -> limelight.switchToTargetPipeline());
+    }
+
+    private void init(Swerve swerve, LimelightVision limelight) {
+        limelight.switchToLocalizationPipeline();
+
+        /* Reset starting pose to limelight pose */
+        swerve.resetOdometry(limelight.getPoseEstimate().get().pose);
     }
 }
