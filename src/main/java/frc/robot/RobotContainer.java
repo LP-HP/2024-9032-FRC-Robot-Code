@@ -30,6 +30,8 @@ public class RobotContainer {
     /* Subsystems */
     private final LimelightVision limelight = new LimelightVision(Constants.VisionConstants.limelightName, true);
     private final Swerve swerve = new Swerve(() -> limelight.getPoseEstimate());
+    private final Intake intake = new Intake();
+    private final Shooter shooter = new Shooter();
 
     private boolean isFieldCentric = false;
 

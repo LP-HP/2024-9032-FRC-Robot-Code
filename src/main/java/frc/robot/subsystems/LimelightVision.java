@@ -33,6 +33,7 @@ public class LimelightVision extends SubsystemBase {
 
             else {
                 lastPoseEstimate.pose = currentPose;
+                lastPoseEstimate.isValid = true;
 
                 // Subtract the pipeline latency from the starting time to get measurement time
                 lastPoseEstimate.measurementTime = Timer.getFPGATimestamp() -
@@ -61,7 +62,7 @@ public class LimelightVision extends SubsystemBase {
 
     public void switchToTargetPipeline() {
         if(isLocalizationPipeline) {
-            LimelightHelpers.setPipelineIndex(name, Constants.VisionConstants.targetPipelineId);
+            LimelightHelpers.setPipelineIndex(name, Constants.VisionConstants.targetPipelineID);
 
             isLocalizationPipeline = false;
         }
@@ -69,14 +70,10 @@ public class LimelightVision extends SubsystemBase {
 
     public void switchToLocalizationPipeline() {
         if(!isLocalizationPipeline) {
-            LimelightHelpers.setPipelineIndex(name, Constants.VisionConstants.localizationPipelineId);
+            LimelightHelpers.setPipelineIndex(name, Constants.VisionConstants.localizationPipelineID);
 
             isLocalizationPipeline = true;
         }
-    }
-
-    public double getMeasurementTime() {
-        return 0;
     }
 
     public Optional<VisionPoseMeasurement> getPoseEstimate() {

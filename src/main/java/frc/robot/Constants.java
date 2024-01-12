@@ -19,11 +19,45 @@ public final class Constants {
         public static final double visionPoseTolerance = 1;//TODO tune for localization (in meters)
 
         public static final String limelightName = "9032Limelight";//TODO set name
-        public static final int targetPipelineId = 1;
-         public static final int localizationPipelineId = 0;//TODO make sure this aligns with the limelight config
+        public static final int targetPipelineID = 1;
+        public static final int localizationPipelineID = 0;//TODO make sure this aligns with the limelight config
     }
 
-    public static final class Swerve {
+    public static final class IntakeConstants {//TODO tune
+        /* Intake Arm */
+        public static final int armMotorID = 13;
+        public static final double armPositionGround = 0;
+        public static final double kPArm = 0;
+        public static final double kDArm = 0;
+
+        /* Arm and Flywheel Motor  */
+        public static final int motorCurrentLimit = 80;
+        public static final int motorVoltageComp = 12;
+
+        /* Intake Flywheel */
+        public static final int intakeFlywheelMotorID = 14;
+        public static final double intakeVelocity = 1;
+        public static final double kPIntake = 0;
+        public static final double kDIntake = 0;
+    }
+
+     public static final class ShooterConstants {//TODO tune
+        /* Shooter Arm */
+        public static final int armMotorID = 15;
+        public static final double kPArm = 0;
+        public static final double kDArm = 0;
+
+        /* Arm and Flywheel Motor  */
+        public static final int motorCurrentLimit = 80;
+        public static final int motorVoltageComp = 12;
+
+        /* Shooter Flywheel */
+        public static final int shooterFlywheelMotorID = 16;
+        public static final double kPShooter = 0;
+        public static final double kDShooter = 0;
+    }
+
+    public static final class SwerveConstants {
         public static final boolean invertGyro = false; //TODO ensure Gyro works
         public static final SPI.Port gyroPort = SPI.Port.kMXP;
 
