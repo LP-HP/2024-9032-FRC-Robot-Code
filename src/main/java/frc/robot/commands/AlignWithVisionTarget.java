@@ -21,7 +21,7 @@ public class AlignWithVisionTarget extends Command {
     }
 
     @Override
-    public void execute() {
+    public void execute() {//TODO add telemetry
         swerve.driveClosedLoop(
             new Translation2d(), 
             swerveRotController.calculate(swerve.getPose().getRotation().getDegrees()));
