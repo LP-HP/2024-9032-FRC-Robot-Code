@@ -21,6 +21,9 @@ public final class Constants {
         public static final String limelightName = "9032Limelight";//TODO set name
         public static final int targetPipelineID = 1;
         public static final int localizationPipelineID = 0;//TODO make sure this aligns with the limelight config
+
+        public static final double kPRotation = 0;//TODO tune and test
+        public static final double kDRotation = 0;
     }
 
     public static final class IntakeConstants {//TODO tune
