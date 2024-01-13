@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.ControlType;
@@ -17,6 +20,7 @@ import frc.robot.Constants;
 public class Shooter extends SubsystemBase {
     private CANSparkMax armMotor;    
     private SparkPIDController armController;
+    private double armSetpoint;
 
     private CANSparkMax shooterFlywheelMotor;
     private SparkPIDController shooterController;
@@ -64,23 +68,33 @@ public class Shooter extends SubsystemBase {
     
     /* Just sets the target */
     public Command setArmTargetPosition(double position) {
-        return runOnce(() -> armController.setReference(position, ControlType.kPosition));
+        return runOnce(() -> {
+            armSetpoint = position;
+
+            armController.setReference(armSetpoint, ControlType.kPosition); 
+        });
     }
 
     /* Sets the target and wait until it is achieved */
-    public Command moveArmToPosition(double position) { 
+    public Command moveArmToPositionFromArea(DoubleSupplier areaSup) { 
         return new FunctionalCommand(
-        () -> armController.setReference(position, ControlType.kPosition),//Set target position at start
+        /* Sets target the position at the start to an interpolated value from the lookup table */
+        () -> {
+            armSetpoint = Constants.ShooterConstants.armPosLookupTableFromArea.get(areaSup.getAsDouble());
+
+            armController.setReference(armSetpoint, ControlType.kPosition);
+        },
         () -> {},
         (unused) -> {},
         /* We are finished if the arm position is within our tolerance */
-        () -> Math.abs(armMotor.getEncoder().getPosition() - position) < Constants.ShooterConstants.armSetpointTolerance,
+        () -> Math.abs(armMotor.getEncoder().getPosition() - armSetpoint) < Constants.ShooterConstants.armSetpointTolerance,
         this);
     }   
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Shooter Arm Position", armMotor.getEncoder().getPosition());
+        SmartDashboard.putNumber("Shooter Arm Setpoint", armSetpoint);
         SmartDashboard.putNumber("Shooter Flywheel Velocity", shooterFlywheelMotor.getEncoder().getVelocity());
     }
 }

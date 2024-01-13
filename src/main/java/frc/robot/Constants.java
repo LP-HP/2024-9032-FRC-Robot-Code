@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI;
@@ -47,6 +48,12 @@ public final class Constants {
         public static final double kPArm = 0;
         public static final double kDArm = 0;
         public static final double armSetpointTolerance = 0.5;
+        /* Key - Target Area : Value - Arm Position */
+        public static final InterpolatingDoubleTreeMap armPosLookupTableFromArea = new InterpolatingDoubleTreeMap();
+        static {
+            armPosLookupTableFromArea.put(0.0, 3.0);
+            armPosLookupTableFromArea.put(1.0, 4.0);
+        }
 
         /* Arm and Flywheel Motor  */
         public static final int motorCurrentLimit = 80;
@@ -116,9 +123,9 @@ public final class Constants {
         public static final double angleConversionFactor = 360.0 / angleGearRatio;
 
         /* Swerve Profiling Values */
-        /** Meters per Second */
+        /* Meters per Second */
         public static final double maxSpeed = 4.5; //TODO: This must be tuned to specific robot - needed for teleop
-        /** Radians per Second */
+        /* Radians per Second */
         public static final double maxAngularVelocity = 10.0; //TODO: This must be tuned to specific robot - needed for teleop
 
         /* Neutral Modes */

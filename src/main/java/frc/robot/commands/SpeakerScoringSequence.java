@@ -10,8 +10,8 @@ public class SpeakerScoringSequence extends SequentialCommandGroup {
     public SpeakerScoringSequence(Swerve swerve, LimelightVision limelight, Shooter shooter) {
         addCommands(
             new AlignWithRotationTarget(swerve, () -> limelight.getAprilTagTarget().xOffset),
-            shooter.moveArmToPosition(3),//TODO lerp lookup table
-            shooter.setShooterVelocity(3),
+            shooter.moveArmToPositionFromArea(() -> limelight.getAprilTagTarget().area),
+            shooter.setShooterVelocity(3),//TODO do lookup table if needed
             Commands.waitSeconds(0.25),
             shooter.disableShooterFlywheel()
         );
