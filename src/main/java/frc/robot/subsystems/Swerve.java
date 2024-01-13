@@ -64,8 +64,8 @@ public class Swerve extends SubsystemBase {
                 this::getSpeeds, 
                 this::driveAuto,
                 new HolonomicPathFollowerConfig(
-                    new PIDConstants(Constants.AutoConstants.kPTranslation, 0, Constants.AutoConstants.kDTranslation),
-                    new PIDConstants(Constants.AutoConstants.kPRotation, 0, Constants.AutoConstants.kDRotation), 
+                    new PIDConstants(Constants.ClosedLoopConstants.kPTranslation, 0, Constants.ClosedLoopConstants.kDTranslation),
+                    new PIDConstants(Constants.ClosedLoopConstants.kPRotation, 0, Constants.ClosedLoopConstants.kDRotation), 
                     Constants.SwerveConstants.maxSpeed, 
                     Constants.SwerveConstants.driveRadius,
                     new ReplanningConfig()), 

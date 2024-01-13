@@ -21,20 +21,12 @@ public class TestAuto extends SequentialCommandGroup {
         Command second = AutoBuilder.followPath(paths.get(1));
         
         addCommands(
-            new InstantCommand(() -> init(swerve, limelight), swerve, limelight),
+            /* Reset starting pose to limelight pose */
+            new InstantCommand(() -> swerve.resetOdometry(limelight.getPoseEstimate().get().pose), swerve, limelight),
             first,
             Commands.waitSeconds(1),
             second
         );
 
-        //When we switch to teleop make sure we switch pipelines
-        finallyDo(() -> limelight.switchToTargetPipeline());
-    }
-//FIXME does this allow enough time for the pose to be gotten before reset and teleop will not be in target pipeline unless the auto runs...
-    private void init(Swerve swerve, LimelightVision limelight) {
-        limelight.switchToLocalizationPipeline();
-
-        //Reset starting pose to limelight pose
-        swerve.resetOdometry(limelight.getPoseEstimate().get().pose);
     }
 }

@@ -26,6 +26,8 @@ public class RobotContainer {
     /* Driver Buttons */
     private final Trigger zeroGyroButton = driveController.a().debounce(0.1);
     private final Trigger fieldCentricButton = driveController.x().debounce(0.1);
+    private final Trigger speakerScoreButton = driveController.y().debounce(0.1);
+    private final Trigger enableIntakeButton = driveController.b().debounce(0.1);
 
     /* Subsystems */
     private final LimelightVision limelight = new LimelightVision(Constants.VisionConstants.limelightName, true);
@@ -52,7 +54,18 @@ public class RobotContainer {
 
         autoChooser.addOption("Test Auto 1 ring", new TestAuto(swerve, limelight));
         autoChooser.addOption("Test Auto 2 rings", new TestAuto(swerve, limelight));
+        autoChooser.addOption("Align with april tag test", new AlignWithRotationTarget(swerve, () -> limelight.getAprilTagTarget().xOffset));
         SmartDashboard.putData("Choose an Auto:", autoChooser);//Let us choose autos through the dashboard
+    }
+
+    /* Only reset variables - don't run any commands here */
+    public void autonomousInit() {
+        limelight.switchToLocalizationPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
+    }
+
+    /* Only reset variables - don't run any commands here */
+    public void teleopInit() {
+        limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
     }
 
     private boolean isFieldCentric() {
@@ -67,17 +80,24 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         /* 
-         * Current controls:
+         * Current controls: 
          * 
-         * left stick controls strafing
-         * right stick controls 
+         * left stick x and y - controls strafing
+         * right stick x - controls rotation 
          * 
          * a -> zero gyro
          * x -> toggle field centric
+         * y [must have a valid target] -> run speaker scoring sequence (align with tag, move shooter arm, shoot)
+         * b -> enable intake
          * 
         */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
         fieldCentricButton.onTrue(new InstantCommand(() -> isFieldCentric = !isFieldCentric));//Toggle field centric
+        speakerScoreButton.onTrue(
+            new SpeakerScoringSequence(swerve, limelight, shooter)
+            .onlyIf(() -> limelight.getAprilTagTarget().isValid)//Only run if there is a valid target
+        );
+        enableIntakeButton.onTrue(intake.enableIntake());
     }
 
     /**

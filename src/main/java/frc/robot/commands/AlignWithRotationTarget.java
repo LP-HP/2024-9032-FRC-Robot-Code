@@ -1,30 +1,32 @@
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.VisionConstants;
+import frc.robot.Constants.ClosedLoopConstants;
 import frc.robot.subsystems.Swerve;
 
 public class AlignWithRotationTarget extends Command {
     private Swerve swerve;
 
     private PIDController swerveRotController;
-    private double targetRot;
+    private DoubleSupplier targetRotSup;
 
-    public AlignWithRotationTarget(Swerve swerve, double targetRot) {
+    public AlignWithRotationTarget(Swerve swerve, DoubleSupplier targetRotSup) {
         this.swerve = swerve;       
-        this.targetRot = targetRot;
+        this.targetRotSup = targetRotSup;
 
-        swerveRotController = new PIDController(VisionConstants.kPRotation, 0, VisionConstants.kDRotation);
+        swerveRotController = new PIDController(ClosedLoopConstants.kPRotationTarget, 0, ClosedLoopConstants.kDRotationTarget);
 
         addRequirements(swerve);
     }
 
     @Override
     public void initialize() {
-        swerveRotController.setSetpoint(targetRot);
+        swerveRotController.setSetpoint(targetRotSup.getAsDouble());
     }
 
     @Override

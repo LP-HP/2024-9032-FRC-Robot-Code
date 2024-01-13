@@ -21,9 +21,6 @@ public final class Constants {
         public static final String limelightName = "9032Limelight";//TODO set name
         public static final int targetPipelineID = 1;
         public static final int localizationPipelineID = 0;//TODO make sure this aligns with the limelight config
-
-        public static final double kPRotation = 0;//TODO tune and test
-        public static final double kDRotation = 0;
     }
 
     public static final class IntakeConstants {//TODO tune
@@ -170,12 +167,16 @@ public final class Constants {
         }
     }
 
-    public static final class AutoConstants { 
-        /* PID Constants for path following */
+    public static final class ClosedLoopConstants { 
+        /* PID Constants for Path Following */
         public static final double kPTranslation = 1; // TODO: TUNE for auto pathplanner
         public static final double kDTranslation = 0;
 
         public static final double kPRotation = 1;
         public static final double kDRotation = 0;
+
+         /* PID Constants for Rotation to a Target */
+        public static final double kPRotationTarget = 1;//TODO tune and test
+        public static final double kDRotationTarget = 0;
     }
 }
