@@ -49,6 +49,7 @@ public final class Constants {
         public static final int armMotorID = 15;
         public static final double kPArm = 0;
         public static final double kDArm = 0;
+        public static final double armSetpointTolerance = 0.5;
 
         /* Arm and Flywheel Motor  */
         public static final int motorCurrentLimit = 80;

@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.swerveutil.CANSparkMaxUtil;
 import frc.lib.swerveutil.CANSparkMaxUtil.Usage;
@@ -60,10 +61,22 @@ public class Shooter extends SubsystemBase {
     public Command disableShooterFlywheel() {
         return runOnce(() -> shooterController.setReference(0, ControlType.kVelocity));
     }
-
-    public Command setArmPosition(double position) {
+    
+    /* Just sets the target */
+    public Command setArmTargetPosition(double position) {
         return runOnce(() -> armController.setReference(position, ControlType.kPosition));
     }
+
+    /* Sets the target and wait until it is achieved */
+    public Command moveArmToPosition(double position) { 
+        return new FunctionalCommand(
+        () -> armController.setReference(position, ControlType.kPosition),//Set target position at start
+        () -> {},
+        (unused) -> {},
+        /* We are finished if the arm position is within our tolerance */
+        () -> Math.abs(armMotor.getEncoder().getPosition() - position) < Constants.ShooterConstants.armSetpointTolerance,
+        this);
+    }   
 
     @Override
     public void periodic() {
