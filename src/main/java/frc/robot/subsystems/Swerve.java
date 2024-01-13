@@ -1,11 +1,13 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
-
+import frc.robot.subsystems.LimelightVision.VisionPoseMeasurement;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -14,30 +16,35 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
-    private SwerveDriveOdometry swerveOdometry;
+    private SwerveDrivePoseEstimator swerveOdometry;
     private SwerveModule[] swerveMods;
     private AHRS gyro;
 
     private final Field2d field = new Field2d();
 
-    public Swerve() {
-        gyro = new AHRS(Constants.Swerve.gyroPort);//Automatically calibrates
+    private Supplier<Optional<VisionPoseMeasurement>> visionSup;
+
+    public Swerve(Supplier<Optional<VisionPoseMeasurement>> optionalVisionSupplier) {
+        gyro = new AHRS(Constants.SwerveConstants.gyroPort);//Automatically calibrates
 
         swerveMods = new SwerveModule[] {
-            new SwerveModule(0, Constants.Swerve.Mod0.constants),
-            new SwerveModule(1, Constants.Swerve.Mod1.constants),
-            new SwerveModule(2, Constants.Swerve.Mod2.constants),
-            new SwerveModule(3, Constants.Swerve.Mod3.constants)
+            new SwerveModule(0, Constants.SwerveConstants.Mod0.constants),
+            new SwerveModule(1, Constants.SwerveConstants.Mod1.constants),
+            new SwerveModule(2, Constants.SwerveConstants.Mod2.constants),
+            new SwerveModule(3, Constants.SwerveConstants.Mod3.constants)
         };
 
         /* The 1 second wait before setting absolute positions avoids a bug with initializing the motors
@@ -48,19 +55,22 @@ public class Swerve extends SubsystemBase {
 
         zeroGyro();
 
-        swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getGyroYaw(), getModulePositions());
+        swerveOdometry = new SwerveDrivePoseEstimator(Constants.SwerveConstants.swerveKinematics, getGyroYaw(), getModulePositions(), new Pose2d());
 
-        AutoBuilder.configureHolonomic(//TODO check pathplannerlib
+        //Sets up pathplanner for auto path following
+        AutoBuilder.configureHolonomic(
                 this::getPose,
                 this::resetOdometry,
                 this::getSpeeds, 
                 this::driveAuto,
                 new HolonomicPathFollowerConfig(
-                    new PIDConstants(Constants.AutoConstants.kPTranslation, 0, Constants.AutoConstants.kDTranslation),
-                    new PIDConstants(Constants.AutoConstants.kPRotation, 0, Constants.AutoConstants.kDRotation), 
-                    Constants.Swerve.maxSpeed, 
-                    Constants.Swerve.driveRadius,
+                    new PIDConstants(Constants.ClosedLoopConstants.kPTranslation, 0, Constants.ClosedLoopConstants.kDTranslation),
+                    new PIDConstants(Constants.ClosedLoopConstants.kPRotation, 0, Constants.ClosedLoopConstants.kDRotation), 
+                    Constants.SwerveConstants.maxSpeed, 
+                    Constants.SwerveConstants.driveRadius,
                     new ReplanningConfig()), 
+                /* Supplier for if the path should be mirrored for the red alliance - will always use blue for origin */
+                () -> DriverStation.getAlliance().orElseGet(() -> DriverStation.Alliance.Blue) == DriverStation.Alliance.Red,
                 this);
 
         SmartDashboard.putData("Field", field);//Show field view
@@ -74,12 +84,14 @@ public class Swerve extends SubsystemBase {
         PathPlannerLogging.setLogActivePathCallback((poses) -> {
             field.getObject("path").setPoses(poses);
         });
+
+        visionSup = optionalVisionSupplier;
     }
 
     public void driveAuto(ChassisSpeeds speeds) {
-        SwerveModuleState[] desiredStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(speeds);
+        SwerveModuleState[] desiredStates = Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(speeds);
 
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed);
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.SwerveConstants.maxSpeed);
 
         for(SwerveModule mod : swerveMods){
             mod.setDesiredState(desiredStates[mod.getNumber()], false);
@@ -92,7 +104,7 @@ public class Swerve extends SubsystemBase {
 
     public void driveOpenLoop(Translation2d translation, double rotation, boolean fieldCentric) {
         SwerveModuleState[] desiredStates =
-            Constants.Swerve.swerveKinematics.toSwerveModuleStates(
+            Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(
                 fieldCentric ? ChassisSpeeds.fromFieldRelativeSpeeds(//For field relative driving
                                     translation.getX(), 
                                     translation.getY(), 
@@ -105,7 +117,7 @@ public class Swerve extends SubsystemBase {
                                     rotation)
                                 );
 
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed);
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.SwerveConstants.maxSpeed);
 
         for(SwerveModule mod : swerveMods) {
             mod.setDesiredState(desiredStates[mod.getNumber()], true);
@@ -113,7 +125,7 @@ public class Swerve extends SubsystemBase {
     }     
 
     public Pose2d getPose() {
-        return swerveOdometry.getPoseMeters();
+        return swerveOdometry.getEstimatedPosition();
     }
 
     public void resetOdometry(Pose2d pose) {
@@ -139,7 +151,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public ChassisSpeeds getSpeeds() {
-        return Constants.Swerve.swerveKinematics.toChassisSpeeds(getModuleStates());
+        return Constants.SwerveConstants.swerveKinematics.toChassisSpeeds(getModuleStates());
     }
 
     public void zeroGyro() {
@@ -147,7 +159,7 @@ public class Swerve extends SubsystemBase {
     }
 
     private Rotation2d getGyroYaw() {
-        return (Constants.Swerve.invertGyro) ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
+        return (Constants.SwerveConstants.invertGyro) ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
     }
 
     public void resetModulesToAbsolute() {
@@ -156,9 +168,28 @@ public class Swerve extends SubsystemBase {
         }
     }
 
+    private void updateVisionLocalization(Pose2d visionPose, double time) {
+        Transform2d poseDifference = visionPose.minus(swerveOdometry.getEstimatedPosition());
+
+        /* Only add the vision update if it is within the tolerance - prevents vision noise */
+        if(Math.abs(poseDifference.getX()) < Constants.VisionConstants.visionPoseTolerance
+        && Math.abs(poseDifference.getY()) < Constants.VisionConstants.visionPoseTolerance) {
+             swerveOdometry.addVisionMeasurement(visionPose, time);
+        } 
+
+        else
+            System.out.println("Discarded vision measurement " + visionPose);
+    }
+
     @Override
     public void periodic() {//TODO change dashboard
         swerveOdometry.update(getGyroYaw(), getModulePositions());  
+
+        if(!visionSup.get().isEmpty()) {//Only update vision if an update is provided
+            VisionPoseMeasurement measurement = visionSup.get().get();
+
+            updateVisionLocalization(measurement.pose, measurement.measurementTime);
+        }
 
         for(SwerveModule mod : swerveMods) {//Send swerve module telemetry
             int modNum = mod.getNumber();
@@ -168,7 +199,7 @@ public class Swerve extends SubsystemBase {
             SmartDashboard.putNumber("Mod " + modNum + " Velocity", mod.getState().speedMetersPerSecond);    
         }
         
-        Pose2d currentPose = swerveOdometry.getPoseMeters();
+        Pose2d currentPose = swerveOdometry.getEstimatedPosition();
 
         SmartDashboard.putNumber("Pose X", currentPose.getX());//Send odometry telemetry
         SmartDashboard.putNumber("Pose Y", currentPose.getY());

@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI;
@@ -15,7 +16,56 @@ public final class Constants {
 
     public static final int driveControllerPort = 0;
 
-    public static final class Swerve {
+    public static final class VisionConstants {
+        public static final double visionPoseTolerance = 1;//TODO tune for localization (in meters)
+
+        public static final String limelightName = "9032Limelight";//TODO set name
+        public static final int targetPipelineID = 1;
+        public static final int localizationPipelineID = 0;//TODO make sure this aligns with the limelight config
+    }
+
+    public static final class IntakeConstants {//TODO tune
+        /* Intake Arm */
+        public static final int armMotorID = 13;
+        public static final double armPositionGround = 0;
+        public static final double kPArm = 0;
+        public static final double kDArm = 0;
+
+        /* Arm and Flywheel Motor  */
+        public static final int motorCurrentLimit = 80;
+        public static final int motorVoltageComp = 12;
+
+        /* Intake Flywheel */
+        public static final int intakeFlywheelMotorID = 14;
+        public static final double intakeVelocity = 1;
+        public static final double kPIntake = 0;
+        public static final double kDIntake = 0;
+    }
+
+     public static final class ShooterConstants {//TODO tune
+        /* Shooter Arm */
+        public static final int armMotorID = 15;
+        public static final double kPArm = 0;
+        public static final double kDArm = 0;
+        public static final double armSetpointTolerance = 0.5;
+        /* Key - Target Area : Value - Arm Position */
+        public static final InterpolatingDoubleTreeMap armPosLookupTableFromArea = new InterpolatingDoubleTreeMap();
+        static {
+            armPosLookupTableFromArea.put(0.0, 3.0);
+            armPosLookupTableFromArea.put(1.0, 4.0);
+        }
+
+        /* Arm and Flywheel Motor  */
+        public static final int motorCurrentLimit = 80;
+        public static final int motorVoltageComp = 12;
+
+        /* Shooter Flywheel */
+        public static final int shooterFlywheelMotorID = 16;
+        public static final double kPShooter = 0;
+        public static final double kDShooter = 0;
+    }
+
+    public static final class SwerveConstants {
         public static final boolean invertGyro = false; //TODO ensure Gyro works
         public static final SPI.Port gyroPort = SPI.Port.kMXP;
 
@@ -73,9 +123,9 @@ public final class Constants {
         public static final double angleConversionFactor = 360.0 / angleGearRatio;
 
         /* Swerve Profiling Values */
-        /** Meters per Second */
+        /* Meters per Second */
         public static final double maxSpeed = 4.5; //TODO: This must be tuned to specific robot - needed for teleop
-        /** Radians per Second */
+        /* Radians per Second */
         public static final double maxAngularVelocity = 10.0; //TODO: This must be tuned to specific robot - needed for teleop
 
         /* Neutral Modes */
@@ -124,12 +174,16 @@ public final class Constants {
         }
     }
 
-    public static final class AutoConstants { 
-        /* PID Constants for path following */
+    public static final class ClosedLoopConstants { 
+        /* PID Constants for Path Following */
         public static final double kPTranslation = 1; // TODO: TUNE for auto pathplanner
         public static final double kDTranslation = 0;
 
         public static final double kPRotation = 1;
         public static final double kDRotation = 0;
+
+         /* PID Constants for Rotation to a Target */
+        public static final double kPRotationTarget = 1;//TODO tune and test
+        public static final double kDRotationTarget = 0;
     }
 }
