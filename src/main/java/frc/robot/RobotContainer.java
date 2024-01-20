@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,6 +19,7 @@ import frc.robot.subsystems.*;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+    /* Auto Chooser */
     private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     /* Controllers */
@@ -40,15 +43,19 @@ public class RobotContainer {
     private boolean isFieldCentric = false;
   
     public RobotContainer() {
-        swerve.setDefaultCommand(//Will run when there is no command set, such as during teleop
+        //Will run the following command when there is no other command set, such as during teleop
+        swerve.setDefaultCommand(
             new TeleopSwerve(
                 swerve, 
-                () -> -driveController.getLeftY(),//The y axis is inverted by default on the xbox controller
+                () -> -driveController.getLeftY(),//The y axis is inverted by default on the xbox controller, so uninvert it
                 driveController::getLeftX,
                 driveController::getRightX,
                 this::isFieldCentric
             )
         );
+
+        //Tell pathplanner which commands to associate with named commands in the gui
+        registerPathplannerCommands();
 
         //Configure the button bindings
         configureButtonBindings();
@@ -56,8 +63,10 @@ public class RobotContainer {
         //Configure the subsystem triggers
         configureSubsystemTriggers();
 
-        autoChooser.addOption("Test Auto 1 ring", new TestAuto(swerve, limelight));
-        autoChooser.addOption("Test Auto 2 rings", new TestAuto(swerve, limelight));
+        autoChooser.addOption("Path Test Auto No Vision", new TestAutoNoVision(swerve));
+        autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
+        autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
+        autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
         autoChooser.addOption("Align with april tag test", new AlignWithRotationTarget(swerve, () -> limelight.getAprilTagTarget().xOffset));
         SmartDashboard.putData("Choose an Auto:", autoChooser);//Let us choose autos through the dashboard
     }
@@ -76,6 +85,12 @@ public class RobotContainer {
         return isFieldCentric;
     }
 
+    private void registerPathplannerCommands() {
+        NamedCommands.registerCommand("IntakeToGround", intake.setToGroundPosition());
+        NamedCommands.registerCommand("EnableIntake", intake.enableIntake());
+        NamedCommands.registerCommand("ShooterArmNote1", shooter.setArmTargetPosition(4));//TODO have a constant
+    }
+
     private void configureButtonBindings() {
         /* 
          * Current controls: 
@@ -90,12 +105,15 @@ public class RobotContainer {
          * 
         */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
+
         fieldCentricButton.onTrue(new InstantCommand(() -> isFieldCentric = !isFieldCentric));//Toggle field centric
+
         speakerScoreButton.onTrue(
             new SpeakerScoringSequence(swerve, limelight, shooter)
             /* Only run if there is a valid target and it's a speaker tag */
             .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag())
         );
+
         enableIntakeButton.onTrue(
             intake.setToGroundPosition()
             .andThen(intake.enableIntake())

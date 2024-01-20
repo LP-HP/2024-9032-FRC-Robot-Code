@@ -11,6 +11,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.swerveutil.CANSparkMaxUtil;
@@ -60,6 +61,12 @@ public class Shooter extends SubsystemBase {
 
     public Command setShooterVelocity(double velocity) {
         return runOnce(() -> shooterController.setReference(velocity, ControlType.kVelocity));
+    }
+
+    public Command setShooterVelocityThenWaitThenDisable(double velocity, double waitTime) {
+        return setShooterVelocity(velocity)
+           .andThen(Commands.waitSeconds(waitTime))
+           .andThen(disableShooterFlywheel());
     }
 
     public Command disableShooterFlywheel() {
