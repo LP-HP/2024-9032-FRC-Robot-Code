@@ -53,8 +53,6 @@ public class Swerve extends SubsystemBase {
         Timer.delay(1.0);
         resetModulesToAbsolute();//Set integrated encoders to the absolute positions using cancoders
 
-        zeroGyro();
-
         swerveOdometry = new SwerveDrivePoseEstimator(Constants.SwerveConstants.swerveKinematics, getGyroYaw(), getModulePositions(), new Pose2d());
 
         //Sets up pathplanner for auto path following
@@ -118,6 +116,8 @@ public class Swerve extends SubsystemBase {
                                 );
 
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.SwerveConstants.maxSpeed);
+
+        SmartDashboard.putBoolean("Field Centric", fieldCentric);
 
         for(SwerveModule mod : swerveMods) {
             mod.setDesiredState(desiredStates[mod.getNumber()], true);

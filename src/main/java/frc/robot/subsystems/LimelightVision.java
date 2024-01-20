@@ -51,6 +51,7 @@ public class LimelightVision extends SubsystemBase {
             currentTarget.yOffset = LimelightHelpers.getTY(name);
             currentTarget.area = LimelightHelpers.getTA(name);
             currentTarget.isValid = LimelightHelpers.getTV(name);
+            currentTarget.id = LimelightHelpers.getFiducialID(name);
 
             SmartDashboard.putNumber("Target X", currentTarget.xOffset);//TODO update dashboard
             SmartDashboard.putNumber("Target Y", currentTarget.yOffset);
@@ -96,8 +97,17 @@ public class LimelightVision extends SubsystemBase {
     public static final class AprilTagTarget {
         public double xOffset = 0;
         public double yOffset = 0;
+        public double id;
         public double area = 0;
         public boolean isValid = false;
+
+        public boolean isSpeakerTag() {
+            return id == 4 || id == 7;
+        }
+
+        public boolean isAmpTag() {
+            return id == 6 || id == 5;
+        }
     }
 
     public static final class VisionPoseMeasurement {

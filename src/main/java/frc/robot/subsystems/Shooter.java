@@ -66,6 +66,10 @@ public class Shooter extends SubsystemBase {
         return runOnce(() -> shooterController.setReference(0, ControlType.kVelocity));
     }
     
+    public Command setToPassthroughPosition() {
+        return runOnce(() -> armController.setReference(Constants.ShooterConstants.armPositionPassthrough, ControlType.kPosition)); 
+    }
+
     /* Just sets the target */
     public Command setArmTargetPosition(double position) {
         return runOnce(() -> {
@@ -78,7 +82,7 @@ public class Shooter extends SubsystemBase {
     /* Sets the target and wait until it is achieved */
     public Command moveArmToPositionFromArea(DoubleSupplier areaSup) { 
         return new FunctionalCommand(
-        /* Sets target the position at the start to an interpolated value from the lookup table */
+        /* Sets the target position at the start to an interpolated value from the lookup table */
         () -> {
             armSetpoint = Constants.ShooterConstants.armPosLookupTableFromArea.get(areaSup.getAsDouble());
 

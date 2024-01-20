@@ -13,7 +13,8 @@ public class SpeakerScoringSequence extends SequentialCommandGroup {
             shooter.moveArmToPositionFromArea(() -> limelight.getAprilTagTarget().area),
             shooter.setShooterVelocity(3),//TODO do lookup table if needed
             Commands.waitSeconds(0.25),
-            shooter.disableShooterFlywheel()
+            shooter.disableShooterFlywheel(),
+            shooter.setToPassthroughPosition()
         );
     }
 }
