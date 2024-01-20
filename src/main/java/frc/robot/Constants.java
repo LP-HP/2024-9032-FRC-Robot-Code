@@ -29,6 +29,7 @@ public final class Constants {
         public static final int armMotorID = 13;
         public static final double armPositionGround = 0;
         public static final double armPositionPassthrough = 100;
+        public static final double armPositionAmp = 12;
         /* Controller Constants */
         public static final double armSetpointTolerance = 0.5;
         public static final double kPArm = 0;

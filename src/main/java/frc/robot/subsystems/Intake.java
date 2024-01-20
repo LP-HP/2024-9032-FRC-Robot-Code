@@ -66,6 +66,10 @@ public class Intake extends SubsystemBase {
         return runOnce(() -> armController.setReference(Constants.IntakeConstants.armPositionGround, ControlType.kPosition));
     }
 
+    public Command setToAmpPosition() {
+        return runOnce(() -> armController.setReference(Constants.IntakeConstants.armPositionAmp, ControlType.kPosition));
+    }
+
     /* Sets the target and wait until it is achieved */
     public Command moveToPassthroughPosition() {
         return new FunctionalCommand(
