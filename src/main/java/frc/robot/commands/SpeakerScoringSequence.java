@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.LimelightVision;
 import frc.robot.subsystems.Shooter;
@@ -11,9 +10,7 @@ public class SpeakerScoringSequence extends SequentialCommandGroup {
         addCommands(
             new AlignWithRotationTarget(swerve, () -> limelight.getAprilTagTarget().xOffset),
             shooter.moveArmToPositionFromArea(() -> limelight.getAprilTagTarget().area),
-            shooter.setShooterVelocity(3),//TODO do lookup table if needed
-            Commands.waitSeconds(0.25),
-            shooter.disableShooterFlywheel(),
+            shooter.setShooterVelocityThenWaitThenDisable(5, 0.25),//TODO do lookup table if needed
             shooter.setToPassthroughPosition()
         );
     }
