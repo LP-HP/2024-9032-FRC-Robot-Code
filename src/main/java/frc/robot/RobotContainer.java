@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,20 +23,22 @@ public class RobotContainer {
     private final CommandXboxController driveController = new CommandXboxController(Constants.driveControllerPort);//TODO remap controls
 
     /* Driver Buttons */
-    private final Trigger zeroGyroButton = driveController.a().debounce(0.1);
-    private final Trigger fieldCentricButton = driveController.x().debounce(0.1);
-    private final Trigger speakerScoreButton = driveController.y().debounce(0.1);
-    private final Trigger enableIntakeButton = driveController.b().debounce(0.1);
+    private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
+    private final Trigger fieldCentricButton = driveController.x().debounce(0.025);
+    private final Trigger speakerScoreButton = driveController.y().debounce(0.025);
+    private final Trigger enableIntakeButton = driveController.b().debounce(0.025);
 
     /* Subsystems */
     private final LimelightVision limelight = new LimelightVision(Constants.VisionConstants.limelightName, true);
-    private final Swerve swerve = new Swerve(() -> limelight.getPoseEstimate());
+    private final Swerve swerve = new Swerve(limelight::getPoseEstimate);
     private final Intake intake = new Intake();
     private final Shooter shooter = new Shooter();
 
-    private boolean isFieldCentric = false;
+    /* Subsystem Triggers */
+    private final Trigger intakeBeamBreakTrigger = new Trigger(intake::isBeamBreakTriggered);
 
-    /** The container for the robot. Contains subsystems, OI devices, and commands. */
+    private boolean isFieldCentric = false;
+  
     public RobotContainer() {
         swerve.setDefaultCommand(//Will run when there is no command set, such as during teleop
             new TeleopSwerve(
@@ -51,6 +52,9 @@ public class RobotContainer {
 
         //Configure the button bindings
         configureButtonBindings();
+
+        //Configure the subsystem triggers
+        configureSubsystemTriggers();
 
         autoChooser.addOption("Test Auto 1 ring", new TestAuto(swerve, limelight));
         autoChooser.addOption("Test Auto 2 rings", new TestAuto(swerve, limelight));
@@ -72,12 +76,6 @@ public class RobotContainer {
         return isFieldCentric;
     }
 
-    /**
-     * Use this method to define your button->command mappings. Buttons can be created by
-     * instantiating a {@link GenericHID} or one of its subclasses ({@link
-     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-     * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-     */
     private void configureButtonBindings() {
         /* 
          * Current controls: 
@@ -87,24 +85,37 @@ public class RobotContainer {
          * 
          * a -> zero gyro
          * x -> toggle field centric
-         * y [must have a valid target] -> run speaker scoring sequence (align with tag, move shooter arm, shoot)
-         * b -> enable intake
+         * y [must have a valid speaker target] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
+         * b -> set intake to ground position and enable intake at the same time
          * 
         */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
         fieldCentricButton.onTrue(new InstantCommand(() -> isFieldCentric = !isFieldCentric));//Toggle field centric
         speakerScoreButton.onTrue(
             new SpeakerScoringSequence(swerve, limelight, shooter)
-            .onlyIf(() -> limelight.getAprilTagTarget().isValid)//Only run if there is a valid target
+            /* Only run if there is a valid target and it's a speaker tag */
+            .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag())
         );
-        enableIntakeButton.onTrue(intake.enableIntake());
+        enableIntakeButton.onTrue(
+            intake.setToGroundPosition()
+            .andThen(intake.enableIntake())
+        );
     }
 
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
+    private void configureSubsystemTriggers() {
+        /* 
+         * Current triggers:
+         * 
+         * intake beam break -> disable intake and move to passthrough position
+         * 
+         */
+        intakeBeamBreakTrigger.onTrue(
+            intake.disableIntake()
+            .andThen(intake.moveToPassthroughPosition())//TODO next this should run something that passes the ring into the shooter and then stops when the next beam break is triggered
+        );
+    }
+
+    /* Only return the auto command here */
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
     }

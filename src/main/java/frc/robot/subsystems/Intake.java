@@ -6,8 +6,10 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.swerveutil.CANSparkMaxUtil;
 import frc.lib.swerveutil.CANSparkMaxUtil.Usage;
@@ -19,6 +21,8 @@ public class Intake extends SubsystemBase {
 
     private CANSparkMax intakeFlywheelMotor;
     private SparkPIDController intakeController;
+
+    private final DigitalInput beamBreak = new DigitalInput(Constants.IntakeConstants.beamBreakPort);
 
     public Intake() {
         armMotor = new CANSparkMax(Constants.IntakeConstants.armMotorID, MotorType.kBrushless);
@@ -53,9 +57,28 @@ public class Intake extends SubsystemBase {
         intakeFlywheelMotor.burnFlash();
     }
 
-    public Command moveToGroundPosition() {
+    public boolean isBeamBreakTriggered() {
+        return !beamBreak.get();//TODO true or false?
+    }
+
+    /* Just sets the target */
+    public Command setToGroundPosition() {
         return runOnce(() -> armController.setReference(Constants.IntakeConstants.armPositionGround, ControlType.kPosition));
     }
+
+    /* Sets the target and wait until it is achieved */
+    public Command moveToPassthroughPosition() {
+        return new FunctionalCommand(
+        /* Sets the target position at the start */
+        () -> armController.setReference(Constants.IntakeConstants.armPositionPassthrough, ControlType.kPosition),
+        () -> {},
+        (unused) -> {},
+         /* We are finished if the arm position is within our tolerance */
+        () -> 
+            Math.abs(armMotor.getEncoder().getPosition() - Constants.IntakeConstants.armPositionPassthrough) 
+            < Constants.IntakeConstants.armSetpointTolerance,
+        this);
+    } 
 
     public Command enableIntake() {
         return runOnce(() -> intakeController.setReference(Constants.IntakeConstants.intakeVelocity, ControlType.kVelocity));
