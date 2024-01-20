@@ -17,7 +17,9 @@ import frc.robot.subsystems.*;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+    /* Auto Chooser and Number of Notes Chooser */
     private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+    private final SendableChooser<Integer> noteAmtChooter = new SendableChooser<>();
 
     /* Controllers */
     private final CommandXboxController driveController = new CommandXboxController(Constants.driveControllerPort);//TODO remap controls
@@ -56,8 +58,12 @@ public class RobotContainer {
         //Configure the subsystem triggers
         configureSubsystemTriggers();
 
-        autoChooser.addOption("Test Auto 1 ring", new TestAuto(swerve, limelight));
-        autoChooser.addOption("Test Auto 2 rings", new TestAuto(swerve, limelight));
+        noteAmtChooter.addOption("1 Note", 1);
+        noteAmtChooter.addOption("2 Notes", 2);
+        SmartDashboard.putData("# of Notes:", noteAmtChooter);
+
+        autoChooser.addOption("Path Test Auto No Vision", new TestAutoNoVision(swerve));
+        autoChooser.addOption("Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, noteAmtChooter::getSelected));
         autoChooser.addOption("Align with april tag test", new AlignWithRotationTarget(swerve, () -> limelight.getAprilTagTarget().xOffset));
         SmartDashboard.putData("Choose an Auto:", autoChooser);//Let us choose autos through the dashboard
     }
