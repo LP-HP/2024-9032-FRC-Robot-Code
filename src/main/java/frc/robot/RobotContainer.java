@@ -19,8 +19,6 @@ import frc.robot.subsystems.*;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    /* Controllers */
-    private final Joystick driver = new Joystick(0);//TODO remap controls
     /* Auto Chooser */
     private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
