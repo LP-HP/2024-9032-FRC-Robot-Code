@@ -1,0 +1,73 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.5679475491967626,
+        "y": 7.068574707220673
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.3479282065452507,
+        "y": 6.971077125052112
+      },
+      "isLocked": true,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.137658622110595,
+        "y": 6.493338972426163
+      },
+      "prevControl": {
+        "x": 1.2796798990272582,
+        "y": 6.610336071028437
+      },
+      "nextControl": null,
+      "isLocked": true,
+      "linkedName": "Path 1 end"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "Move Shooter Arm and Lower Intake",
+      "waypointRelativePos": 0.35,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ShooterArmNote1"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeToGround"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 33.690067525979885,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": null,
+  "useDefaultConstraints": false
+}

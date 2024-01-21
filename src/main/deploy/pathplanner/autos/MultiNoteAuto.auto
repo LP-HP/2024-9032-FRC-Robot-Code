@@ -1,0 +1,25 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1rst shoot alignment"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2nd note alignment"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
