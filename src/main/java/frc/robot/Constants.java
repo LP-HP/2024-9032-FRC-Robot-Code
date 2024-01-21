@@ -57,11 +57,11 @@ public final class Constants {
         public static final double kPArm = 0;
         public static final double kDArm = 0;
         public static final double armSetpointTolerance = 0.5;
-        /* Key - Target Area : Value - Arm Position */
-        public static final InterpolatingDoubleTreeMap armPosLookupTableFromArea = new InterpolatingDoubleTreeMap();
+        /* Key - Target Y Offset : Value - Arm Position */
+        public static final InterpolatingDoubleTreeMap armPosLookupTableFromTargetY = new InterpolatingDoubleTreeMap();
         static {
-            armPosLookupTableFromArea.put(0.0, 3.0);
-            armPosLookupTableFromArea.put(1.0, 4.0);
+            armPosLookupTableFromTargetY.put(0.0, 3.0);
+            armPosLookupTableFromTargetY.put(1.0, 4.0);
         }
 
         /* Arm and Flywheel Motor  */
