@@ -17,7 +17,7 @@ public final class Constants {
     public static final int driveControllerPort = 0;
 
     public static final class VisionConstants {
-        public static final double visionPoseTolerance = 1;//TODO tune for localization (in meters)
+        public static final double visionPoseTolerance = 1.0;//TODO tune for localization (in meters)
 
         public static final String limelightName = "9032Limelight";//TODO set name
         public static final int targetPipelineID = 1;
@@ -27,13 +27,13 @@ public final class Constants {
     public static final class IntakeConstants {//TODO tune
         /* Intake Arm */
         public static final int armMotorID = 13;
-        public static final double armPositionGround = 0;
-        public static final double armPositionPassthrough = 100;
-        public static final double armPositionAmp = 12;
+        public static final double armPositionGround = 0.0;
+        public static final double armPositionPassthrough = 100.0;
+        public static final double armPositionAmp = 12.0;
         /* Controller Constants */
         public static final double armSetpointTolerance = 0.5;
-        public static final double kPArm = 0;
-        public static final double kDArm = 0;
+        public static final double kPArm = 0.0;
+        public static final double kDArm = 0.0;
 
         /* Arm and Flywheel Motor  */
         public static final int motorCurrentLimit = 80;
@@ -41,9 +41,9 @@ public final class Constants {
 
         /* Intake Flywheel */
         public static final int intakeFlywheelMotorID = 14;
-        public static final double intakeVelocity = 1;
-        public static final double kPIntake = 0;
-        public static final double kDIntake = 0;
+        public static final double intakeVelocity = 1.0;
+        public static final double kPIntake = 0.0;
+        public static final double kDIntake = 0.0;
 
         /* Sensors */
         public static final int beamBreakPort = 0;
@@ -52,10 +52,10 @@ public final class Constants {
      public static final class ShooterConstants {//TODO tune
         /* Shooter Arm */
         public static final int armMotorID = 15;
-        public static final double armPositionPassthrough = 100;
+        public static final double armPositionPassthrough = 100.0;
         /* Controller Constants */
-        public static final double kPArm = 0;
-        public static final double kDArm = 0;
+        public static final double kPArm = 0.0;
+        public static final double kDArm = 0.0;
         public static final double armSetpointTolerance = 0.5;
         /* Key - Target Y Offset : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap armPosLookupTableFromTargetY = new InterpolatingDoubleTreeMap();
@@ -70,8 +70,8 @@ public final class Constants {
 
         /* Shooter Flywheel */
         public static final int shooterFlywheelMotorID = 16;
-        public static final double kPShooter = 0;
-        public static final double kDShooter = 0;
+        public static final double kPShooter = 0.0;
+        public static final double kDShooter = 0.0;
     }
 
     public static final class SwerveConstants {
@@ -79,8 +79,8 @@ public final class Constants {
         public static final SPI.Port gyroPort = SPI.Port.kMXP;
 
         /* Drivetrain Constants */
-        public static final double trackWidth = Units.inchesToMeters(24); //TODO: This must be tuned to specific robot - needed for teleop
-        public static final double wheelBase = Units.inchesToMeters(24); //TODO: This must be tuned to specific robot - needed for teleop
+        public static final double trackWidth = Units.inchesToMeters(24.5); //TODO: This must be tuned to specific robot - needed for teleop
+        public static final double wheelBase = Units.inchesToMeters(24.5); //TODO: This must be tuned to specific robot - needed for teleop
         public static final double driveRadius = Math.sqrt(
             Math.pow(wheelBase / 2.0, 2.0) + 
             Math.pow(trackWidth / 2.0, 2.0));//TODO Distance from the center of the robot to the furthest module - needed for auto
@@ -102,7 +102,7 @@ public final class Constants {
         public static final boolean driveMotorInvert = false;
 
         /* Angle Encoder Invert */
-        public static final SensorDirectionValue canCoderInvert = SensorDirectionValue.CounterClockwise_Positive;
+        public static final SensorDirectionValue canCoderInvert = SensorDirectionValue.Clockwise_Positive;
 
         /* Swerve Voltage Compensation */
         public static final double voltageComp = 12.0;
@@ -124,9 +124,9 @@ public final class Constants {
         public static final double driveKF = 0.0;
 
         /* Drive Motor Characterization Values */
-        public static final double driveKS = 0; //TODO: This must be tuned to specific robot - needed for auto
-        public static final double driveKV = 0;
-        public static final double driveKA = 0;
+        public static final double driveKS = 0.0; //TODO: This must be tuned to specific robot - needed for auto
+        public static final double driveKV = 0.0;
+        public static final double driveKA = 0.0;
 
         /* Drive Motor Conversion Factors */
         public static final double driveConversionPositionFactor = wheelCircumference / driveGearRatio;
@@ -145,41 +145,41 @@ public final class Constants {
 
         /* Module Specific Constants */
         /* Front Left Module - Module 0 */
-        public static final class Mod0 { //TODO: This must be tuned to specific robot - needed for teleop
-            public static final int driveMotorID = 2;
-            public static final int angleMotorID = 1;
+        public static final class Mod0 { 
+            public static final int driveMotorID = 1;
+            public static final int angleMotorID = 2;
             public static final int canCoderID = 9;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(233.96);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(97.425);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
 
         /* Front Right Module - Module 1 */
-        public static final class Mod1 { //TODO: This must be tuned to specific robot - needed for teleop
+        public static final class Mod1 { 
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
             public static final int canCoderID = 10;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(339.52);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(40.254);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
         
         /* Back Left Module - Module 2 */
-        public static final class Mod2 { //TODO: This must be tuned to specific robot - needed for teleop
+        public static final class Mod2 { 
             public static final int driveMotorID = 5;
             public static final int angleMotorID = 6;
             public static final int canCoderID = 11;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(356.13);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(302.256);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
 
         /* Back Right Module - Module 3 */
-        public static final class Mod3 { //TODO: This must be tuned to specific robot - needed for teleop
+        public static final class Mod3 { 
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 12;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(147.92);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(107.23);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -187,14 +187,14 @@ public final class Constants {
 
     public static final class ClosedLoopConstants { 
         /* PID Constants for Path Following */
-        public static final double kPTranslation = 1; // TODO: TUNE for auto pathplanner
-        public static final double kDTranslation = 0;
+        public static final double kPTranslation = 1.0; // TODO: TUNE for auto pathplanner
+        public static final double kDTranslation = 0.0;
 
-        public static final double kPRotation = 1;
-        public static final double kDRotation = 0;
+        public static final double kPRotation = 1.0;
+        public static final double kDRotation = 0.0;
 
          /* PID Constants for Rotation to a Target */
-        public static final double kPRotationTarget = 1;//TODO tune and test
-        public static final double kDRotationTarget = 0;
+        public static final double kPRotationTarget = 1.0;//TODO tune and test
+        public static final double kDRotationTarget = 0.0;
     }
 }

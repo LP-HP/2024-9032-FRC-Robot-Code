@@ -178,7 +178,7 @@ public class Swerve extends SubsystemBase {
         } 
 
         else
-            System.out.println("Discarded vision measurement " + visionPose);
+            System.err.println("Discarded vision measurement " + visionPose);
     }
 
     @Override
@@ -194,16 +194,16 @@ public class Swerve extends SubsystemBase {
         for(SwerveModule mod : swerveMods) {//Send swerve module telemetry
             int modNum = mod.getNumber();
 
-            SmartDashboard.putNumber("Mod " + modNum + " Cancoder Angle", mod.getCanCoderAngle().getDegrees());
-            SmartDashboard.putNumber("Mod " + modNum + " Integrated Angle", mod.getPosition().angle.getDegrees());
-            SmartDashboard.putNumber("Mod " + modNum + " Velocity", mod.getState().speedMetersPerSecond);    
+            SmartDashboard.putNumber("Swerve Mod " + modNum + " Cancoder Angle", mod.getCanCoderAngle().getDegrees());
+            SmartDashboard.putNumber("Swerve Mod " + modNum + " Integrated Angle", mod.getPosition().angle.getDegrees());
+            SmartDashboard.putNumber("Swerve Mod " + modNum + " Velocity", mod.getState().speedMetersPerSecond);    
         }
         
         Pose2d currentPose = swerveOdometry.getEstimatedPosition();
 
-        SmartDashboard.putNumber("Pose X", currentPose.getX());//Send odometry telemetry
-        SmartDashboard.putNumber("Pose Y", currentPose.getY());
-        SmartDashboard.putNumber("Pose Rot", currentPose.getRotation().getDegrees());
+        SmartDashboard.putNumber("Swerve Pose X", currentPose.getX());//Send odometry telemetry
+        SmartDashboard.putNumber("Swerve Pose Y", currentPose.getY());
+        SmartDashboard.putNumber("Swerve Pose Rot", currentPose.getRotation().getDegrees());
 
         field.setRobotPose(currentPose);//Update field view
     }
