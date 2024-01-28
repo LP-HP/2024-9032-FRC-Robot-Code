@@ -36,6 +36,8 @@ public final class Constants {
         public static final double armPositionGround = 0.0;
         public static final double armPositionPassthrough = 100.0;
         public static final double armPositionAmp = 12.0;
+        public static final double armPositionStorage = 0.0;
+        public static final double armEncoderConversionFactor = 60.0;//TODO make sure this works
         /* Controller Constants */
         public static final double armSetpointTolerance = 0.5;
         public static final double kPArm = 0.0;
@@ -62,6 +64,7 @@ public final class Constants {
         public static final int armMotorID = 15;
         public static final double armPositionPassthrough = 100.0;
         public static final double armPositionStorage = 80.0;
+        public static final double armEncoderConversionFactor = 60.0;//TODO make sure this works
         /* Controller Constants */
         public static final double kPArm = 0.0;
         public static final double kDArm = 0.0;
@@ -73,12 +76,13 @@ public final class Constants {
             armPosLookupTableFromTargetY.put(1.0, 4.0);
         }
 
-        /* Arm, Flywheel, and Storage Motors  */
+        /* For Arm and Flywheel Motors  */
         public static final int neoV1CurrentLimit = 80;
         public static final int motorVoltageComp = 12;
 
         /* Shooter Flywheel */
         public static final int shooterFlywheelMotorID = 16;
+        /* Controller Constants */
         public static final double shooterFlywheelVelocityTolerance = 0.5;//TODO UNITSSSSS
         public static final double kPShooter = 0.0;
         public static final double kDShooter = 0.0;

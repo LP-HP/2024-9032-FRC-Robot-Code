@@ -5,6 +5,8 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import java.util.function.DoubleSupplier;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -22,6 +24,7 @@ import frc.robot.Constants;
 public class Shooter extends SubsystemBase {
     private CANSparkMax armMotor;    
     private SparkPIDController armController;
+    private RelativeEncoder armEncoder;
     private double armSetpoint;
 
     private CANSparkMax shooterFlywheelMotor;
@@ -42,6 +45,11 @@ public class Shooter extends SubsystemBase {
 
         passthroughStorageMotor = new CANSparkMax(Constants.ShooterConstants.storageMotorID, MotorType.kBrushless);
         configStorageMotor();
+
+        armEncoder = armMotor.getEncoder();
+        armEncoder.setPositionConversionFactor(Constants.ShooterConstants.armEncoderConversionFactor);
+        /* Reset the relative encoder to the absolute encoder value */
+        armEncoder.setPosition(armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
     }
 
     private void configArmMotor() {
@@ -52,7 +60,6 @@ public class Shooter extends SubsystemBase {
         armController.setP(Constants.ShooterConstants.kPArm);
         armController.setD(Constants.ShooterConstants.kDArm);
         armMotor.enableVoltageCompensation(Constants.ShooterConstants.motorVoltageComp);
-        armMotor.getEncoder().setPosition(0);//TODO use absolute encoder
         armMotor.burnFlash();
     }
 
@@ -69,7 +76,7 @@ public class Shooter extends SubsystemBase {
 
     private void configStorageMotor() {
         passthroughStorageMotor.restoreFactoryDefaults();
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(armMotor, Usage.kVelocityOnly);
+        CANSparkMaxUtil.setCANSparkMaxBusUsage(armMotor, Usage.kMinimal);
         passthroughStorageMotor.setSmartCurrentLimit(Constants.ShooterConstants.neo550CurrentLimit);
         passthroughStorageMotor.setIdleMode(IdleMode.kBrake);
         passthroughStorageMotor.enableVoltageCompensation(Constants.ShooterConstants.motorVoltageComp);
@@ -103,6 +110,10 @@ public class Shooter extends SubsystemBase {
         this);
     }
 
+    private Command disableShooterFlywheel() {
+        return runOnce(() -> shooterController.setReference(0, ControlType.kVelocity));
+    }
+
     public Command setShooterVelocityThenWaitThenDisable(double velocity, double waitTime) {
         return waitForShooterVelocity(velocity)
            .andThen(enableStorageMotorToFlywheels())
@@ -111,47 +122,26 @@ public class Shooter extends SubsystemBase {
            .andThen(disableStorageMotor());
     }
 
-    public Command disableShooterFlywheel() {
-        return runOnce(() -> shooterController.setReference(0, ControlType.kVelocity));
+    /* Just sets the target */
+    private void setArmTargetPosition(double position) {
+        armSetpoint = position;
+
+        armController.setReference(armSetpoint, ControlType.kPosition); 
     }
-    
+
     public Command setToPassthroughPosition() {
-        return runOnce(() -> armController.setReference(Constants.ShooterConstants.armPositionPassthrough, ControlType.kPosition)); 
+        return runOnce(() -> setArmTargetPosition(Constants.ShooterConstants.armPositionPassthrough)); 
     }
 
     public Command setToStoragePosition() {
-        return runOnce(() -> armController.setReference(Constants.ShooterConstants.armPositionStorage, ControlType.kPosition)); 
-    }
-
-    /* Just sets the target */
-    public Command setArmTargetPosition(double position) {
-        return runOnce(() -> {
-            armSetpoint = position;
-
-            armController.setReference(armSetpoint, ControlType.kPosition); 
-        });
+        return runOnce(() -> setArmTargetPosition(Constants.ShooterConstants.armPositionStorage)); 
     }
 
     /* Sets the target and wait until it is achieved */
-    public Command moveArmToPassthroughPosition() { 
+    private Command moveArmToTargetPosition(double position) { 
         return new FunctionalCommand(
         /* Sets the target position at the start */
-        () -> armController.setReference(Constants.ShooterConstants.armPositionPassthrough, ControlType.kPosition),
-        () -> {},
-        (unused) -> {},
-        /* We are finished if the arm position is within our tolerance */
-        () -> Math.abs(armMotor.getEncoder().getPosition() - Constants.ShooterConstants.armPositionPassthrough) < Constants.ShooterConstants.armSetpointTolerance,
-        this);
-    }   
-
-    public Command moveArmToPositionFromTargetY(DoubleSupplier targetYSup) { 
-        return new FunctionalCommand(
-        /* Sets the target position at the start to an interpolated value from the lookup table */
-        () -> {
-            armSetpoint = Constants.ShooterConstants.armPosLookupTableFromTargetY.get(targetYSup.getAsDouble());
-
-            armController.setReference(armSetpoint, ControlType.kPosition);
-        },
+        () -> setArmTargetPosition(position),
         () -> {},
         (unused) -> {},
         /* We are finished if the arm position is within our tolerance */
@@ -159,9 +149,18 @@ public class Shooter extends SubsystemBase {
         this);
     }   
 
+    public Command moveArmToPassthroughPosition() {
+        return moveArmToTargetPosition(Constants.ShooterConstants.armPositionPassthrough);
+    }
+
+    public Command moveArmToPositionFromTargetY(DoubleSupplier targetYSup) { 
+        /* Sets the target position to an interpolated value from the lookup table */
+        return moveArmToTargetPosition(Constants.ShooterConstants.armPosLookupTableFromTargetY.get(targetYSup.getAsDouble()));
+    }   
+
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Shooter Arm Position", armMotor.getEncoder().getPosition());
+        SmartDashboard.putNumber("Shooter Arm Position Relative", armMotor.getEncoder().getPosition());
         SmartDashboard.putNumber("Shooter Arm Setpoint", armSetpoint);
         SmartDashboard.putNumber("Shooter Flywheel Velocity", shooterFlywheelMotor.getEncoder().getVelocity());
     }

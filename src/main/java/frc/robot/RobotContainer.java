@@ -107,9 +107,9 @@ public class RobotContainer {
          * 
          * a -> zero gyro
          * x -> toggle field centric
-         * y [must have a valid speaker target] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
-         * b -> [must not have a note] set intake to ground position and enable intake at the same time
-         * right bumper [must have a note in the intake] -> store note 
+         * y [must have a valid speaker target and a note] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
+         * b -> [must not have a note] set intake to ground position and enable intake
+         * right bumper [must have a note in the intake] -> put note into shooter
          * 
         */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
@@ -140,13 +140,13 @@ public class RobotContainer {
         /* 
          * Current triggers:
          * 
-         * intake beam break -> disable intake and move to passthrough position
+         * intake beam break -> disable intake and move to storage position and rumble controller
          * shooter beam break -> disable intake and storage motor and move shooter to storage position
          * 
          */
         intakeBeamBreakTrigger.onTrue(
             intake.disableIntake()
-            .andThen(intake.moveToPassthroughPosition())
+            .andThen(intake.setToStoragePosition())
             .alongWith(setAndDisableRumble())
         );
 

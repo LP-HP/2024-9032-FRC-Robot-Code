@@ -28,8 +28,9 @@ public class MultiNoteAuto extends SequentialCommandGroup {
             new InstantCommand(() -> swerve.resetOdometry(limelight.getPoseEstimate().get().pose), swerve, limelight),
             /* Drive to the position to shoot the 1rst note, while moving the arm to the shooting position and lowering the intake */
             firstNoteShootAlignment,
-            /* Enable shooter, wait, and disable */
-            shooter.setShooterVelocityThenWaitThenDisable(5, 0.25)
+            /* Enable shooter, wait, disable, and store */
+            shooter.setShooterVelocityThenWaitThenDisable(5, 0.25),
+            shooter.setToStoragePosition()
         );
 
         //Add a 2nd note
@@ -38,11 +39,15 @@ public class MultiNoteAuto extends SequentialCommandGroup {
                 /* Drive to the position to intake and shoot the 2nd note, while enabling the intake */
                 secondNoteAlignment,
                 /* Turn the intake off */
-                intake.disableIntake(),
-                /* Move intake to passthrough position */
-                intake.moveToPassthroughPosition(), //TODO need some way to get the ring into the shooter
-                /* Enable shooter, wait, and disable */
-                shooter.setShooterVelocityThenWaitThenDisable(6, 0.25)
+                intake.disableIntake(),//TODO use beam break
+                /* Move intake and shooter to passthrough position */
+                intake.moveToPassthroughPosition().alongWith(shooter.moveArmToPassthroughPosition()), 
+                /* Move ring into shooter */
+                shooter.enableStorageMotorReceiving(),
+                intake.shootIntoShooter(),
+                /* Enable shooter, wait, disable, and store */
+                shooter.setShooterVelocityThenWaitThenDisable(6, 0.25),
+                shooter.setToStoragePosition()
             );
         }
 

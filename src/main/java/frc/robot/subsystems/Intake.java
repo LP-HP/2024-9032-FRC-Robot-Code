@@ -30,13 +30,14 @@ public class Intake extends SubsystemBase {
     public Intake() {
         armMotor = new CANSparkMax(Constants.IntakeConstants.armMotorID, MotorType.kBrushless);
         armController = armMotor.getPIDController();
-        armEncoder = armMotor.getEncoder();
         configArmMotor();
 
         intakeFlywheelMotor = new CANSparkMax(Constants.IntakeConstants.intakeFlywheelMotorID, MotorType.kBrushless);
         intakeController = intakeFlywheelMotor.getPIDController();
         configIntakeMotor();
 
+        armEncoder = armMotor.getEncoder();
+        armEncoder.setPositionConversionFactor(Constants.IntakeConstants.armEncoderConversionFactor);
          /* Reset the relative encoder to the absolute encoder value */
         armEncoder.setPosition(armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
     }
@@ -68,45 +69,66 @@ public class Intake extends SubsystemBase {
     }
 
     /* Just sets the target */
-    public Command setToGroundPosition() {
-        return runOnce(() -> armController.setReference(Constants.IntakeConstants.armPositionGround, ControlType.kPosition));
+    private void setArmTargetPosition(double position) {
+        armController.setReference(position, ControlType.kPosition);
     }
 
-    public Command setToAmpPosition() {
-        return runOnce(() -> armController.setReference(Constants.IntakeConstants.armPositionAmp, ControlType.kPosition));
+    public Command setToGroundPosition() {
+        return runOnce(() -> setArmTargetPosition(Constants.IntakeConstants.armPositionGround));
+    }
+
+    public Command setToPassthroughPosition() {
+        return runOnce(() -> setArmTargetPosition(Constants.IntakeConstants.armPositionPassthrough));
+    }
+
+    public Command setToStoragePosition() {
+        return runOnce(() -> setArmTargetPosition(Constants.IntakeConstants.armPositionStorage));
     }
 
     /* Sets the target and wait until it is achieved */
-    public Command moveToPassthroughPosition() {
+    private Command moveToTargetPosition(double position) {
         return new FunctionalCommand(
         /* Sets the target position at the start */
-        () -> armController.setReference(Constants.IntakeConstants.armPositionPassthrough, ControlType.kPosition),
+        () -> setArmTargetPosition(position),
         () -> {},
         (unused) -> {},
          /* We are finished if the arm position is within our tolerance */
-        () -> Math.abs(armEncoder.getPosition() - Constants.IntakeConstants.armPositionPassthrough) < Constants.IntakeConstants.armSetpointTolerance,
+        () -> Math.abs(armEncoder.getPosition() - position) < Constants.IntakeConstants.armSetpointTolerance,
         this);
     } 
 
+    public Command moveToAmpPosition() {
+        return moveToTargetPosition(Constants.IntakeConstants.armPositionAmp);
+    }
+
+    public Command moveToPassthroughPosition() {
+        return moveToTargetPosition(Constants.IntakeConstants.armPositionPassthrough);
+    }
+
+    private void setIntakeVelocity(double velocity) {
+        intakeController.setReference(velocity, ControlType.kVelocity);
+    }
+    
     public Command enableIntake() {
-        return runOnce(() -> intakeController.setReference(Constants.IntakeConstants.intakeVelocity, ControlType.kVelocity));
+        return runOnce(() -> setIntakeVelocity(Constants.IntakeConstants.intakeVelocity));
     }
 
     public Command disableIntake() {
-        return runOnce(() -> intakeController.setReference(0, ControlType.kVelocity));
+        return runOnce(() -> setIntakeVelocity(0));
     }
 
     public Command shootIntoAmp() {
-        return runOnce(() -> intakeController.setReference(Constants.IntakeConstants.outtakeAmpVelocity, ControlType.kVelocity));
+        return runOnce(() -> setIntakeVelocity(Constants.IntakeConstants.outtakeAmpVelocity));
     }
 
     public Command shootIntoShooter() {
-        return runOnce(() -> intakeController.setReference(Constants.IntakeConstants.outtakeToShooterVelocity, ControlType.kVelocity));
+        return runOnce(() -> setIntakeVelocity(Constants.IntakeConstants.outtakeToShooterVelocity));
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Intake Arm Position", armMotor.getEncoder().getPosition());
+        SmartDashboard.putNumber("Intake Arm Position Relative", armEncoder.getPosition());
+        SmartDashboard.putNumber("Intake Arm Position Absolute", armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
         SmartDashboard.putNumber("Intake Flywheel Velocity", intakeFlywheelMotor.getEncoder().getVelocity());
     }
 }
