@@ -31,13 +31,14 @@ public class TeleopSwerve extends Command {
     @Override
     public void execute() {
         //Use joystick deadband to prevent small drifts
-        double translationVal = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.stickDeadband);
-        double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband);
-        double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
+        double translationVal = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.TeleopConstants.stickDeadband);
+        double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.TeleopConstants.stickDeadband);
+        double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.TeleopConstants.stickDeadband);
 
+        //Run the open loop drive using joystick values - multiply by conversion factors to get units in m/s
         swerve.driveOpenLoop(
-            new Translation2d(translationVal, strafeVal).times(Constants.SwerveConstants.maxSpeed), 
-            rotationVal * Constants.SwerveConstants.maxAngularVelocity, 
+            new Translation2d(translationVal, strafeVal).times(Constants.TeleopConstants.joystickToSpeedConversionFactor), 
+            rotationVal * Constants.TeleopConstants.joystickToAngularVelocityConversionFactor, 
             fieldCentricSup.getAsBoolean()
         );
     }

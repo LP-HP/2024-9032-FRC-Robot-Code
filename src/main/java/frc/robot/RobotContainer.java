@@ -25,7 +25,7 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     /* Controllers */
-    private final CommandXboxController driveController = new CommandXboxController(Constants.driveControllerPort);//TODO remap controls
+    private final CommandXboxController driveController = new CommandXboxController(Constants.driveControllerPort);
 
     /* Driver Buttons */
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);

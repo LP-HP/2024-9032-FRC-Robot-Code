@@ -48,7 +48,7 @@ public class Swerve extends SubsystemBase {
         };
 
         /* The 1 second wait before setting absolute positions avoids a bug with initializing the motors
-         * Stolen from: https://github.com/Team364/BaseFalconSwerve/issues/8 
+         * See: https://github.com/Team364/BaseFalconSwerve/issues/8 
          */
         Timer.delay(1.0);
         resetModulesToAbsolute();//Set integrated encoders to the absolute positions using cancoders

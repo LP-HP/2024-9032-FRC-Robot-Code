@@ -73,9 +73,9 @@ public class SwerveModule {
         if (isOpenLoop) {
             /* Scale speed by cosine of angle error, which slows down movement perpendicular to the desired direction of travel
              * Smoothes driving when modules change directions
-             * Stolen from: https://github.com/wpilibsuite/allwpilib/pull/5758
+             * See: https://github.com/wpilibsuite/allwpilib/pull/5758
              */
-            desiredState.speedMetersPerSecond *= desiredState.angle.minus(currentState.angle).getCos();//TODO does this help or hurt??
+            desiredState.speedMetersPerSecond *= desiredState.angle.minus(currentState.angle).getCos();
 
             double percentOutput = desiredState.speedMetersPerSecond / Constants.SwerveConstants.maxSpeed;
 
@@ -104,7 +104,10 @@ public class SwerveModule {
     }
 
     private Rotation2d getIntegratedAngle() {
-        return Rotation2d.fromDegrees(integratedAngleEncoder.getPosition());
+        return Rotation2d.fromDegrees(Constants.SwerveConstants.integratedEncoderInvert 
+            /* Invert the angle in the range [0, 360) */
+            ? (180 + integratedAngleEncoder.getPosition()) % 360
+            : integratedAngleEncoder.getPosition());
     }
 
     public Rotation2d getCanCoderAngle() {
