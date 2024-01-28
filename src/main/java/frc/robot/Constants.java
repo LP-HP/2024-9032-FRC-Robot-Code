@@ -122,9 +122,9 @@ public final class Constants {
 
         /* Angle Motor PID Values */
         public static final double angleKP = 0.05;//TODO Tune - needed for teleop
-        public static final double angleKI = 0;
-        public static final double angleKD = 0;
-        public static final double angleKF = 0;
+        public static final double angleKI = 0.0;
+        public static final double angleKD = 0.0;
+        public static final double angleKF = 0.0;
 
         /* Drive Motor PID Values */
         public static final double driveKP = 0.05; //TODO: This must be tuned to specific robot - needed for closed loop
