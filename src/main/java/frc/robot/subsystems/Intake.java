@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -18,6 +20,7 @@ import frc.robot.Constants;
 public class Intake extends SubsystemBase {
     private CANSparkMax armMotor;    
     private SparkPIDController armController;
+    private RelativeEncoder armEncoder;
 
     private CANSparkMax intakeFlywheelMotor;
     private SparkPIDController intakeController;
@@ -27,11 +30,15 @@ public class Intake extends SubsystemBase {
     public Intake() {
         armMotor = new CANSparkMax(Constants.IntakeConstants.armMotorID, MotorType.kBrushless);
         armController = armMotor.getPIDController();
+        armEncoder = armMotor.getEncoder();
         configArmMotor();
 
         intakeFlywheelMotor = new CANSparkMax(Constants.IntakeConstants.intakeFlywheelMotorID, MotorType.kBrushless);
         intakeController = intakeFlywheelMotor.getPIDController();
         configIntakeMotor();
+
+         /* Reset the relative encoder to the absolute encoder value */
+        armEncoder.setPosition(armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
     }
 
     private void configArmMotor() {
@@ -42,7 +49,6 @@ public class Intake extends SubsystemBase {
         armController.setP(Constants.IntakeConstants.kPArm);
         armController.setD(Constants.IntakeConstants.kDArm);
         armMotor.enableVoltageCompensation(Constants.IntakeConstants.motorVoltageComp);
-        armMotor.getEncoder().setPosition(0);//TODO use absolute encoder
         armMotor.burnFlash();
     }
 
@@ -78,9 +84,7 @@ public class Intake extends SubsystemBase {
         () -> {},
         (unused) -> {},
          /* We are finished if the arm position is within our tolerance */
-        () -> 
-            Math.abs(armMotor.getEncoder().getPosition() - Constants.IntakeConstants.armPositionPassthrough) 
-            < Constants.IntakeConstants.armSetpointTolerance,
+        () -> Math.abs(armEncoder.getPosition() - Constants.IntakeConstants.armPositionPassthrough) < Constants.IntakeConstants.armSetpointTolerance,
         this);
     } 
 
@@ -90,6 +94,14 @@ public class Intake extends SubsystemBase {
 
     public Command disableIntake() {
         return runOnce(() -> intakeController.setReference(0, ControlType.kVelocity));
+    }
+
+    public Command shootIntoAmp() {
+        return runOnce(() -> intakeController.setReference(Constants.IntakeConstants.outtakeAmpVelocity, ControlType.kVelocity));
+    }
+
+    public Command shootIntoShooter() {
+        return runOnce(() -> intakeController.setReference(Constants.IntakeConstants.outtakeToShooterVelocity, ControlType.kVelocity));
     }
 
     @Override

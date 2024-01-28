@@ -48,6 +48,8 @@ public final class Constants {
         /* Intake Flywheel */
         public static final int intakeFlywheelMotorID = 14;
         public static final double intakeVelocity = 1.0;
+        public static final double outtakeAmpVelocity = -1.0;
+        public static final double outtakeToShooterVelocity = -0.5;
         public static final double kPIntake = 0.0;
         public static final double kDIntake = 0.0;
 
@@ -59,6 +61,7 @@ public final class Constants {
         /* Shooter Arm */
         public static final int armMotorID = 15;
         public static final double armPositionPassthrough = 100.0;
+        public static final double armPositionStorage = 80.0;
         /* Controller Constants */
         public static final double kPArm = 0.0;
         public static final double kDArm = 0.0;
@@ -70,14 +73,24 @@ public final class Constants {
             armPosLookupTableFromTargetY.put(1.0, 4.0);
         }
 
-        /* Arm and Flywheel Motor  */
-        public static final int motorCurrentLimit = 80;
+        /* Arm, Flywheel, and Storage Motors  */
+        public static final int neoV1CurrentLimit = 80;
         public static final int motorVoltageComp = 12;
 
         /* Shooter Flywheel */
         public static final int shooterFlywheelMotorID = 16;
+        public static final double shooterFlywheelVelocityTolerance = 0.5;//TODO UNITSSSSS
         public static final double kPShooter = 0.0;
         public static final double kDShooter = 0.0;
+
+        /* Storage Motor */
+        public static final int storageMotorID = 21;
+        public static final int neo550CurrentLimit = 30;
+        public static final double storageMotorPowerReceiving = 0.5;
+        public static final double storageMotorPowerToFlywheels = 1;
+
+        /* Sensors */
+        public static final int beamBreakPort = 0;
     }
 
     public static final class SwerveConstants {

@@ -4,10 +4,13 @@ import java.util.Optional;
 
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.autos.*;
@@ -30,17 +33,19 @@ public class RobotContainer {
     /* Driver Buttons */
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
     private final Trigger fieldCentricButton = driveController.x().debounce(0.025);
-    // private final Trigger speakerScoreButton = driveController.y().debounce(0.025);
-    // private final Trigger enableIntakeButton = driveController.b().debounce(0.025);
+    private final Trigger speakerScoreButton = driveController.y().debounce(0.025);
+    private final Trigger enableIntakeButton = driveController.b().debounce(0.025);
+    private final Trigger storeNoteButton = driveController.rightBumper().debounce(0.025);
 
     /* Subsystems */
     // private final LimelightVision limelight = new LimelightVision(Constants.VisionConstants.limelightName, true);
     private final Swerve swerve = new Swerve(Optional::empty);//limelight::getPoseEstimate);
-    // private final Intake intake = new Intake();
-    // private final Shooter shooter = new Shooter();
+    private final Intake intake = new Intake();
+    private final Shooter shooter = new Shooter();
 
     /* Subsystem Triggers */
-    // private final Trigger intakeBeamBreakTrigger = new Trigger(intake::isBeamBreakTriggered);
+    private final Trigger intakeBeamBreakTrigger = new Trigger(intake::isBeamBreakTriggered).debounce(0.025);
+    private final Trigger shooterBeamBreakTrigger = new Trigger(shooter::isBeamBreakTriggered).debounce(0.025);
 
     private boolean isFieldCentric = false;
   
@@ -103,7 +108,8 @@ public class RobotContainer {
          * a -> zero gyro
          * x -> toggle field centric
          * y [must have a valid speaker target] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
-         * b -> set intake to ground position and enable intake at the same time
+         * b -> [must not have a note] set intake to ground position and enable intake at the same time
+         * right bumper [must have a note in the intake] -> store note 
          * 
         */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
@@ -112,14 +118,22 @@ public class RobotContainer {
 
         // speakerScoreButton.onTrue(
         //     new SpeakerScoringSequence(swerve, limelight, shooter)
-        //     /* Only run if there is a valid target and it's a speaker tag */
-        //     .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag())
+        //     /* Only run if there is a valid target and it's a speaker tag and we have a note */
+        //     .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.isBeamBreakTriggered())
         // );
 
-        // enableIntakeButton.onTrue(
-        //     intake.setToGroundPosition()
-        //     .andThen(intake.enableIntake())
-        // );
+        enableIntakeButton.onTrue(
+            intake.setToGroundPosition()
+            .andThen(intake.enableIntake())
+            .onlyIf(() -> !intake.isBeamBreakTriggered())
+        );
+
+        storeNoteButton.onTrue(
+            shooter.moveArmToPassthroughPosition()
+            .andThen(shooter.enableStorageMotorReceiving())
+            .andThen(intake.shootIntoShooter())
+            .onlyIf(intake::isBeamBreakTriggered)
+        );
     }
 
     private void configureSubsystemTriggers() {
@@ -127,12 +141,28 @@ public class RobotContainer {
          * Current triggers:
          * 
          * intake beam break -> disable intake and move to passthrough position
+         * shooter beam break -> disable intake and storage motor and move shooter to storage position
          * 
          */
-        // intakeBeamBreakTrigger.onTrue(
-        //     intake.disableIntake()
-        //     .andThen(intake.moveToPassthroughPosition())//TODO next this should run something that passes the ring into the shooter and then stops when the next beam break is triggered
-        // );
+        intakeBeamBreakTrigger.onTrue(
+            intake.disableIntake()
+            .andThen(intake.moveToPassthroughPosition())
+            .alongWith(setAndDisableRumble())
+        );
+
+        shooterBeamBreakTrigger.onTrue(
+            shooter.disableStorageMotor()
+            .andThen(intake.disableIntake())
+            .andThen(shooter.setToStoragePosition())
+        );
+    }
+
+    private Command setAndDisableRumble() {
+        return new SequentialCommandGroup(
+            new InstantCommand(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 1)),
+            Commands.waitSeconds(0.25),
+            new InstantCommand(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 0))
+        );
     }
 
     /* Only return the auto command here */
