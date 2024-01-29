@@ -61,7 +61,8 @@ public final class Constants {
 
      public static final class ShooterConstants {//TODO tune
         /* Shooter Arm */
-        public static final int armMotorID = 15;
+        public static final int armMotorMainID = 15;
+        public static final int armMotorFollowerID = 55;
         public static final double armPositionPassthrough = 100.0;
         public static final double armPositionStorage = 80.0;
         public static final double armEncoderConversionFactor = 60.0;//TODO make sure this works

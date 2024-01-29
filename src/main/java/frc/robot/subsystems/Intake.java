@@ -29,12 +29,13 @@ public class Intake extends SubsystemBase {
 
     public Intake() {
         armMotor = new CANSparkMax(Constants.IntakeConstants.armMotorID, MotorType.kBrushless);
-        armController = armMotor.getPIDController();
         configArmMotor();
 
         intakeFlywheelMotor = new CANSparkMax(Constants.IntakeConstants.intakeFlywheelMotorID, MotorType.kBrushless);
-        intakeController = intakeFlywheelMotor.getPIDController();
         configIntakeMotor();
+
+        armController = armMotor.getPIDController();
+        intakeController = intakeFlywheelMotor.getPIDController();
 
         armEncoder = armMotor.getEncoder();
         armEncoder.setPositionConversionFactor(Constants.IntakeConstants.armEncoderConversionFactor);
