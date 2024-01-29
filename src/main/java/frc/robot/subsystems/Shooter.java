@@ -39,7 +39,7 @@ public class Shooter extends SubsystemBase {
         armMotorMain = new CANSparkMax(Constants.ShooterConstants.armMotorMainID, MotorType.kBrushless);
         configMainArmMotor();
 
-        armMotorFollower = new CANSparkMax(Constants.ShooterConstants.armMotorMainID, MotorType.kBrushless);
+        armMotorFollower = new CANSparkMax(Constants.ShooterConstants.armMotorFollowerID, MotorType.kBrushless);
         configFollowerArmMotor();
 
         shooterFlywheelMotor = new CANSparkMax(Constants.ShooterConstants.shooterFlywheelMotorID, MotorType.kBrushless);
@@ -76,7 +76,7 @@ public class Shooter extends SubsystemBase {
         armMotorFollower.setIdleMode(IdleMode.kBrake);
         armMotorFollower.enableVoltageCompensation(Constants.ShooterConstants.motorVoltageComp);
         /* This will cause the follower motor to produce the same output as the main motor */
-        armMotorFollower.follow(armMotorMain);
+        armMotorFollower.follow(armMotorMain);//TODO MAKE SURE THIS IS NOT INVERTED OR IT MIGHT FRY
         armMotorFollower.burnFlash();
     }
 
