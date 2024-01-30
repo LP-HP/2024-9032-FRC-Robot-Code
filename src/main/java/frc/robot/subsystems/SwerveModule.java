@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.lib.swerveutil.CANSparkMaxUtil;
-import frc.lib.swerveutil.CTREModuleState;
 import frc.lib.swerveutil.SwerveModuleConstants;
 import frc.lib.swerveutil.CANSparkMaxUtil.Usage;
 import frc.robot.Constants;
@@ -120,7 +119,7 @@ public class SwerveModule {
     }
 
     public void resetToAbsolute() {
-        /* Add the offset to zero the module and put the range [0, 360) */
+        /* Add the offset to zero the module and put in the range [0, 360) */
         double absolutePosition = getCanCoderAngle().plus(angleOffset).getDegrees() % 360;
 
         integratedAngleEncoder.setPosition(absolutePosition);
