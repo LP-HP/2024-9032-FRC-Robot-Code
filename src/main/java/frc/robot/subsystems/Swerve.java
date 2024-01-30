@@ -60,7 +60,7 @@ public class Swerve extends SubsystemBase {
                 this::getPose,
                 this::resetOdometry,
                 this::getSpeeds, 
-                this::driveAuto,
+                this::driveClosedLoopFromSpeeds,
                 new HolonomicPathFollowerConfig(
                     new PIDConstants(Constants.ClosedLoopConstants.kPTranslation, 0, Constants.ClosedLoopConstants.kDTranslation),
                     new PIDConstants(Constants.ClosedLoopConstants.kPRotation, 0, Constants.ClosedLoopConstants.kDRotation), 
@@ -86,7 +86,7 @@ public class Swerve extends SubsystemBase {
         visionSup = optionalVisionSupplier;
     }
 
-    public void driveAuto(ChassisSpeeds speeds) {
+    public void driveClosedLoopFromSpeeds(ChassisSpeeds speeds) {
         SwerveModuleState[] desiredStates = Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(speeds);
 
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.SwerveConstants.maxSpeed);
@@ -97,7 +97,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public void driveClosedLoop(Translation2d translation, double rotation) {
-        driveAuto(new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
+        driveClosedLoopFromSpeeds(new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
     }
 
     public void driveOpenLoop(Translation2d translation, double rotation, boolean fieldCentric) {

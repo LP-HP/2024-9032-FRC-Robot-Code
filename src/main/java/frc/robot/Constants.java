@@ -20,6 +20,8 @@ public final class Constants {
         public static final double joystickToSpeedConversionFactor = 0.5;
         /* Radians per Second */
         public static final double joystickToAngularVelocityConversionFactor = 0.5 * Math.PI;
+        /* Meters per Second Squared */
+        public static final double accelerationLimit = 1.5;//TODO tune
     }
 
     public static final class VisionConstants {
