@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.Optional;
+
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -23,22 +25,22 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     /* Controllers */
-    private final CommandXboxController driveController = new CommandXboxController(Constants.driveControllerPort);//TODO remap controls
+    private final CommandXboxController driveController = new CommandXboxController(Constants.driveControllerPort);
 
     /* Driver Buttons */
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
     private final Trigger fieldCentricButton = driveController.x().debounce(0.025);
-    private final Trigger speakerScoreButton = driveController.y().debounce(0.025);
-    private final Trigger enableIntakeButton = driveController.b().debounce(0.025);
+    // private final Trigger speakerScoreButton = driveController.y().debounce(0.025);
+    // private final Trigger enableIntakeButton = driveController.b().debounce(0.025);
 
     /* Subsystems */
-    private final LimelightVision limelight = new LimelightVision(Constants.VisionConstants.limelightName, true);
-    private final Swerve swerve = new Swerve(limelight::getPoseEstimate);
-    private final Intake intake = new Intake();
-    private final Shooter shooter = new Shooter();
+    // private final LimelightVision limelight = new LimelightVision(Constants.VisionConstants.limelightName, true);
+    private final Swerve swerve = new Swerve(Optional::empty);//limelight::getPoseEstimate);
+    // private final Intake intake = new Intake();
+    // private final Shooter shooter = new Shooter();
 
     /* Subsystem Triggers */
-    private final Trigger intakeBeamBreakTrigger = new Trigger(intake::isBeamBreakTriggered);
+    // private final Trigger intakeBeamBreakTrigger = new Trigger(intake::isBeamBreakTriggered);
 
     private boolean isFieldCentric = false;
   
@@ -64,21 +66,21 @@ public class RobotContainer {
         configureSubsystemTriggers();
 
         autoChooser.addOption("Path Test Auto No Vision", new TestAutoNoVision(swerve));
-        autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
-        autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
-        autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
-        autoChooser.addOption("Align with april tag test", new AlignWithRotationTarget(swerve, () -> limelight.getAprilTagTarget().xOffset));
+        // autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
+        // autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
+        // autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
+        // autoChooser.addOption("Align with april tag test", new AlignWithRotationTarget(swerve, () -> limelight.getAprilTagTarget().xOffset));
         SmartDashboard.putData("Choose an Auto:", autoChooser);//Let us choose autos through the dashboard
     }
 
     /* Only reset variables - don't run any commands here */
     public void autonomousInit() {
-        limelight.switchToLocalizationPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
+        // limelight.switchToLocalizationPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
     }
 
     /* Only reset variables - don't run any commands here */
     public void teleopInit() {
-        limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
+        // limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
     }
 
     private boolean isFieldCentric() {
@@ -86,9 +88,9 @@ public class RobotContainer {
     }
 
     private void registerPathplannerCommands() {
-        NamedCommands.registerCommand("IntakeToGround", intake.setToGroundPosition());
-        NamedCommands.registerCommand("EnableIntake", intake.enableIntake());
-        NamedCommands.registerCommand("ShooterArmNote1", shooter.setArmTargetPosition(4));//TODO have a constant
+        // NamedCommands.registerCommand("IntakeToGround", intake.setToGroundPosition());
+        // NamedCommands.registerCommand("EnableIntake", intake.enableIntake());
+        // NamedCommands.registerCommand("ShooterArmNote1", shooter.setArmTargetPosition(4));//TODO have a constant
     }
 
     private void configureButtonBindings() {
@@ -108,16 +110,16 @@ public class RobotContainer {
 
         fieldCentricButton.onTrue(new InstantCommand(() -> isFieldCentric = !isFieldCentric));//Toggle field centric
 
-        speakerScoreButton.onTrue(
-            new SpeakerScoringSequence(swerve, limelight, shooter)
-            /* Only run if there is a valid target and it's a speaker tag */
-            .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag())
-        );
+        // speakerScoreButton.onTrue(
+        //     new SpeakerScoringSequence(swerve, limelight, shooter)
+        //     /* Only run if there is a valid target and it's a speaker tag */
+        //     .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag())
+        // );
 
-        enableIntakeButton.onTrue(
-            intake.setToGroundPosition()
-            .andThen(intake.enableIntake())
-        );
+        // enableIntakeButton.onTrue(
+        //     intake.setToGroundPosition()
+        //     .andThen(intake.enableIntake())
+        // );
     }
 
     private void configureSubsystemTriggers() {
@@ -127,10 +129,10 @@ public class RobotContainer {
          * intake beam break -> disable intake and move to passthrough position
          * 
          */
-        intakeBeamBreakTrigger.onTrue(
-            intake.disableIntake()
-            .andThen(intake.moveToPassthroughPosition())//TODO next this should run something that passes the ring into the shooter and then stops when the next beam break is triggered
-        );
+        // intakeBeamBreakTrigger.onTrue(
+        //     intake.disableIntake()
+        //     .andThen(intake.moveToPassthroughPosition())//TODO next this should run something that passes the ring into the shooter and then stops when the next beam break is triggered
+        // );
     }
 
     /* Only return the auto command here */

@@ -87,11 +87,11 @@ public class Shooter extends SubsystemBase {
     }
 
     /* Sets the target and wait until it is achieved */
-    public Command moveArmToPositionFromArea(DoubleSupplier areaSup) { 
+    public Command moveArmToPositionFromTargetY(DoubleSupplier targetYSup) { 
         return new FunctionalCommand(
         /* Sets the target position at the start to an interpolated value from the lookup table */
         () -> {
-            armSetpoint = Constants.ShooterConstants.armPosLookupTableFromArea.get(areaSup.getAsDouble());
+            armSetpoint = Constants.ShooterConstants.armPosLookupTableFromTargetY.get(targetYSup.getAsDouble());
 
             armController.setReference(armSetpoint, ControlType.kPosition);
         },
