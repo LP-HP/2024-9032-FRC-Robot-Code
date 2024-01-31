@@ -70,7 +70,7 @@ public class RobotContainer {
         //Configure the subsystem triggers
         configureSubsystemTriggers();
 
-        autoChooser.addOption("Path Test Auto No Vision", new TestAutoNoVision(swerve));
+        autoChooser.addOption("Swerve Auto Shakedown", new SwerveShakedown(swerve));
         // autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
         // autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
         // autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));

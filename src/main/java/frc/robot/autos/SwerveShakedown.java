@@ -11,19 +11,23 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Swerve;
 
-public class TestAutoNoVision extends SequentialCommandGroup {
-    /* An auto to test 2 paths with a wait without vision */
-    public TestAutoNoVision(Swerve swerve) {
-        List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile("TestAuto");
+public class SwerveShakedown extends SequentialCommandGroup {
+    /* An auto to test the swerve drive without vision 
+     * 
+     * The 1rst path should just drive forward 2 meters
+     * The 2nd path should drive to the left in a curve 2 meters while rotating in the movement direction
+     * 
+    */
+    public SwerveShakedown(Swerve swerve) {
+        List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile("SwerveShakedown");
 
         Command first = AutoBuilder.followPath(paths.get(0));
         Command second = AutoBuilder.followPath(paths.get(1));
         
         addCommands(
             first,
-            Commands.waitSeconds(1),
+            Commands.waitSeconds(5),
             second
         );
-
     }
 }

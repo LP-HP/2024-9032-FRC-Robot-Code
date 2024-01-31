@@ -1,6 +1,12 @@
 {
   "version": 1.0,
-  "startingPose": null,
+  "startingPose": {
+    "position": {
+      "x": 1.0,
+      "y": 1.0
+    },
+    "rotation": 0
+  },
   "command": {
     "type": "sequential",
     "data": {
@@ -8,13 +14,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Test to ring"
+            "pathName": "1rst path"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Test shoot"
+            "pathName": "2nd path"
           }
         }
       ]
