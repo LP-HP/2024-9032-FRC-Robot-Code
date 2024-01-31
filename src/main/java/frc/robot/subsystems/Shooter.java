@@ -197,5 +197,6 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putNumber("Shooter Arm Position Absolute", armMotorMain.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
         SmartDashboard.putNumber("Shooter Arm Setpoint", armSetpoint);
         SmartDashboard.putNumber("Shooter Flywheel Velocity", shooterFlywheelMotorMain.getEncoder().getVelocity());
+        SmartDashboard.putBoolean("Beam Break Triggered", isBeamBreakTriggered());
     }
 }

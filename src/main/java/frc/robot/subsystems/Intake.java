@@ -131,5 +131,6 @@ public class Intake extends SubsystemBase {
         SmartDashboard.putNumber("Intake Arm Position Relative", armEncoder.getPosition());
         SmartDashboard.putNumber("Intake Arm Position Absolute", armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
         SmartDashboard.putNumber("Intake Flywheel Velocity", intakeFlywheelMotor.getEncoder().getVelocity());
+        SmartDashboard.putBoolean("Beam Break Triggered", isBeamBreakTriggered());
     }
 }
