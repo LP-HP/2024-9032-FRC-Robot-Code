@@ -141,7 +141,7 @@ public class RobotContainer {
          * Current triggers:
          * 
          * intake beam break -> disable intake and move to storage position and rumble controller
-         * shooter beam break -> disable intake and storage motor and move shooter to storage position
+         * shooter beam break -> disable intake and storage motor and move shooter and intake to storage position
          * 
          */
         intakeBeamBreakTrigger.onTrue(
@@ -154,6 +154,7 @@ public class RobotContainer {
             shooter.disableStorageMotor()
             .andThen(intake.disableIntake())
             .andThen(shooter.setToStoragePosition())
+            .andThen(intake.setToStoragePosition())
         );
     }
 

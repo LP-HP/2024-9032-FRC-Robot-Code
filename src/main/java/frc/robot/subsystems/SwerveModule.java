@@ -107,9 +107,9 @@ public class SwerveModule {
     private Rotation2d getIntegratedAngle() {
         return Rotation2d.fromDegrees(Constants.SwerveConstants.integratedEncoderInvert 
             /* Invert and put the angle in the range [0, 360) */
-            ? (180 + integratedAngleEncoder.getPosition()) % 360
+            ? (180.0 + integratedAngleEncoder.getPosition()) % 360.0
             /* Put the angle in the range [0, 360) */
-            : integratedAngleEncoder.getPosition() % 360
+            : integratedAngleEncoder.getPosition() % 360.0
             );//TODO check to see if the angle should wrap or not - SHOULD work
     }
 
@@ -120,7 +120,7 @@ public class SwerveModule {
 
     public void resetToAbsolute() {
         /* Add the offset to zero the module and put in the range [0, 360) */
-        double absolutePosition = getCanCoderAngle().plus(angleOffset).getDegrees() % 360;
+        double absolutePosition = getCanCoderAngle().plus(angleOffset).getDegrees() % 360.0;
 
         integratedAngleEncoder.setPosition(absolutePosition);
     }
@@ -142,8 +142,8 @@ public class SwerveModule {
         angleController.setFF(Constants.SwerveConstants.angleKF);
         /* Wrap in the range [0, 360) */
         angleController.setPositionPIDWrappingEnabled(true);
-        angleController.setPositionPIDWrappingMaxInput(360);
-        angleController.setPositionPIDWrappingMinInput(0);
+        angleController.setPositionPIDWrappingMaxInput(360.0);
+        angleController.setPositionPIDWrappingMinInput(0.0);
         angleMotor.enableVoltageCompensation(Constants.SwerveConstants.voltageComp);
         angleMotor.burnFlash();
     }

@@ -28,7 +28,8 @@ public class Shooter extends SubsystemBase {
     private RelativeEncoder armEncoder;
     private double armSetpoint;
 
-    private CANSparkMax shooterFlywheelMotor;
+    private CANSparkMax shooterFlywheelMotorMain;
+    private CANSparkMax shooterFlywheelMotorFollower;
     private SparkPIDController shooterController;
 
     private CANSparkMax passthroughStorageMotor;
@@ -42,14 +43,17 @@ public class Shooter extends SubsystemBase {
         armMotorFollower = new CANSparkMax(Constants.ShooterConstants.armMotorFollowerID, MotorType.kBrushless);
         configFollowerArmMotor();
 
-        shooterFlywheelMotor = new CANSparkMax(Constants.ShooterConstants.shooterFlywheelMotorID, MotorType.kBrushless);
-        configShooterMotor();
+        shooterFlywheelMotorMain = new CANSparkMax(Constants.ShooterConstants.shooterFlywheelMotorMainID, MotorType.kBrushless);
+        configMainShooterMotor();
+
+        shooterFlywheelMotorFollower = new CANSparkMax(Constants.ShooterConstants.shooterFlywheelMotorFollowerID, MotorType.kBrushless);
+        configFollowerShooterMotor();
 
         passthroughStorageMotor = new CANSparkMax(Constants.ShooterConstants.storageMotorID, MotorType.kBrushless);
         configStorageMotor();
 
         armController = armMotorMain.getPIDController();
-        shooterController = shooterFlywheelMotor.getPIDController();
+        shooterController = shooterFlywheelMotorMain.getPIDController();
 
         armEncoder = armMotorMain.getEncoder();
         armEncoder.setPositionConversionFactor(Constants.ShooterConstants.armEncoderConversionFactor);
@@ -71,7 +75,7 @@ public class Shooter extends SubsystemBase {
 
     private void configFollowerArmMotor() {
         armMotorFollower.restoreFactoryDefaults();
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(armMotorMain, Usage.kMinimal);
+        CANSparkMaxUtil.setCANSparkMaxBusUsage(armMotorFollower, Usage.kMinimal);
         armMotorFollower.setSmartCurrentLimit(Constants.ShooterConstants.neoV1CurrentLimit);
         armMotorFollower.setIdleMode(IdleMode.kBrake);
         armMotorFollower.enableVoltageCompensation(Constants.ShooterConstants.motorVoltageComp);
@@ -80,15 +84,27 @@ public class Shooter extends SubsystemBase {
         armMotorFollower.burnFlash();
     }
 
-    private void configShooterMotor() {
-        shooterFlywheelMotor.restoreFactoryDefaults();
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(shooterFlywheelMotor, Usage.kVelocityOnly);
-        shooterFlywheelMotor.setSmartCurrentLimit(Constants.ShooterConstants.neoV1CurrentLimit);
-        shooterFlywheelMotor.setIdleMode(IdleMode.kBrake);
+    private void configMainShooterMotor() {
+        shooterFlywheelMotorMain.restoreFactoryDefaults();
+        /* Makes this motor the leader */
+        CANSparkMaxUtil.setCANSparkMaxBusUsage(shooterFlywheelMotorMain, Usage.kVelocityOnly, true);
+        shooterFlywheelMotorMain.setSmartCurrentLimit(Constants.ShooterConstants.neoV1CurrentLimit);
+        shooterFlywheelMotorMain.setIdleMode(IdleMode.kBrake);
         shooterController.setP(Constants.ShooterConstants.kPShooter);
         shooterController.setD(Constants.ShooterConstants.kDShooter);
-        shooterFlywheelMotor.enableVoltageCompensation(Constants.ShooterConstants.motorVoltageComp);
-        shooterFlywheelMotor.burnFlash();
+        shooterFlywheelMotorMain.enableVoltageCompensation(Constants.ShooterConstants.motorVoltageComp);
+        shooterFlywheelMotorMain.burnFlash();
+    }
+
+    private void configFollowerShooterMotor() {
+        shooterFlywheelMotorFollower.restoreFactoryDefaults();
+        CANSparkMaxUtil.setCANSparkMaxBusUsage(shooterFlywheelMotorFollower, Usage.kMinimal);
+        shooterFlywheelMotorFollower.setSmartCurrentLimit(Constants.ShooterConstants.neoV1CurrentLimit);
+        shooterFlywheelMotorFollower.setIdleMode(IdleMode.kBrake);
+        shooterFlywheelMotorFollower.enableVoltageCompensation(Constants.ShooterConstants.motorVoltageComp);
+        /* This will cause the follower motor to produce the inverted main motor output */
+        shooterFlywheelMotorFollower.follow(shooterFlywheelMotorMain, true);//TODO invert or no?
+        shooterFlywheelMotorFollower.burnFlash();
     }
 
     private void configStorageMotor() {
@@ -123,7 +139,7 @@ public class Shooter extends SubsystemBase {
         () -> {}, 
         (unused) -> {}, 
         /* We are finished if the flywheel velocity is within our tolerance */
-        () -> Math.abs(shooterFlywheelMotor.getEncoder().getVelocity() - velocity) < Constants.ShooterConstants.shooterFlywheelVelocityTolerance, 
+        () -> Math.abs(shooterFlywheelMotorMain.getEncoder().getVelocity() - velocity) < Constants.ShooterConstants.shooterFlywheelVelocityTolerance, 
         this);
     }
 
@@ -177,8 +193,9 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Shooter Arm Position Relative", armMotorMain.getEncoder().getPosition());
+        SmartDashboard.putNumber("Shooter Arm Position Relative", armEncoder.getPosition());
+        SmartDashboard.putNumber("Shooter Arm Position Absolute", armMotorMain.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
         SmartDashboard.putNumber("Shooter Arm Setpoint", armSetpoint);
-        SmartDashboard.putNumber("Shooter Flywheel Velocity", shooterFlywheelMotor.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Shooter Flywheel Velocity", shooterFlywheelMotorMain.getEncoder().getVelocity());
     }
 }

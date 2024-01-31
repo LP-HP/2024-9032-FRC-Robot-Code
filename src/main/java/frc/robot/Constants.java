@@ -32,6 +32,7 @@ public final class Constants {
         public static final int localizationPipelineID = 0;//TODO make sure this aligns with the limelight config
     }
 
+    /* Using CANIds 13-14 - 2 motors */
     public static final class IntakeConstants {//TODO tune
         /* Intake Arm */
         public static final int armMotorID = 13;
@@ -46,7 +47,7 @@ public final class Constants {
         public static final double kDArm = 0.0;
 
         /* Arm and Flywheel Motor  */
-        public static final int motorCurrentLimit = 80;
+        public static final int motorCurrentLimit = 60;
         public static final int motorVoltageComp = 12;
 
         /* Intake Flywheel */
@@ -61,10 +62,11 @@ public final class Constants {
         public static final int beamBreakPort = 0;
     }
 
-     public static final class ShooterConstants {//TODO tune
+    /* Using CANIds 15-19 - 5 motors */
+    public static final class ShooterConstants {//TODO tune
         /* Shooter Arm */
         public static final int armMotorMainID = 15;
-        public static final int armMotorFollowerID = 55;
+        public static final int armMotorFollowerID = 16;
         public static final double armPositionPassthrough = 100.0;
         public static final double armPositionStorage = 80.0;
         public static final double armEncoderConversionFactor = 60.0;//TODO make sure this works
@@ -80,18 +82,19 @@ public final class Constants {
         }
 
         /* For Arm and Flywheel Motors  */
-        public static final int neoV1CurrentLimit = 80;
+        public static final int neoV1CurrentLimit = 60;
         public static final int motorVoltageComp = 12;
 
-        /* Shooter Flywheel */
-        public static final int shooterFlywheelMotorID = 16;
+        /* Shooter Flywheels */
+        public static final int shooterFlywheelMotorMainID = 17;
+        public static final int shooterFlywheelMotorFollowerID = 18;
         /* Controller Constants */
         public static final double shooterFlywheelVelocityTolerance = 0.5;//TODO UNITSSSSS
         public static final double kPShooter = 0.0;
         public static final double kDShooter = 0.0;
 
         /* Storage Motor */
-        public static final int storageMotorID = 21;
+        public static final int storageMotorID = 19;
         public static final int neo550CurrentLimit = 30;
         public static final double storageMotorPowerReceiving = 0.5;
         public static final double storageMotorPowerToFlywheels = 1;
@@ -100,6 +103,7 @@ public final class Constants {
         public static final int beamBreakPort = 0;
     }
 
+    /* Using CANIds 1-12 - 8 motors and 4 cancoders */
     public static final class SwerveConstants {
         public static final boolean invertGyro = false;
         public static final SPI.Port gyroPort = SPI.Port.kMXP;
