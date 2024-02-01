@@ -24,8 +24,9 @@ public class MultiNoteAuto extends SequentialCommandGroup {
         
         //Add at least 1 note
         addCommands(
-            /* Reset starting pose to limelight pose */
+            /* Reset starting pose to limelight pose and start adding vision measurements */
             new InstantCommand(() -> swerve.resetOdometry(limelight.getPoseEstimate().get().pose), swerve, limelight),
+            new InstantCommand(() -> swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate), swerve, limelight),
             /* Drive to the position to shoot the 1rst note, while moving the arm to the shooting position and lowering the intake */
             firstNoteShootAlignment,
             /* Enable shooter, wait, disable, and store */

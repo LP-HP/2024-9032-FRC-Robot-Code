@@ -9,6 +9,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javax.swing.text.html.Option;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -35,9 +37,9 @@ public class Swerve extends SubsystemBase {
 
     private final Field2d field = new Field2d();
 
-    private Supplier<Optional<VisionPoseMeasurement>> visionSup;
+    private Supplier<Optional<VisionPoseMeasurement>> visionSup = Optional::empty;
 
-    public Swerve(Supplier<Optional<VisionPoseMeasurement>> optionalVisionSupplier) {
+    public Swerve() {
         gyro = new AHRS(Constants.SwerveConstants.gyroPort);//Automatically calibrates
 
         swerveMods = new SwerveModule[] {
@@ -82,8 +84,6 @@ public class Swerve extends SubsystemBase {
         PathPlannerLogging.setLogActivePathCallback((poses) -> {
             field.getObject("path").setPoses(poses);
         });
-
-        visionSup = optionalVisionSupplier;
     }
 
     public void driveClosedLoopFromSpeeds(ChassisSpeeds speeds) {
@@ -166,6 +166,10 @@ public class Swerve extends SubsystemBase {
         for(SwerveModule mod : swerveMods) {
             mod.resetToAbsolute();
         }
+    }
+
+    public void addOptionalVisionPoseSupplier(Supplier<Optional<VisionPoseMeasurement>> poseSupplier) {
+        visionSup = poseSupplier;
     }
 
     private void updateVisionLocalization(Pose2d visionPose, double time) {
