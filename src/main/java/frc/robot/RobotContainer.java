@@ -1,9 +1,6 @@
 package frc.robot;
 
-import java.util.Optional;
-
-import com.pathplanner.lib.auto.NamedCommands;
-
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,13 +29,14 @@ public class RobotContainer {
 
     /* Driver Buttons */
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
-    private final Trigger fieldCentricButton = driveController.x().debounce(0.025);
+    private final Trigger fieldCentricButton = driveController.x().debounce(0.025);//TODO remove
     private final Trigger speakerScoreButton = driveController.y().debounce(0.025);
     private final Trigger enableIntakeButton = driveController.b().debounce(0.025);
     private final Trigger storeNoteButton = driveController.rightBumper().debounce(0.025);
+    private final Trigger aprilTagAlignmentTest = driveController.leftBumper().debounce(0.025);///TODO remove
 
     /* Subsystems */
-    // private final LimelightVision limelight = new LimelightVision(Constants.VisionConstants.limelightName, true);
+    private final LimelightVision limelight = new LimelightVision(Constants.VisionConstants.limelightName, true);
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
     private final Shooter shooter = new Shooter();
@@ -74,18 +72,18 @@ public class RobotContainer {
         // autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
         // autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
         // autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
-        // autoChooser.addOption("Align with april tag test", new AlignWithRotationTarget(swerve, () -> limelight.getAprilTagTarget().xOffset));
+        autoChooser.addOption("Align with April Tag", new AlignWithRotationTarget(swerve, () -> limelight.getAprilTagTarget().xOffset));
         SmartDashboard.putData("Choose an Auto:", autoChooser);//Let us choose autos through the dashboard
     }
 
     /* Only reset variables - don't run any commands here */
     public void autonomousInit() {
-        // limelight.switchToLocalizationPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
+        limelight.switchToLocalizationPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
     }
 
     /* Only reset variables - don't run any commands here */
     public void teleopInit() {
-        // limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
+        limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
     }
 
     private boolean isFieldCentric() {
@@ -95,7 +93,7 @@ public class RobotContainer {
     private void registerPathplannerCommands() {
         // NamedCommands.registerCommand("IntakeToGround", intake.setToGroundPosition());
         // NamedCommands.registerCommand("EnableIntake", intake.enableIntake());
-        // NamedCommands.registerCommand("ShooterArmNote1", shooter.setArmTargetPosition(4));//TODO have a constant
+        // NamedCommands.registerCommand("ShooterArmNote1", shooter.setArmTargetPosition(4));//TODO maybe don't register here
     }
 
     private void configureButtonBindings() {
@@ -106,7 +104,6 @@ public class RobotContainer {
          * right stick x - controls rotation 
          * 
          * a -> zero gyro
-         * x -> toggle field centric
          * y [must have a valid speaker target and a note] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
          * b -> [must not have a note] set intake to ground position and enable intake
          * right bumper [must have a note in the intake] -> put note into shooter
@@ -114,13 +111,13 @@ public class RobotContainer {
         */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
 
-        fieldCentricButton.onTrue(new InstantCommand(() -> isFieldCentric = !isFieldCentric));//Toggle field centric
+        fieldCentricButton.onTrue(new InstantCommand(() -> isFieldCentric = !isFieldCentric));//TODO remove
 
-        // speakerScoreButton.onTrue(
-        //     new SpeakerScoringSequence(swerve, limelight, shooter)
-        //     /* Only run if there is a valid target and it's a speaker tag and we have a note */
-        //     .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.isBeamBreakTriggered())
-        // );
+        speakerScoreButton.onTrue(
+            new SpeakerScoringSequence(swerve, limelight, shooter)
+            /* Only run if there is a valid target and it's a speaker tag and we have a note */
+            .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.isBeamBreakTriggered())
+        );
 
         enableIntakeButton.onTrue(
             intake.setToGroundPosition()
@@ -133,6 +130,14 @@ public class RobotContainer {
             .andThen(shooter.enableStorageMotorReceiving())
             .andThen(intake.shootIntoShooter())
             .onlyIf(intake::isBeamBreakTriggered)
+        );
+
+        aprilTagAlignmentTest.onTrue(//TODO move to other class
+            new LockToRotationTargetWhileMoving(swerve, 
+                () -> limelight.getAprilTagTarget().xOffset, 
+                () -> 
+                    new Translation2d(driveController.getLeftX(), -driveController.getLeftY())
+                    .times(Constants.TeleopConstants.joystickToSpeedConversionFactor))
         );
     }
 
