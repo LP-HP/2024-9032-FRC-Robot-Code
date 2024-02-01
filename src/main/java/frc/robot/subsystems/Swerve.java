@@ -9,8 +9,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import javax.swing.text.html.Option;
-
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
