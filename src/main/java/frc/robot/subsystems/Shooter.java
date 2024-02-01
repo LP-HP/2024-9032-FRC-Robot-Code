@@ -38,12 +38,15 @@ public class Shooter extends SubsystemBase {
 
     public Shooter() {
         armMotorMain = new CANSparkMax(Constants.ShooterConstants.armMotorMainID, MotorType.kBrushless);
+        armController = armMotorMain.getPIDController();
+        armEncoder = armMotorMain.getEncoder();
         configMainArmMotor();
 
         armMotorFollower = new CANSparkMax(Constants.ShooterConstants.armMotorFollowerID, MotorType.kBrushless);
         configFollowerArmMotor();
 
         shooterFlywheelMotorMain = new CANSparkMax(Constants.ShooterConstants.shooterFlywheelMotorMainID, MotorType.kBrushless);
+        shooterController = shooterFlywheelMotorMain.getPIDController();
         configMainShooterMotor();
 
         shooterFlywheelMotorFollower = new CANSparkMax(Constants.ShooterConstants.shooterFlywheelMotorFollowerID, MotorType.kBrushless);
@@ -52,11 +55,6 @@ public class Shooter extends SubsystemBase {
         passthroughStorageMotor = new CANSparkMax(Constants.ShooterConstants.storageMotorID, MotorType.kBrushless);
         configStorageMotor();
 
-        armController = armMotorMain.getPIDController();
-        shooterController = shooterFlywheelMotorMain.getPIDController();
-
-        armEncoder = armMotorMain.getEncoder();
-        armEncoder.setPositionConversionFactor(Constants.ShooterConstants.armEncoderConversionFactor);
         /* Reset the relative encoder to the absolute encoder value */
         armEncoder.setPosition(armMotorMain.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
     }
@@ -67,6 +65,7 @@ public class Shooter extends SubsystemBase {
         CANSparkMaxUtil.setCANSparkMaxBusUsage(armMotorMain, Usage.kPositionOnly, true);
         armMotorMain.setSmartCurrentLimit(Constants.ShooterConstants.neoV1CurrentLimit);
         armMotorMain.setIdleMode(IdleMode.kBrake);
+        armEncoder.setPositionConversionFactor(Constants.ShooterConstants.armEncoderConversionFactor);
         armController.setP(Constants.ShooterConstants.kPArm);
         armController.setD(Constants.ShooterConstants.kDArm);
         armMotorMain.enableVoltageCompensation(Constants.ShooterConstants.motorVoltageComp);

@@ -29,16 +29,14 @@ public class Intake extends SubsystemBase {
 
     public Intake() {
         armMotor = new CANSparkMax(Constants.IntakeConstants.armMotorID, MotorType.kBrushless);
+        armController = armMotor.getPIDController();
+        armEncoder = armMotor.getEncoder();
         configArmMotor();
 
         intakeFlywheelMotor = new CANSparkMax(Constants.IntakeConstants.intakeFlywheelMotorID, MotorType.kBrushless);
+        intakeController = intakeFlywheelMotor.getPIDController();
         configIntakeMotor();
 
-        armController = armMotor.getPIDController();
-        intakeController = intakeFlywheelMotor.getPIDController();
-
-        armEncoder = armMotor.getEncoder();
-        armEncoder.setPositionConversionFactor(Constants.IntakeConstants.armEncoderConversionFactor);
          /* Reset the relative encoder to the absolute encoder value */
         armEncoder.setPosition(armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
     }
@@ -48,6 +46,7 @@ public class Intake extends SubsystemBase {
         CANSparkMaxUtil.setCANSparkMaxBusUsage(armMotor, Usage.kPositionOnly);
         armMotor.setSmartCurrentLimit(Constants.IntakeConstants.motorCurrentLimit);
         armMotor.setIdleMode(IdleMode.kBrake);
+        armEncoder.setPositionConversionFactor(Constants.IntakeConstants.armEncoderConversionFactor);
         armController.setP(Constants.IntakeConstants.kPArm);
         armController.setD(Constants.IntakeConstants.kDArm);
         armMotor.enableVoltageCompensation(Constants.IntakeConstants.motorVoltageComp);
