@@ -20,7 +20,7 @@ public class AlignWithRotationTarget extends Command {
         this.targetRotSup = targetRotSup;
 
         swerveRotController = new PIDController(ClosedLoopConstants.kPRotationTarget, 0, ClosedLoopConstants.kDRotationTarget);
-        swerveRotController.enableContinuousInput(0.0, 360.0);//TODO the units will be messed up
+        swerveRotController.enableContinuousInput(-180.0, 180.0);//TODO the units will be messed up
 
         addRequirements(swerve);
     }

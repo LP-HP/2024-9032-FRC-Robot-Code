@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -8,9 +9,10 @@ import frc.lib.swerveutil.CANSparkMaxUtil;
 import frc.lib.swerveutil.SwerveModuleConstants;
 import frc.lib.swerveutil.CANSparkMaxUtil.Usage;
 import frc.robot.Constants;
-import frc.robot.Robot;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
@@ -106,27 +108,36 @@ public class SwerveModule {
 
     private Rotation2d getIntegratedAngle() {
         return Rotation2d.fromDegrees(Constants.SwerveConstants.integratedEncoderInvert 
-            /* Invert and put the angle in the range [0, 360) */
-            ? (180.0 + integratedAngleEncoder.getPosition()) % 360.0
-            /* Put the angle in the range [0, 360) */
-            : integratedAngleEncoder.getPosition() % 360.0
+            /* Invert and put the angle in the range (-180, 180] */
+            ? MathUtil.inputModulus(-integratedAngleEncoder.getPosition(), -180.0, 180.0)
+            /* Put the angle in the range (-180, 180] */
+            : MathUtil.inputModulus(integratedAngleEncoder.getPosition(), -180.0, 180.0)
             );//TODO check to see if the angle should wrap or not - SHOULD work
     }
 
     public Rotation2d getCanCoderAngle() {
-        /* In the range [0, 360) */
+        /* In the range (-180, 180] */
         return Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getValue());
     }
 
     public void resetToAbsolute() {
-        /* Add the offset to zero the module and put in the range [0, 360) */
-        double absolutePosition = getCanCoderAngle().plus(angleOffset).getDegrees() % 360.0;
+        /* Add the offset to zero the module and put in the range (-180, 180] */
+        double absolutePosition = MathUtil.inputModulus(getCanCoderAngle().plus(angleOffset).getDegrees(), -180.0, 180.0);
 
         integratedAngleEncoder.setPosition(absolutePosition);
+
+        /* Move to zeroed position */
+        angleController.setReference(0.0, ControlType.kPosition);
     }
 
-    private void configAngleEncoder() {        
-        angleEncoder.getConfigurator().apply(Robot.ctreConfigs.swerveCanCoderConfig);
+    private void configAngleEncoder() {      
+        CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
+
+        /* Put in the range (-180, 180] and invert if needed */
+        cancoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+        cancoderConfig.MagnetSensor.SensorDirection = Constants.SwerveConstants.canCoderInvert;
+        
+        angleEncoder.getConfigurator().apply(cancoderConfig);
     }
 
     private void configAngleMotor() {
@@ -140,10 +151,10 @@ public class SwerveModule {
         angleController.setI(Constants.SwerveConstants.angleKI);
         angleController.setD(Constants.SwerveConstants.angleKD);
         angleController.setFF(Constants.SwerveConstants.angleKF);
-        /* Wrap in the range [0, 360) */
+        /* Wrap in the range (-180, 180] */
         angleController.setPositionPIDWrappingEnabled(true);
-        angleController.setPositionPIDWrappingMaxInput(360.0);
-        angleController.setPositionPIDWrappingMinInput(0.0);
+        angleController.setPositionPIDWrappingMaxInput(180.0);
+        angleController.setPositionPIDWrappingMinInput(-180.0);
         angleMotor.enableVoltageCompensation(Constants.SwerveConstants.voltageComp);
         angleMotor.burnFlash();
     }

@@ -100,6 +100,7 @@ public class Swerve extends SubsystemBase {
 
     public void driveOpenLoop(Translation2d translation, double rotation, boolean fieldCentric) {
         SwerveModuleState[] desiredStates =
+            /* Kinematics wants module angles in the range (-180, 180] */
             Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(
                 fieldCentric ? ChassisSpeeds.fromFieldRelativeSpeeds(//For field relative driving
                                     translation.getX(), 
@@ -156,8 +157,8 @@ public class Swerve extends SubsystemBase {
         gyro.zeroYaw();
     }
 
-    private Rotation2d getGyroYaw() {
-        return (Constants.SwerveConstants.invertGyro) ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
+    private Rotation2d getGyroYaw() {//TODO check gyro invert
+        return (Constants.SwerveConstants.invertGyro) ? Rotation2d.fromDegrees(-gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
     }
 
     public void resetModulesToAbsolute() {
