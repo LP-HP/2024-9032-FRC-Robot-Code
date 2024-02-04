@@ -15,13 +15,15 @@ public final class Constants {
     public static final int driveControllerPort = 0;
 
     public static final class TeleopConstants {
-        public static final double stickDeadband = 0.02;
+        public static final double stickDeadband = 0.05;
+        public static final boolean isFieldCentric = true;
         /* Meters per Second */
-        public static final double joystickToSpeedConversionFactor = 0.5;
+        public static final double joystickToSpeedConversionFactor = 1;
         /* Radians per Second */
-        public static final double joystickToAngularVelocityConversionFactor = 0.5 * Math.PI;
+        public static final double joystickToAngularVelocityConversionFactor = Math.PI;
         /* Meters per Second Squared */
-        public static final double accelerationLimit = 1.5;//TODO tune
+        public static final double accelerationLimit = 16.0;//TODO tune
+        public static final double decelerationLimit = -16.0;//TODO tune
     }
 
     public static final class VisionConstants {
@@ -35,15 +37,16 @@ public final class Constants {
     /* Using CANIds 13-14 - 2 motors */
     public static final class IntakeConstants {//TODO tune
         /* Intake Arm */
-        public static final int armMotorID = 13;
+        public static final int armMotorID = 13;        
+        public static final double armEncoderConversionFactor = 1.0 / 60.0;//TODO make sure this works
+        /* Positions */
         public static final double armPositionGround = 0.0;
-        public static final double armPositionPassthrough = 100.0;
-        public static final double armPositionAmp = 12.0;
+        public static final double armPositionPassthrough = -0.279761493206024;
+        public static final double armPositionAmp = -0.279761493206024;
         public static final double armPositionStorage = 0.0;
-        public static final double armEncoderConversionFactor = 60.0;//TODO make sure this works
         /* Controller Constants */
-        public static final double armSetpointTolerance = 0.5;
-        public static final double kPArm = 0.0;
+        public static final double armSetpointTolerance = 0.01;
+        public static final double kPArm = 1.0;
         public static final double kDArm = 0.0;
 
         /* Arm and Flywheel Motor  */
@@ -52,11 +55,9 @@ public final class Constants {
 
         /* Intake Flywheel */
         public static final int intakeFlywheelMotorID = 14;
-        public static final double intakeVelocity = 1.0;
-        public static final double outtakeAmpVelocity = -1.0;
-        public static final double outtakeToShooterVelocity = -0.5;
-        public static final double kPIntake = 0.0;
-        public static final double kDIntake = 0.0;
+        public static final double intakePower = -0.2;
+        public static final double outtakeAmpPower = -0.1;
+        public static final double outtakeToShooterPower = -0.5;
 
         /* Sensors */
         public static final int beamBreakPort = 0;
@@ -66,10 +67,11 @@ public final class Constants {
     public static final class ShooterConstants {//TODO tune
         /* Shooter Arm */
         public static final int armMotorMainID = 15;
-        public static final int armMotorFollowerID = 16;
+        public static final int armMotorFollowerID = 16;        
+        public static final double armEncoderConversionFactor = 60.0;//TODO make sure this works
+        /* Positions */
         public static final double armPositionPassthrough = 100.0;
         public static final double armPositionStorage = 80.0;
-        public static final double armEncoderConversionFactor = 60.0;//TODO make sure this works
         /* Controller Constants */
         public static final double kPArm = 0.0;
         public static final double kDArm = 0.0;
@@ -100,12 +102,12 @@ public final class Constants {
         public static final double storageMotorPowerToFlywheels = 1;
 
         /* Sensors */
-        public static final int beamBreakPort = 0;
+        public static final int beamBreakPort = 1;
     }
 
     /* Using CANIds 1-12 - 8 motors and 4 cancoders */
     public static final class SwerveConstants {
-        public static final boolean invertGyro = false;
+        public static final boolean invertGyro = true;
         public static final SPI.Port gyroPort = SPI.Port.kMXP;
 
         /* Drivetrain Constants */
@@ -134,8 +136,8 @@ public final class Constants {
         public static final boolean driveMotorInvert = false;
 
         /* Angle Encoder Inverts */
-        public static final SensorDirectionValue canCoderInvert = SensorDirectionValue.Clockwise_Positive;
-        public static final boolean integratedEncoderInvert = true;
+        public static final SensorDirectionValue canCoderInvert = SensorDirectionValue.CounterClockwise_Positive;
+        public static final boolean integratedEncoderInvert = false;
 
         /* Swerve Voltage Compensation */
         public static final double voltageComp = 12.0;
@@ -145,9 +147,9 @@ public final class Constants {
         public static final int driveContinuousCurrentLimit = 80;
 
         /* Angle Motor PID Values */
-        public static final double angleKP = 0.05;//TODO Tune - needed for teleop
+        public static final double angleKP = 0.065;//TODO Tune - needed for teleop
         public static final double angleKI = 0.0;
-        public static final double angleKD = 0.0;
+        public static final double angleKD = 0.01;
         public static final double angleKF = 0.0;
 
         /* Drive Motor PID Values */
@@ -179,7 +181,7 @@ public final class Constants {
             public static final int driveMotorID = 1;
             public static final int angleMotorID = 2;
             public static final int canCoderID = 9;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(266.836);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-94.482);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -189,7 +191,7 @@ public final class Constants {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
             public static final int canCoderID = 10;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(139.834 + 180);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-40.430);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -199,7 +201,7 @@ public final class Constants {
             public static final int driveMotorID = 5;
             public static final int angleMotorID = 6;
             public static final int canCoderID = 11;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(60.117);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(57.920);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -209,7 +211,7 @@ public final class Constants {
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 12;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(73.389 + 180);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-106.700);
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }

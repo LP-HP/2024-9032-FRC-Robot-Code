@@ -3,7 +3,6 @@ package frc.robot.commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.Swerve;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -17,17 +16,15 @@ public class TeleopSwerve extends Command {
     private DoubleSupplier translationSup;
     private DoubleSupplier strafeSup;
     private DoubleSupplier rotationSup;
-    private BooleanSupplier fieldCentricSup;
 
-    private final SlewRateLimiter accelerationLimiterTranslation = new SlewRateLimiter(Constants.TeleopConstants.accelerationLimit);
-    private final SlewRateLimiter accelerationLimiterStrafe = new SlewRateLimiter(Constants.TeleopConstants.accelerationLimit);
+    private final SlewRateLimiter accelerationLimiterTranslation = new SlewRateLimiter(Constants.TeleopConstants.accelerationLimit, Constants.TeleopConstants.decelerationLimit, 0.0);
+    private final SlewRateLimiter accelerationLimiterStrafe = new SlewRateLimiter(Constants.TeleopConstants.accelerationLimit, Constants.TeleopConstants.decelerationLimit, 0.0);
 
-    public TeleopSwerve(Swerve swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup) {
+    public TeleopSwerve(Swerve swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {
         this.swerve = swerve;
         this.translationSup = translationSup;
         this.strafeSup = strafeSup;
         this.rotationSup = rotationSup;
-        this.fieldCentricSup = robotCentricSup;
 
         addRequirements(swerve);
     }
@@ -50,7 +47,7 @@ public class TeleopSwerve extends Command {
         swerve.driveOpenLoop(
             new Translation2d(translationVal, strafeVal), 
             rotationVal * Constants.TeleopConstants.joystickToAngularVelocityConversionFactor, 
-            fieldCentricSup.getAsBoolean()
+            Constants.TeleopConstants.isFieldCentric
         );
     }
 }

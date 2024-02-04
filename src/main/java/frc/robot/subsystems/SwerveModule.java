@@ -112,7 +112,7 @@ public class SwerveModule {
             ? MathUtil.inputModulus(-integratedAngleEncoder.getPosition(), -180.0, 180.0)
             /* Put the angle in the range (-180, 180] */
             : MathUtil.inputModulus(integratedAngleEncoder.getPosition(), -180.0, 180.0)
-            );//TODO check to see if the angle should wrap or not - SHOULD work
+            );
     }
 
     public Rotation2d getCanCoderAngle() {
@@ -122,12 +122,12 @@ public class SwerveModule {
 
     public void resetToAbsolute() {
         /* Add the offset to zero the module and put in the range (-180, 180] */
-        double absolutePosition = MathUtil.inputModulus(getCanCoderAngle().plus(angleOffset).getDegrees(), -180.0, 180.0);
+        double absolutePosition = MathUtil.inputModulus(getCanCoderAngle().minus(angleOffset).getDegrees(), -180.0, 180.0);
 
         integratedAngleEncoder.setPosition(absolutePosition);
 
         /* Move to zeroed position */
-        angleController.setReference(0.0, ControlType.kPosition);
+        angleController.setReference(absolutePosition, ControlType.kPosition);
     }
 
     private void configAngleEncoder() {      

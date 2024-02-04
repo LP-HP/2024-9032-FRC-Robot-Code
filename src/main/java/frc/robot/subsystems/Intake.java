@@ -23,7 +23,6 @@ public class Intake extends SubsystemBase {
     private RelativeEncoder armEncoder;
 
     private CANSparkMax intakeFlywheelMotor;
-    private SparkPIDController intakeController;
 
     private final DigitalInput beamBreak = new DigitalInput(Constants.IntakeConstants.beamBreakPort);
 
@@ -34,11 +33,10 @@ public class Intake extends SubsystemBase {
         configArmMotor();
 
         intakeFlywheelMotor = new CANSparkMax(Constants.IntakeConstants.intakeFlywheelMotorID, MotorType.kBrushless);
-        intakeController = intakeFlywheelMotor.getPIDController();
         configIntakeMotor();
 
          /* Reset the relative encoder to the absolute encoder value */
-        armEncoder.setPosition(armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
+        // armEncoder.setPosition(armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());//TODO 
     }
 
     private void configArmMotor() {
@@ -58,8 +56,6 @@ public class Intake extends SubsystemBase {
         CANSparkMaxUtil.setCANSparkMaxBusUsage(intakeFlywheelMotor, Usage.kVelocityOnly);
         intakeFlywheelMotor.setSmartCurrentLimit(Constants.IntakeConstants.motorCurrentLimit);
         intakeFlywheelMotor.setIdleMode(IdleMode.kBrake);
-        intakeController.setP(Constants.IntakeConstants.kPIntake);
-        intakeController.setD(Constants.IntakeConstants.kDIntake);
         intakeFlywheelMotor.enableVoltageCompensation(Constants.IntakeConstants.motorVoltageComp);
         intakeFlywheelMotor.burnFlash();
     }
@@ -105,29 +101,30 @@ public class Intake extends SubsystemBase {
         return moveToTargetPosition(Constants.IntakeConstants.armPositionPassthrough);
     }
 
-    private void setIntakeVelocity(double velocity) {
-        intakeController.setReference(velocity, ControlType.kVelocity);
+    private void setIntakePower(double power) {
+        intakeFlywheelMotor.set(power);
     }
     
     public Command enableIntake() {
-        return runOnce(() -> setIntakeVelocity(Constants.IntakeConstants.intakeVelocity));
+        return runOnce(() -> setIntakePower(Constants.IntakeConstants.intakePower));
     }
 
     public Command disableIntake() {
-        return runOnce(() -> setIntakeVelocity(0));
+        return runOnce(() -> setIntakePower(0));
     }
 
     public Command shootIntoAmp() {
-        return runOnce(() -> setIntakeVelocity(Constants.IntakeConstants.outtakeAmpVelocity));
+        return runOnce(() -> setIntakePower(Constants.IntakeConstants.outtakeAmpPower));
     }
 
     public Command shootIntoShooter() {
-        return runOnce(() -> setIntakeVelocity(Constants.IntakeConstants.outtakeToShooterVelocity));
+        return runOnce(() -> setIntakePower(Constants.IntakeConstants.outtakeToShooterPower));
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Intake Arm Position Relative", armEncoder.getPosition());
+        SmartDashboard.putNumber("Intake Arm Speed", armMotor.getAppliedOutput());
         SmartDashboard.putNumber("Intake Arm Position Absolute", armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
         SmartDashboard.putNumber("Intake Flywheel Velocity", intakeFlywheelMotor.getEncoder().getVelocity());
         SmartDashboard.putBoolean("Beam Break Triggered", isBeamBreakTriggered());

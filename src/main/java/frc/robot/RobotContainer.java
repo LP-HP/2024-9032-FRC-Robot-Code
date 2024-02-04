@@ -29,23 +29,20 @@ public class RobotContainer {
 
     /* Driver Buttons */
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
-    private final Trigger fieldCentricButton = driveController.x().debounce(0.025);//TODO remove
     private final Trigger speakerScoreButton = driveController.y().debounce(0.025);
     private final Trigger enableIntakeButton = driveController.b().debounce(0.025);
     private final Trigger storeNoteButton = driveController.rightBumper().debounce(0.025);
     private final Trigger aprilTagAlignmentTest = driveController.leftBumper().debounce(0.025);///TODO remove
 
     /* Subsystems */
-    private final LimelightVision limelight = new LimelightVision(Constants.VisionConstants.limelightName, true);
+    private final LimelightVision limelight = new LimelightVision(Constants.VisionConstants.limelightName, false);
     private final Swerve swerve = new Swerve();
-    private final Intake intake = new Intake();
-    private final Shooter shooter = new Shooter();
+    // private final Intake intake = new Intake();
+    // private final Shooter shooter = new Shooter();
 
     /* Subsystem Triggers */
-    private final Trigger intakeBeamBreakTrigger = new Trigger(intake::isBeamBreakTriggered).debounce(0.025);
-    private final Trigger shooterBeamBreakTrigger = new Trigger(shooter::isBeamBreakTriggered).debounce(0.025);
-
-    private boolean isFieldCentric = false;
+    // private final Trigger intakeBeamBreakTrigger = new Trigger(intake::isBeamBreakTriggered).debounce(0.025);
+    // private final Trigger shooterBeamBreakTrigger = new Trigger(shooter::isBeamBreakTriggered).debounce(0.025);
   
     public RobotContainer() {
         //Will run the following command when there is no other command set, such as during teleop
@@ -53,9 +50,8 @@ public class RobotContainer {
             new TeleopSwerve(
                 swerve, 
                 () -> -driveController.getLeftY(),//The y axis is inverted by default on the xbox controller, so uninvert it
-                driveController::getLeftX,
-                driveController::getRightX,
-                this::isFieldCentric
+                () -> -driveController.getLeftX(),
+                driveController::getRightX
             )
         );
 
@@ -86,10 +82,6 @@ public class RobotContainer {
         limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
     }
 
-    private boolean isFieldCentric() {
-        return isFieldCentric;
-    }
-
     private void registerPathplannerCommands() {
         // NamedCommands.registerCommand("IntakeToGround", intake.setToGroundPosition());
         // NamedCommands.registerCommand("EnableIntake", intake.enableIntake());
@@ -111,34 +103,34 @@ public class RobotContainer {
         */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
 
-        fieldCentricButton.onTrue(new InstantCommand(() -> isFieldCentric = !isFieldCentric));//TODO remove
+        // enableIntakeButton.onTrue(intake.enableIntake());//TODO remove
+        // speakerScoreButton.onTrue(intake.setToPassthroughPosition());
+        // speakerScoreButton.onTrue(
+        //     new SpeakerScoringSequence(swerve, limelight, shooter)
+        //     /* Only run if there is a valid target and it's a speaker tag and we have a note */
+        //     .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.isBeamBreakTriggered())
+        // );
 
-        speakerScoreButton.onTrue(
-            new SpeakerScoringSequence(swerve, limelight, shooter)
-            /* Only run if there is a valid target and it's a speaker tag and we have a note */
-            .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.isBeamBreakTriggered())
-        );
+        // enableIntakeButton.onTrue(
+        //     intake.setToGroundPosition()
+        //     .andThen(intake.enableIntake())
+        //     .onlyIf(() -> !intake.isBeamBreakTriggered())
+        // );
 
-        enableIntakeButton.onTrue(
-            intake.setToGroundPosition()
-            .andThen(intake.enableIntake())
-            .onlyIf(() -> !intake.isBeamBreakTriggered())
-        );
+        // storeNoteButton.onTrue(
+        //     shooter.moveArmToPassthroughPosition()
+        //     .andThen(shooter.enableStorageMotorReceiving())
+        //     .andThen(intake.shootIntoShooter())
+        //     .onlyIf(intake::isBeamBreakTriggered)
+        // );
 
-        storeNoteButton.onTrue(
-            shooter.moveArmToPassthroughPosition()
-            .andThen(shooter.enableStorageMotorReceiving())
-            .andThen(intake.shootIntoShooter())
-            .onlyIf(intake::isBeamBreakTriggered)
-        );
-
-        aprilTagAlignmentTest.onTrue(//TODO move to other class
-            new LockToRotationTargetWhileMoving(swerve, 
-                () -> limelight.getAprilTagTarget().xOffset, 
-                () -> 
-                    new Translation2d(driveController.getLeftX(), -driveController.getLeftY())
-                    .times(Constants.TeleopConstants.joystickToSpeedConversionFactor))
-        );
+        // aprilTagAlignmentTest.onTrue(//TODO move to other class
+        //     new LockToRotationTargetWhileMoving(swerve, 
+        //         () -> limelight.getAprilTagTarget().xOffset, 
+        //         () -> 
+        //             new Translation2d(driveController.getLeftX(), -driveController.getLeftY())
+        //             .times(Constants.TeleopConstants.joystickToSpeedConversionFactor))
+        // );
     }
 
     private void configureSubsystemTriggers() {
@@ -149,18 +141,18 @@ public class RobotContainer {
          * shooter beam break -> disable intake and storage motor and move shooter and intake to storage position
          * 
          */
-        intakeBeamBreakTrigger.onTrue(
-            intake.disableIntake()
-            .andThen(intake.setToStoragePosition())
-            .alongWith(setAndDisableRumble())
-        );
+        // intakeBeamBreakTrigger.onTrue(
+        //     intake.disableIntake()
+        //     .andThen(intake.setToStoragePosition())
+        //     .alongWith(setAndDisableRumble())
+        // );
 
-        shooterBeamBreakTrigger.onTrue(
-            shooter.disableStorageMotor()
-            .andThen(intake.disableIntake())
-            .andThen(shooter.setToStoragePosition())
-            .andThen(intake.setToStoragePosition())
-        );
+        // shooterBeamBreakTrigger.onTrue(
+        //     shooter.disableStorageMotor()
+        //     .andThen(intake.disableIntake())
+        //     .andThen(shooter.setToStoragePosition())
+        //     .andThen(intake.setToStoragePosition())
+        // );
     }
 
     private Command setAndDisableRumble() {

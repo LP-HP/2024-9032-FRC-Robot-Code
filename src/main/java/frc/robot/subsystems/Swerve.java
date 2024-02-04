@@ -116,8 +116,6 @@ public class Swerve extends SubsystemBase {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.SwerveConstants.maxSpeed);
 
-        SmartDashboard.putBoolean("Field Centric", fieldCentric);
-
         for(SwerveModule mod : swerveMods) {
             mod.setDesiredState(desiredStates[mod.getNumber()], true);
         }
@@ -157,7 +155,7 @@ public class Swerve extends SubsystemBase {
         gyro.zeroYaw();
     }
 
-    private Rotation2d getGyroYaw() {//TODO check gyro invert
+    private Rotation2d getGyroYaw() {
         return (Constants.SwerveConstants.invertGyro) ? Rotation2d.fromDegrees(-gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
     }
 
