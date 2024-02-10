@@ -38,7 +38,7 @@ public class Intake extends SubsystemBase {
         configIntakeMotor();
 
          /* Reset the relative encoder to the absolute encoder value */
-        armEncoder.setPosition(armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
+        // armEncoder.setPosition(armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());//TODO absolute encoder
     }
 
     private void configArmMotor() {
