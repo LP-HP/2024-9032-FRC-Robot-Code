@@ -35,9 +35,9 @@ public class Swerve extends SubsystemBase {
 
     private final Field2d field = new Field2d();
 
-    private Supplier<Optional<VisionPoseMeasurement>> visionSup;
+    private Supplier<Optional<VisionPoseMeasurement>> visionSup = Optional::empty;
 
-    public Swerve(Supplier<Optional<VisionPoseMeasurement>> optionalVisionSupplier) {
+    public Swerve() {
         gyro = new AHRS(Constants.SwerveConstants.gyroPort);//Automatically calibrates
 
         swerveMods = new SwerveModule[] {
@@ -60,7 +60,7 @@ public class Swerve extends SubsystemBase {
                 this::getPose,
                 this::resetOdometry,
                 this::getSpeeds, 
-                this::driveAuto,
+                this::driveClosedLoopFromSpeeds,
                 new HolonomicPathFollowerConfig(
                     new PIDConstants(Constants.ClosedLoopConstants.kPTranslation, 0, Constants.ClosedLoopConstants.kDTranslation),
                     new PIDConstants(Constants.ClosedLoopConstants.kPRotation, 0, Constants.ClosedLoopConstants.kDRotation), 
@@ -82,11 +82,9 @@ public class Swerve extends SubsystemBase {
         PathPlannerLogging.setLogActivePathCallback((poses) -> {
             field.getObject("path").setPoses(poses);
         });
-
-        visionSup = optionalVisionSupplier;
     }
 
-    public void driveAuto(ChassisSpeeds speeds) {
+    public void driveClosedLoopFromSpeeds(ChassisSpeeds speeds) {
         SwerveModuleState[] desiredStates = Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(speeds);
 
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.SwerveConstants.maxSpeed);
@@ -97,11 +95,12 @@ public class Swerve extends SubsystemBase {
     }
 
     public void driveClosedLoop(Translation2d translation, double rotation) {
-        driveAuto(new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
+        driveClosedLoopFromSpeeds(new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
     }
 
     public void driveOpenLoop(Translation2d translation, double rotation, boolean fieldCentric) {
         SwerveModuleState[] desiredStates =
+            /* Kinematics wants module angles in the range (-180, 180] */
             Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(
                 fieldCentric ? ChassisSpeeds.fromFieldRelativeSpeeds(//For field relative driving
                                     translation.getX(), 
@@ -116,8 +115,6 @@ public class Swerve extends SubsystemBase {
                                 );
 
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.SwerveConstants.maxSpeed);
-
-        SmartDashboard.putBoolean("Field Centric", fieldCentric);
 
         for(SwerveModule mod : swerveMods) {
             mod.setDesiredState(desiredStates[mod.getNumber()], true);
@@ -159,13 +156,17 @@ public class Swerve extends SubsystemBase {
     }
 
     private Rotation2d getGyroYaw() {
-        return (Constants.SwerveConstants.invertGyro) ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
+        return (Constants.SwerveConstants.invertGyro) ? Rotation2d.fromDegrees(-gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
     }
 
     public void resetModulesToAbsolute() {
         for(SwerveModule mod : swerveMods) {
             mod.resetToAbsolute();
         }
+    }
+
+    public void addOptionalVisionPoseSupplier(Supplier<Optional<VisionPoseMeasurement>> poseSupplier) {
+        visionSup = poseSupplier;
     }
 
     private void updateVisionLocalization(Pose2d visionPose, double time) {
