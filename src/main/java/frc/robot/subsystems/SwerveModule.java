@@ -1,17 +1,18 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.lib.swerveutil.CANSparkMaxUtil;
-import frc.lib.swerveutil.CTREModuleState;
 import frc.lib.swerveutil.SwerveModuleConstants;
 import frc.lib.swerveutil.CANSparkMaxUtil.Usage;
 import frc.robot.Constants;
-import frc.robot.Robot;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
@@ -62,8 +63,9 @@ public class SwerveModule {
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
         SwerveModuleState currentState = getState();
-        /* This is a custom optimize function, since default WPILib optimize assumes continuous controller which CTRE and Rev onboard is not */
-        desiredState = CTREModuleState.optimize(desiredState, currentState.angle); 
+       
+        /* Reverse the direction if needed to avoid rotating more than 90 degrees - works since PID wrapping is enabled */
+        desiredState = SwerveModuleState.optimize(desiredState, currentState.angle);
 
         setAngle(desiredState);
         setSpeed(desiredState, currentState, isOpenLoop);
@@ -73,14 +75,15 @@ public class SwerveModule {
         if (isOpenLoop) {
             /* Scale speed by cosine of angle error, which slows down movement perpendicular to the desired direction of travel
              * Smoothes driving when modules change directions
-             * Stolen from: https://github.com/wpilibsuite/allwpilib/pull/5758
+             * See: https://github.com/wpilibsuite/allwpilib/pull/5758
              */
-            desiredState.speedMetersPerSecond *= desiredState.angle.minus(currentState.angle).getCos();//TODO does this help or hurt??
+            desiredState.speedMetersPerSecond *= desiredState.angle.minus(currentState.angle).getCos();
 
             double percentOutput = desiredState.speedMetersPerSecond / Constants.SwerveConstants.maxSpeed;
 
             driveMotor.set(percentOutput);
-        } else {
+        } 
+        else {
             driveController.setReference(//Set the closed loop velocity controller with a feedforward component
                     desiredState.speedMetersPerSecond,
                     ControlType.kVelocity,
@@ -94,7 +97,7 @@ public class SwerveModule {
     }
 
     private void setAngle(SwerveModuleState desiredState) {
-        //Prevent rotating module if speed is less then 1% to prevent jittering.
+        /* Prevent rotating module if speed is less then 1% to prevent jittering */
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.SwerveConstants.maxSpeed * 0.01))
                 ? lastAngle
                 : desiredState.angle;
@@ -104,20 +107,37 @@ public class SwerveModule {
     }
 
     private Rotation2d getIntegratedAngle() {
-        return Rotation2d.fromDegrees(integratedAngleEncoder.getPosition());
+        return Rotation2d.fromDegrees(Constants.SwerveConstants.integratedEncoderInvert 
+            /* Invert and put the angle in the range (-180, 180] */
+            ? MathUtil.inputModulus(-integratedAngleEncoder.getPosition(), -180.0, 180.0)
+            /* Put the angle in the range (-180, 180] */
+            : MathUtil.inputModulus(integratedAngleEncoder.getPosition(), -180.0, 180.0)
+            );
     }
 
     public Rotation2d getCanCoderAngle() {
+        /* In the range (-180, 180] */
         return Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getValue());
     }
 
     public void resetToAbsolute() {
-        double absolutePosition = getCanCoderAngle().getDegrees() - angleOffset.getDegrees();
+        /* Add the offset to zero the module and put in the range (-180, 180] */
+        double absolutePosition = MathUtil.inputModulus(getCanCoderAngle().minus(angleOffset).getDegrees(), -180.0, 180.0);
+
         integratedAngleEncoder.setPosition(absolutePosition);
+
+        /* Move to zeroed position */
+        angleController.setReference(absolutePosition, ControlType.kPosition);
     }
 
-    private void configAngleEncoder() {        
-        angleEncoder.getConfigurator().apply(Robot.ctreConfigs.swerveCanCoderConfig);
+    private void configAngleEncoder() {      
+        CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
+
+        /* Put in the range (-180, 180] and invert if needed */
+        cancoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+        cancoderConfig.MagnetSensor.SensorDirection = Constants.SwerveConstants.canCoderInvert;
+        
+        angleEncoder.getConfigurator().apply(cancoderConfig);
     }
 
     private void configAngleMotor() {
@@ -131,6 +151,10 @@ public class SwerveModule {
         angleController.setI(Constants.SwerveConstants.angleKI);
         angleController.setD(Constants.SwerveConstants.angleKD);
         angleController.setFF(Constants.SwerveConstants.angleKF);
+        /* Wrap in the range (-180, 180] */
+        angleController.setPositionPIDWrappingEnabled(true);
+        angleController.setPositionPIDWrappingMaxInput(180.0);
+        angleController.setPositionPIDWrappingMinInput(-180.0);
         angleMotor.enableVoltageCompensation(Constants.SwerveConstants.voltageComp);
         angleMotor.burnFlash();
     }

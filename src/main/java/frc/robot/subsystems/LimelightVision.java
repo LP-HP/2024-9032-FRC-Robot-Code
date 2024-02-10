@@ -25,7 +25,7 @@ public class LimelightVision extends SubsystemBase {
     @Override
     public void periodic() {
         if(isLocalizationPipeline) {
-            Pose2d currentPose = LimelightHelpers.getBotPose2d(name);//TODO what coordinates? wpilib blue or origin center
+            Pose2d currentPose = LimelightHelpers.getBotPose2d_wpiBlue(name);//TODO what coordinates? should be wpilib blue
 
             //If we get the same measurement as the last loop then invalidate
             if(currentPose.equals(lastPoseEstimate.pose))
