@@ -1,23 +1,17 @@
 package frc.lib.swerveutil;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.util.SparkMaxConstants;
 
 public class SwerveModuleConstants {
-    public final int driveMotorID;
-    public final int angleMotorID;
+    public final SparkMaxConstants driveMotorConstants;
+    public final SparkMaxConstants angleMotorConstants;
     public final int cancoderID;
     public final Rotation2d angleOffset;
 
-    /**
-     * Swerve Module Constants to be used when creating swerve modules.
-     * @param driveMotorID
-     * @param angleMotorID
-     * @param canCoderID
-     * @param angleOffset
-     */
-    public SwerveModuleConstants(int driveMotorID, int angleMotorID, int canCoderID, Rotation2d angleOffset) {
-        this.driveMotorID = driveMotorID;
-        this.angleMotorID = angleMotorID;
+    public SwerveModuleConstants(SparkMaxConstants driveMotorConstants, SparkMaxConstants angleMotorConstants, int canCoderID, Rotation2d angleOffset) {
+        this.driveMotorConstants = driveMotorConstants;
+        this.angleMotorConstants = angleMotorConstants;
         this.cancoderID = canCoderID;
         this.angleOffset = angleOffset;
     }

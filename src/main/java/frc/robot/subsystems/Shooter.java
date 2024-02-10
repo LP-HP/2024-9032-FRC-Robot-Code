@@ -1,120 +1,52 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkLowLevel.MotorType;
-
 import java.util.function.DoubleSupplier;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkAbsoluteEncoder;
-import com.revrobotics.SparkPIDController;
-import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkBase.IdleMode;
-
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.swerveutil.CANSparkMaxUtil;
-import frc.lib.swerveutil.CANSparkMaxUtil.Usage;
 import frc.robot.Constants;
+import frc.robot.util.SparkMaxWrapper;
 
 public class Shooter extends SubsystemBase {
-    private CANSparkMax armMotorMain;    
-    private CANSparkMax armMotorFollower;    
-    private SparkPIDController armController;
-    private RelativeEncoder armEncoder;
-    private SparkAbsoluteEncoder armEncoderAbsolute;
-    private double armSetpoint;
+    private SparkMaxWrapper armMotor;    
+    private SparkMaxWrapper armMotorFollower;    
 
-    private CANSparkMax shooterFlywheelMotorMain;
-    private CANSparkMax shooterFlywheelMotorFollower;
-    private SparkPIDController shooterController;
+    private SparkMaxWrapper flywheelMotor;
+    private SparkMaxWrapper flywheelMotorFollower;
 
-    private CANSparkMax passthroughStorageMotor;
+    private SparkMaxWrapper passthroughStorageMotor;
 
     private final DigitalInput beamBreak = new DigitalInput(Constants.ShooterConstants.beamBreakPort);
 
     public Shooter() {
-        armMotorMain = new CANSparkMax(Constants.ShooterConstants.armMotorMainID, MotorType.kBrushless);
-        armController = armMotorMain.getPIDController();
-        armEncoder = armMotorMain.getEncoder();
-        armEncoderAbsolute = armMotorMain.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
-        configMainArmMotor();
+        armMotor = new SparkMaxWrapper(Constants.ShooterConstants.shooterArmConstants);
+        armMotor.configAbsoluteEncoder(Constants.ShooterConstants.invertAbsoluteEncoder);
+        armMotor.config();
 
-        armMotorFollower = new CANSparkMax(Constants.ShooterConstants.armMotorFollowerID, MotorType.kBrushless);
-        configFollowerArmMotor();
+        armMotorFollower = new SparkMaxWrapper(Constants.ShooterConstants.shooterArmFolllowerConstants);
+        armMotorFollower.follow(armMotor, Constants.ShooterConstants.invertArmFollower);
+        armMotorFollower.config();
 
-        shooterFlywheelMotorMain = new CANSparkMax(Constants.ShooterConstants.shooterFlywheelMotorMainID, MotorType.kBrushless);
-        shooterController = shooterFlywheelMotorMain.getPIDController();
-        configMainShooterMotor();
+        flywheelMotor = new SparkMaxWrapper(Constants.ShooterConstants.shooterFlywheelConstants);
+        flywheelMotor.config();
 
-        shooterFlywheelMotorFollower = new CANSparkMax(Constants.ShooterConstants.shooterFlywheelMotorFollowerID, MotorType.kBrushless);
-        configFollowerShooterMotor();
+        flywheelMotorFollower = new SparkMaxWrapper(Constants.ShooterConstants.shooterFlywheelFolllowerConstants);
+        flywheelMotorFollower.follow(flywheelMotor, Constants.ShooterConstants.invertFlywheelFollower);
+        flywheelMotorFollower.config();
 
-        passthroughStorageMotor = new CANSparkMax(Constants.ShooterConstants.storageMotorID, MotorType.kBrushless);
-        configStorageMotor();
+        passthroughStorageMotor = new SparkMaxWrapper(Constants.ShooterConstants.shooterStorageConstants);
+        passthroughStorageMotor.config();
 
-        /* Reset the relative encoder to the absolute encoder value */
-        armEncoder.setPosition(armEncoderAbsolute.getPosition());
-    }
+         /* Wait for the encoder to initialize before setting to absolute */
+        Timer.delay(1.0);
 
-    private void configMainArmMotor() {
-        armMotorMain.restoreFactoryDefaults();
-        /* Makes this motor the leader */
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(armMotorMain, Usage.kPositionOnly, true);
-        armMotorMain.setSmartCurrentLimit(Constants.ShooterConstants.neoV1CurrentLimit);
-        armMotorMain.setIdleMode(IdleMode.kBrake);
-        armEncoder.setPositionConversionFactor(Constants.ShooterConstants.armEncoderConversionFactor);
-        armController.setP(Constants.ShooterConstants.kPArm);
-        armController.setD(Constants.ShooterConstants.kDArm);
-        armMotorMain.enableVoltageCompensation(Constants.ShooterConstants.motorVoltageComp);
-        armMotorMain.burnFlash();
-    }
-
-    private void configFollowerArmMotor() {
-        armMotorFollower.restoreFactoryDefaults();
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(armMotorFollower, Usage.kMinimal);
-        armMotorFollower.setSmartCurrentLimit(Constants.ShooterConstants.neoV1CurrentLimit);
-        armMotorFollower.setIdleMode(IdleMode.kBrake);
-        armMotorFollower.enableVoltageCompensation(Constants.ShooterConstants.motorVoltageComp);
-        /* This will cause the follower motor to produce the same output as the main motor */
-        armMotorFollower.follow(armMotorMain);//TODO MAKE SURE THIS IS NOT INVERTED OR IT MIGHT FRY
-        armMotorFollower.burnFlash();
-    }
-
-    private void configMainShooterMotor() {
-        shooterFlywheelMotorMain.restoreFactoryDefaults();
-        /* Makes this motor the leader */
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(shooterFlywheelMotorMain, Usage.kVelocityOnly, true);
-        shooterFlywheelMotorMain.setSmartCurrentLimit(Constants.ShooterConstants.neoV1CurrentLimit);
-        shooterFlywheelMotorMain.setIdleMode(IdleMode.kBrake);
-        shooterController.setP(Constants.ShooterConstants.kPShooter);
-        shooterController.setD(Constants.ShooterConstants.kDShooter);
-        shooterFlywheelMotorMain.enableVoltageCompensation(Constants.ShooterConstants.motorVoltageComp);
-        shooterFlywheelMotorMain.burnFlash();
-    }
-
-    private void configFollowerShooterMotor() {
-        shooterFlywheelMotorFollower.restoreFactoryDefaults();
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(shooterFlywheelMotorFollower, Usage.kMinimal);
-        shooterFlywheelMotorFollower.setSmartCurrentLimit(Constants.ShooterConstants.neoV1CurrentLimit);
-        shooterFlywheelMotorFollower.setIdleMode(IdleMode.kBrake);
-        shooterFlywheelMotorFollower.enableVoltageCompensation(Constants.ShooterConstants.motorVoltageComp);
-        /* This will cause the follower motor to produce the inverted main motor output */
-        shooterFlywheelMotorFollower.follow(shooterFlywheelMotorMain, true);//TODO invert or no?
-        shooterFlywheelMotorFollower.burnFlash();
-    }
-
-    private void configStorageMotor() {
-        passthroughStorageMotor.restoreFactoryDefaults();
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(armMotorMain, Usage.kMinimal);
-        passthroughStorageMotor.setSmartCurrentLimit(Constants.ShooterConstants.neo550CurrentLimit);
-        passthroughStorageMotor.setIdleMode(IdleMode.kBrake);
-        passthroughStorageMotor.enableVoltageCompensation(Constants.ShooterConstants.motorVoltageComp);
-        passthroughStorageMotor.burnFlash();
+         /* Reset the relative encoder to the absolute encoder value */
+        armMotor.relativeEncoder.setPosition(armMotor.getAbsolutePosition());
     }
 
     public boolean isBeamBreakTriggered() {
@@ -136,16 +68,16 @@ public class Shooter extends SubsystemBase {
     private Command waitForShooterVelocity(double velocity) {
         return new FunctionalCommand(
         /* Sets the target velocity at the start */
-        () -> shooterController.setReference(velocity, ControlType.kVelocity), 
+        () -> flywheelMotor.setClosedLoopTarget(velocity), 
         () -> {}, 
         (unused) -> {}, 
         /* We are finished if the flywheel velocity is within our tolerance */
-        () -> Math.abs(shooterFlywheelMotorMain.getEncoder().getVelocity() - velocity) < Constants.ShooterConstants.shooterFlywheelVelocityTolerance, 
+        () -> Math.abs(flywheelMotor.relativeEncoder.getVelocity() - velocity) < Constants.ShooterConstants.shooterFlywheelVelocityTolerance, 
         this);
     }
 
     private Command disableShooterFlywheel() {
-        return runOnce(() -> shooterController.setReference(0, ControlType.kVelocity));
+        return runOnce(() -> flywheelMotor.setClosedLoopTarget(0));
     }
 
     public Command setShooterVelocityThenWaitThenDisable(double velocity, double waitTime) {
@@ -156,30 +88,23 @@ public class Shooter extends SubsystemBase {
            .andThen(disableStorageMotor());
     }
 
-    /* Just sets the target */
-    private void setArmTargetPosition(double position) {
-        armSetpoint = position;
-
-        armController.setReference(armSetpoint, ControlType.kPosition); 
-    }
-
     public Command setToPassthroughPosition() {
-        return runOnce(() -> setArmTargetPosition(Constants.ShooterConstants.armPositionPassthrough)); 
+        return runOnce(() -> armMotor.setClosedLoopTarget(Constants.ShooterConstants.armPositionPassthrough)); 
     }
 
     public Command setToStoragePosition() {
-        return runOnce(() -> setArmTargetPosition(Constants.ShooterConstants.armPositionStorage)); 
+        return runOnce(() -> armMotor.setClosedLoopTarget(Constants.ShooterConstants.armPositionStorage)); 
     }
 
     /* Sets the target and wait until it is achieved */
     private Command moveArmToTargetPosition(double position) { 
         return new FunctionalCommand(
         /* Sets the target position at the start */
-        () -> setArmTargetPosition(position),
+        () -> armMotor.setClosedLoopTarget(position),
         () -> {},
         (unused) -> {},
         /* We are finished if the arm position is within our tolerance */
-        () -> Math.abs(armMotorMain.getEncoder().getPosition() - armSetpoint) < Constants.ShooterConstants.armSetpointTolerance,
+        () -> Math.abs(armMotor.relativeEncoder.getPosition() - position) < Constants.ShooterConstants.armSetpointTolerance,
         this);
     }   
 
@@ -194,10 +119,6 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Shooter Arm Position Relative", armEncoder.getPosition());
-        SmartDashboard.putNumber("Shooter Arm Position Absolute", armEncoderAbsolute.getPosition());
-        SmartDashboard.putNumber("Shooter Arm Setpoint", armSetpoint);
-        SmartDashboard.putNumber("Shooter Flywheel Velocity", shooterFlywheelMotorMain.getEncoder().getVelocity());
-        SmartDashboard.putBoolean("Beam Break Triggered", isBeamBreakTriggered());
+        SmartDashboard.putBoolean("Shooter Beam Break Triggered", isBeamBreakTriggered());
     }
 }

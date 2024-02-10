@@ -106,7 +106,7 @@ public class RobotContainer {
 
         //TODO remove 
         enableIntakeButton.onTrue(intake.enableIntake());//b
-        speakerScoreButton.onTrue(intake.setToPassthroughPosition());//y 
+        speakerScoreButton.onTrue(intake.setToAmpPosition());//y 
         storeNoteButton.onTrue(intake.setToGroundPosition());//r bumper
         aprilTagAlignmentTest.onTrue(intake.shootIntoAmp());//l bumper
 
