@@ -31,13 +31,14 @@ public class RobotContainer {
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
     private final Trigger speakerScoreButton = driveController.y().debounce(0.025);
     private final Trigger enableIntakeButton = driveController.b().debounce(0.025);
+    private final Trigger disableIntakeTemp = driveController.x().debounce(0.025);//TODO remove
     private final Trigger storeNoteButton = driveController.rightBumper().debounce(0.025);
-    private final Trigger aprilTagAlignmentTest = driveController.leftBumper().debounce(0.025);///TODO remove
+    private final Trigger aprilTagAlignmentTest = driveController.leftBumper().debounce(0.025);//TODO remove
 
     /* Subsystems */
     private final LimelightVision limelight = new LimelightVision(Constants.VisionConstants.limelightName, false);
     private final Swerve swerve = new Swerve();
-    // private final Intake intake = new Intake();
+    private final Intake intake = new Intake();
     // private final Shooter shooter = new Shooter();
 
     /* Subsystem Triggers */
@@ -103,8 +104,13 @@ public class RobotContainer {
         */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
 
-        // enableIntakeButton.onTrue(intake.enableIntake());//TODO remove
-        // speakerScoreButton.onTrue(intake.setToPassthroughPosition());
+        //TODO remove 
+        enableIntakeButton.onTrue(intake.enableIntake());//b
+        speakerScoreButton.onTrue(intake.setToPassthroughPosition());//y 
+        storeNoteButton.onTrue(intake.setToGroundPosition());//r bumper
+        aprilTagAlignmentTest.onTrue(intake.shootIntoAmp());//l bumper
+
+        disableIntakeTemp.onTrue(intake.disableIntake());//x
         // speakerScoreButton.onTrue(
         //     new SpeakerScoringSequence(swerve, limelight, shooter)
         //     /* Only run if there is a valid target and it's a speaker tag and we have a note */

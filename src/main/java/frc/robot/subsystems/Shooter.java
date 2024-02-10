@@ -26,6 +26,7 @@ public class Shooter extends SubsystemBase {
     private CANSparkMax armMotorFollower;    
     private SparkPIDController armController;
     private RelativeEncoder armEncoder;
+    private SparkAbsoluteEncoder armEncoderAbsolute;
     private double armSetpoint;
 
     private CANSparkMax shooterFlywheelMotorMain;
@@ -40,6 +41,7 @@ public class Shooter extends SubsystemBase {
         armMotorMain = new CANSparkMax(Constants.ShooterConstants.armMotorMainID, MotorType.kBrushless);
         armController = armMotorMain.getPIDController();
         armEncoder = armMotorMain.getEncoder();
+        armEncoderAbsolute = armMotorMain.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
         configMainArmMotor();
 
         armMotorFollower = new CANSparkMax(Constants.ShooterConstants.armMotorFollowerID, MotorType.kBrushless);
@@ -56,7 +58,7 @@ public class Shooter extends SubsystemBase {
         configStorageMotor();
 
         /* Reset the relative encoder to the absolute encoder value */
-        armEncoder.setPosition(armMotorMain.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
+        armEncoder.setPosition(armEncoderAbsolute.getPosition());
     }
 
     private void configMainArmMotor() {
@@ -193,7 +195,7 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Shooter Arm Position Relative", armEncoder.getPosition());
-        SmartDashboard.putNumber("Shooter Arm Position Absolute", armMotorMain.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
+        SmartDashboard.putNumber("Shooter Arm Position Absolute", armEncoderAbsolute.getPosition());
         SmartDashboard.putNumber("Shooter Arm Setpoint", armSetpoint);
         SmartDashboard.putNumber("Shooter Flywheel Velocity", shooterFlywheelMotorMain.getEncoder().getVelocity());
         SmartDashboard.putBoolean("Beam Break Triggered", isBeamBreakTriggered());

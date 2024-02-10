@@ -21,6 +21,7 @@ public class Intake extends SubsystemBase {
     private CANSparkMax armMotor;    
     private SparkPIDController armController;
     private RelativeEncoder armEncoder;
+    private SparkAbsoluteEncoder armEncoderAbsolute;
 
     private CANSparkMax intakeFlywheelMotor;
 
@@ -30,13 +31,14 @@ public class Intake extends SubsystemBase {
         armMotor = new CANSparkMax(Constants.IntakeConstants.armMotorID, MotorType.kBrushless);
         armController = armMotor.getPIDController();
         armEncoder = armMotor.getEncoder();
+        armEncoderAbsolute = armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
         configArmMotor();
 
         intakeFlywheelMotor = new CANSparkMax(Constants.IntakeConstants.intakeFlywheelMotorID, MotorType.kBrushless);
         configIntakeMotor();
 
          /* Reset the relative encoder to the absolute encoder value */
-        // armEncoder.setPosition(armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());//TODO 
+        armEncoder.setPosition(armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
     }
 
     private void configArmMotor() {
@@ -125,7 +127,7 @@ public class Intake extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Intake Arm Position Relative", armEncoder.getPosition());
         SmartDashboard.putNumber("Intake Arm Speed", armMotor.getAppliedOutput());
-        SmartDashboard.putNumber("Intake Arm Position Absolute", armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
+        SmartDashboard.putNumber("Intake Arm Position Absolute", armEncoderAbsolute.getPosition());
         SmartDashboard.putNumber("Intake Flywheel Velocity", intakeFlywheelMotor.getEncoder().getVelocity());
         SmartDashboard.putBoolean("Beam Break Triggered", isBeamBreakTriggered());
     }

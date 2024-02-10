@@ -40,9 +40,9 @@ public final class Constants {
         public static final int armMotorID = 13;        
         public static final double armEncoderConversionFactor = 1.0 / 60.0;//TODO make sure this works
         /* Positions */
-        public static final double armPositionGround = 0.0;
-        public static final double armPositionPassthrough = -0.279761493206024;
-        public static final double armPositionAmp = -0.279761493206024;
+        public static final double armPositionGround = -0.029761908575892;
+        public static final double armPositionPassthrough = -0.33372887969017;
+        public static final double armPositionAmp = -0.33372887969017;
         public static final double armPositionStorage = 0.0;
         /* Controller Constants */
         public static final double armSetpointTolerance = 0.01;
@@ -56,8 +56,8 @@ public final class Constants {
         /* Intake Flywheel */
         public static final int intakeFlywheelMotorID = 14;
         public static final double intakePower = -0.2;
-        public static final double outtakeAmpPower = -0.1;
-        public static final double outtakeToShooterPower = -0.5;
+        public static final double outtakeAmpPower = 0.6;
+        public static final double outtakeToShooterPower = -0.1;
 
         /* Sensors */
         public static final int beamBreakPort = 0;
@@ -147,7 +147,7 @@ public final class Constants {
         public static final int driveContinuousCurrentLimit = 80;
 
         /* Angle Motor PID Values */
-        public static final double angleKP = 0.065;//TODO Tune - needed for teleop
+        public static final double angleKP = 0.06;//TODO Tune - needed for teleop
         public static final double angleKI = 0.0;
         public static final double angleKD = 0.01;
         public static final double angleKF = 0.0;
