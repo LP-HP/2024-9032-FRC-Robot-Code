@@ -183,7 +183,7 @@ public class Swerve extends SubsystemBase {
     }
 
     @Override
-    public void periodic() {//TODO change dashboard
+    public void periodic() {
         swerveOdometry.update(getGyroYaw(), getModulePositions());  
 
         if(!visionSup.get().isEmpty()) {//Only update vision if an update is provided
@@ -193,11 +193,7 @@ public class Swerve extends SubsystemBase {
         }
 
         for(SwerveModule mod : swerveMods) {//Send swerve module telemetry
-            int modNum = mod.getNumber();
-
-            SmartDashboard.putNumber("Swerve Mod " + modNum + " Cancoder Angle", mod.getCanCoderAngle().getDegrees());
-            SmartDashboard.putNumber("Swerve Mod " + modNum + " Integrated Angle", mod.getPosition().angle.getDegrees());
-            SmartDashboard.putNumber("Swerve Mod " + modNum + " Velocity", mod.getState().speedMetersPerSecond);    
+            SmartDashboard.putNumber("Swerve Mod " +  mod.getNumber() + " Cancoder Angle", mod.getCanCoderAngle().getDegrees());
         }
         
         Pose2d currentPose = swerveOdometry.getEstimatedPosition();

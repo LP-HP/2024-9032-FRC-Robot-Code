@@ -5,6 +5,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.swerveutil.SwerveModuleConstants;
 import frc.robot.Constants;
 import frc.robot.util.SparkMaxWrapper;
@@ -47,6 +48,9 @@ public class SwerveModule {
         driveMotor.config();
 
         lastAngle = getState().angle;
+
+        SmartDashboard.putData(angleMotor);
+        SmartDashboard.putData(driveMotor);
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {

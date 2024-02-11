@@ -28,6 +28,9 @@ public class Intake extends SubsystemBase {
 
          /* Reset the relative encoder to the absolute encoder value */
         armMotor.relativeEncoder.setPosition(armMotor.getAbsolutePosition());
+
+        SmartDashboard.putData(armMotor);
+        SmartDashboard.putData(flywheelMotor);
     }
 
     public boolean isBeamBreakTriggered() {

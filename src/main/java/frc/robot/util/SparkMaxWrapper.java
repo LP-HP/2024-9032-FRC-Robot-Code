@@ -9,13 +9,14 @@ import com.revrobotics.SparkAbsoluteEncoder.Type;
 
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import frc.lib.swerveutil.CANSparkMaxUtil;
 import frc.lib.swerveutil.CANSparkMaxUtil.Usage;
+import frc.robot.Constants;
 
 public class SparkMaxWrapper extends CANSparkMax implements Sendable {
     private final SparkMaxConstants constants;
     private final SparkPIDController controller;
-
     public final RelativeEncoder relativeEncoder;
 
     private AbsoluteEncoder absoluteEncoder;
@@ -60,19 +61,35 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
         switch (constants.mode()) {
             case position:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kPositionOnly);
-                if(relativeEncoder.getPositionConversionFactor() != constants.positionConversionFactor())
+                if(relativeEncoder.getPositionConversionFactor() != constants.positionConversionFactor()) {
                     checkError(relativeEncoder.setPositionConversionFactor(constants.positionConversionFactor()));
+
+                    burnFlash = true;
+                }
                 break;
             case positionLeader:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kPositionOnly, true);
+                if(relativeEncoder.getPositionConversionFactor() != constants.positionConversionFactor()) {
+                    checkError(relativeEncoder.setPositionConversionFactor(constants.positionConversionFactor()));
+
+                    burnFlash = true;
+                }
                 break;
             case velocity:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kVelocityOnly);
-                if(relativeEncoder.getPositionConversionFactor() != constants.positionConversionFactor())
+                if(relativeEncoder.getPositionConversionFactor() != constants.positionConversionFactor()) {
                     checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));//TODO units??
+
+                    burnFlash = true;
+                }
                 break;
             case velocityLeader:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kVelocityOnly, true);
+                if(relativeEncoder.getPositionConversionFactor() != constants.positionConversionFactor()) {
+                    checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));//TODO units??
+
+                    burnFlash = true;
+                }
                 break;
             case percentOutput:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kMinimal);
@@ -81,7 +98,9 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kAll);
                 if(relativeEncoder.getPositionConversionFactor() != constants.positionConversionFactor()) {
                     checkError(relativeEncoder.setPositionConversionFactor(constants.positionConversionFactor()));
-                    checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));
+                    checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));//TODO units??
+
+                    burnFlash = true;
                 }
                 break;
         }
@@ -100,8 +119,13 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
             burnFlash = true;
         }
 
-        if(constants.pidConstants() != null && updatePIDConstants())
-            burnFlash = true;
+        if(constants.pidConstants() != null) {
+            if(setkPIfChanged(constants.pidConstants().kP()) || 
+            setkIIfChanged(constants.pidConstants().kI()) ||
+            setkDIfChanged(constants.pidConstants().kD()) ||
+            setkFIfChanged(constants.pidConstants().kF()))
+                burnFlash = true;
+        }
 
         if(getVoltageCompensationNominalVoltage() != constants.nominalVoltage()) {
             checkError(enableVoltageCompensation(constants.nominalVoltage()));
@@ -111,40 +135,12 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
 
         if(burnFlash) {
             checkError(burnFlash());
+
+            System.out.println("Burned the flash of " + constants.name());
         }
 
         isConfigured = true;
-    }   
-
-    private boolean updatePIDConstants() {
-        boolean constantChanged = false;
-
-        if(constants.pidConstants().kP() != controller.getP()) {
-            checkError(controller.setP(constants.pidConstants().kP()));
-
-            constantChanged = true;
-        }
-
-        if(constants.pidConstants().kI() != controller.getI()) {
-            checkError(controller.setI(constants.pidConstants().kI()));
-
-            constantChanged = true;
-        }
-
-        if(constants.pidConstants().kD() != controller.getD()) {
-            checkError(controller.setD(constants.pidConstants().kD()));
-
-            constantChanged = true;
-        }
-
-        if(constants.pidConstants().kF() != controller.getFF()) {
-            checkError(controller.setFF(constants.pidConstants().kF()));
-
-            constantChanged = true;
-        }
-
-        return constantChanged;
-    }   
+    }      
 
     public void setClosedLoopTarget(double setpoint, double feedforward) {
         if(!isConfigured) {
@@ -205,6 +201,63 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
             System.err.println(constants.name() + " has error " + error);
     }
 
+    private boolean setkPIfChanged(double kP) {
+        if(controller.getP() != kP) {
+            checkError(controller.setP(kP));
+
+            System.out.println("Changed " + constants.name() + " kP to " + kP);
+
+            return true;
+        }
+
+        return false;
+    } 
+
+    private boolean setkIIfChanged(double kI) {
+        if(controller.getI() != kI) {
+            checkError(controller.setI(kI));
+
+            System.out.println("Changed " + constants.name() + " kI to " + kI);
+
+            return true;
+        }
+
+        return false;
+    } 
+
+    private boolean setkDIfChanged(double kD) {
+        if(controller.getD() != kD) {
+            checkError(controller.setD(kD));
+
+            System.out.println("Changed " + constants.name() + " kD to " + kD);
+
+            return true;
+        }
+
+        return false;
+    } 
+
+    private boolean setkFIfChanged(double kF) {
+        if(controller.getFF() != kF) {
+            checkError(controller.setFF(kF));
+
+            System.out.println("Changed " + constants.name() + " kF to " + kF);
+
+            return true;
+        }
+
+        return false;
+    } 
+
+    private void initPIDSendable(SendableBuilder builder) {
+        if(Constants.enablePIDTuning) {
+            builder.addDoubleProperty(constants.name() + " kP", controller::getP, this::setkPIfChanged);
+            builder.addDoubleProperty(constants.name() + " kI", controller::getI, this::setkIIfChanged);
+            builder.addDoubleProperty(constants.name() + " kD", controller::getD, this::setkDIfChanged);
+            builder.addDoubleProperty(constants.name() + " kF", controller::getFF, this::setkFIfChanged);
+        }
+    }
+
     @Override
     public void initSendable(SendableBuilder builder) {
         switch (constants.mode()) {
@@ -213,34 +266,32 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
                 builder.addDoubleProperty(constants.name() + " Position", relativeEncoder::getPosition, null);
                 builder.addDoubleProperty(constants.name() + " Absolute Position", this::getAbsolutePosition, null);
                 builder.addDoubleProperty(constants.name() + " Target Position", () -> closedLoopSetpoint, null);
-                builder.addDoubleProperty(constants.name() + " kP", controller::getP, controller::setP);
-                builder.addDoubleProperty(constants.name() + " kI", controller::getI, controller::setI);
-                builder.addDoubleProperty(constants.name() + " kD", controller::getD, controller::setD);
-                builder.addDoubleProperty(constants.name() + " kF", controller::getFF, controller::setFF);
+                initPIDSendable(builder);
                 break;
             case velocity:
             case velocityLeader:
                 builder.addDoubleProperty(constants.name() + " Velocity", relativeEncoder::getVelocity, null);
                 builder.addDoubleProperty(constants.name() + " Target Velocity", () -> closedLoopSetpoint, null);
-                builder.addDoubleProperty(constants.name() + " kP", controller::getP, controller::setP);
-                builder.addDoubleProperty(constants.name() + " kI", controller::getI, controller::setI);
-                builder.addDoubleProperty(constants.name() + " kD", controller::getD, controller::setD);
-                builder.addDoubleProperty(constants.name() + " kF", controller::getFF, controller::setFF);
+                initPIDSendable(builder);
                 break;
             case velocityControlWithPositionData:
                 builder.addDoubleProperty(constants.name() + " Position", relativeEncoder::getPosition, null);
                 builder.addDoubleProperty(constants.name() + " Velocity", relativeEncoder::getVelocity, null);
                 builder.addDoubleProperty(constants.name() + " Target Velocity", () -> closedLoopSetpoint, null);
-                builder.addDoubleProperty(constants.name() + " kP", controller::getP, controller::setP);
-                builder.addDoubleProperty(constants.name() + " kP", controller::getP, controller::setP);
-                builder.addDoubleProperty(constants.name() + " kI", controller::getI, controller::setI);
-                builder.addDoubleProperty(constants.name() + " kD", controller::getD, controller::setD);
-                builder.addDoubleProperty(constants.name() + " kF", controller::getFF, controller::setFF);
+                initPIDSendable(builder);
                 break;
             case percentOutput:
                 break;
-        }            
+        }   
 
-        builder.addDoubleProperty(constants.name() + " Applied Output", this::getAppliedOutput, null);
+        builder.addDoubleProperty(constants.name() + " Percent Output", this::getAppliedOutput, this::setIfInTestMode);
+        builder.setSafeState(() -> set(0.0));//Runs when test mode is exited
+    }
+
+    private void setIfInTestMode(double percent) {
+        /* Live window is enabled in test mode */
+        if(LiveWindow.isEnabled()) {
+            set(percent);
+        }
     }
 }

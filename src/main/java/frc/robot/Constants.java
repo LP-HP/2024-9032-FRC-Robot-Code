@@ -16,6 +16,7 @@ import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
 
 public final class Constants {
     public static final int driveControllerPort = 0;
+    public static final boolean enablePIDTuning = true;
 
     public static final class TeleopConstants {
         public static final double stickDeadband = 0.05;
