@@ -39,7 +39,7 @@ public class RobotContainer {
     private final LimelightVision limelight = new LimelightVision(Constants.VisionConstants.limelightName, false);
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
-    // private final Shooter shooter = new Shooter();
+    private final Shooter shooter = new Shooter();
 
     /* Subsystem Triggers */
     // private final Trigger intakeBeamBreakTrigger = new Trigger(intake::isBeamBreakTriggered).debounce(0.025);

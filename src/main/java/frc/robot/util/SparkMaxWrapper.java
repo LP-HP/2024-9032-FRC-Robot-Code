@@ -9,6 +9,7 @@ import com.revrobotics.SparkAbsoluteEncoder.Type;
 
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import frc.lib.swerveutil.CANSparkMaxUtil;
 import frc.lib.swerveutil.CANSparkMaxUtil.Usage;
@@ -30,6 +31,8 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
         this.constants = constants;
         controller = getPIDController();
         relativeEncoder = getEncoder();
+
+        SendableRegistry.add(this, constants.name());
     }
 
     public void configAbsoluteEncoder(boolean invert) {
@@ -134,7 +137,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
         }
 
         if(burnFlash) {
-            checkError(burnFlash());
+            //TODO checkError(burnFlash());
 
             System.out.println("Burned the flash of " + constants.name());
         }
@@ -251,10 +254,10 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
 
     private void initPIDSendable(SendableBuilder builder) {
         if(Constants.enablePIDTuning) {
-            builder.addDoubleProperty(constants.name() + " kP", controller::getP, this::setkPIfChanged);
-            builder.addDoubleProperty(constants.name() + " kI", controller::getI, this::setkIIfChanged);
-            builder.addDoubleProperty(constants.name() + " kD", controller::getD, this::setkDIfChanged);
-            builder.addDoubleProperty(constants.name() + " kF", controller::getFF, this::setkFIfChanged);
+            builder.addDoubleProperty("kP", controller::getP, this::setkPIfChanged);
+            builder.addDoubleProperty("kI", controller::getI, this::setkIIfChanged);
+            builder.addDoubleProperty("kD", controller::getD, this::setkDIfChanged);
+            builder.addDoubleProperty("kF", controller::getFF, this::setkFIfChanged);
         }
     }
 
@@ -263,28 +266,28 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
         switch (constants.mode()) {
             case position:
             case positionLeader:
-                builder.addDoubleProperty(constants.name() + " Position", relativeEncoder::getPosition, null);
-                builder.addDoubleProperty(constants.name() + " Absolute Position", this::getAbsolutePosition, null);
-                builder.addDoubleProperty(constants.name() + " Target Position", () -> closedLoopSetpoint, null);
+                builder.addDoubleProperty("Position", relativeEncoder::getPosition, null);
+                builder.addDoubleProperty("Absolute Position", this::getAbsolutePosition, null);
+                builder.addDoubleProperty("Target Position", () -> closedLoopSetpoint, null);
                 initPIDSendable(builder);
                 break;
             case velocity:
             case velocityLeader:
-                builder.addDoubleProperty(constants.name() + " Velocity", relativeEncoder::getVelocity, null);
-                builder.addDoubleProperty(constants.name() + " Target Velocity", () -> closedLoopSetpoint, null);
+                builder.addDoubleProperty("Velocity", relativeEncoder::getVelocity, null);
+                builder.addDoubleProperty("Target Velocity", () -> closedLoopSetpoint, null);
                 initPIDSendable(builder);
                 break;
             case velocityControlWithPositionData:
-                builder.addDoubleProperty(constants.name() + " Position", relativeEncoder::getPosition, null);
-                builder.addDoubleProperty(constants.name() + " Velocity", relativeEncoder::getVelocity, null);
-                builder.addDoubleProperty(constants.name() + " Target Velocity", () -> closedLoopSetpoint, null);
+                builder.addDoubleProperty("Position", relativeEncoder::getPosition, null);
+                builder.addDoubleProperty("Velocity", relativeEncoder::getVelocity, null);
+                builder.addDoubleProperty("Target Velocity", () -> closedLoopSetpoint, null);
                 initPIDSendable(builder);
                 break;
             case percentOutput:
                 break;
         }   
 
-        builder.addDoubleProperty(constants.name() + " Percent Output", this::getAppliedOutput, this::setIfInTestMode);
+        builder.addDoubleProperty("Percent Output", this::getAppliedOutput, this::setIfInTestMode);
         builder.setSafeState(() -> set(0.0));//Runs when test mode is exited
     }
 

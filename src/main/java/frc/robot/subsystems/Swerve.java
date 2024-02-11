@@ -24,16 +24,18 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
-    private SwerveDrivePoseEstimator swerveOdometry;
-    private SwerveModule[] swerveMods;
-    private AHRS gyro;
+    private final SwerveDrivePoseEstimator swerveOdometry;
+    private final SwerveModule[] swerveMods;
+    private final AHRS gyro;
 
     private final Field2d field = new Field2d();
+    private final ShuffleboardTab swerveTab = Shuffleboard.getTab("Swerve");
 
     private Supplier<Optional<VisionPoseMeasurement>> visionSup = Optional::empty;
 
@@ -71,7 +73,7 @@ public class Swerve extends SubsystemBase {
                 () -> DriverStation.getAlliance().orElseGet(() -> DriverStation.Alliance.Blue) == DriverStation.Alliance.Red,
                 this);
 
-        SmartDashboard.putData("Field", field);//Show field view
+        swerveTab.add("Field", field).withPosition(1, 4).withSize(10, 10);//Show field view
 
         //Send pathplanner target pose to field view
         PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
@@ -82,6 +84,13 @@ public class Swerve extends SubsystemBase {
         PathPlannerLogging.setLogActivePathCallback((poses) -> {
             field.getObject("path").setPoses(poses);
         });
+
+        swerveTab.addDouble("Pose X", () -> getPose().getX())
+            .withPosition(1, 1).withSize(1, 1);
+        swerveTab.addDouble("Pose Y", () -> getPose().getY())
+            .withPosition(2, 1).withSize(1, 1);
+        swerveTab.addDouble("Pose Heading", () -> getPose().getRotation().getDegrees())
+            .withPosition(3, 1).withSize(1, 1);
     }
 
     public void driveClosedLoopFromSpeeds(ChassisSpeeds speeds) {
@@ -129,7 +138,7 @@ public class Swerve extends SubsystemBase {
         swerveOdometry.resetPosition(getGyroYaw(), getModulePositions(), pose);
     }
 
-    public SwerveModuleState[] getModuleStates() {
+    private SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for(SwerveModule mod : swerveMods){
             states[mod.getNumber()] = mod.getState();
@@ -138,7 +147,7 @@ public class Swerve extends SubsystemBase {
         return states;
     }
 
-    public SwerveModulePosition[] getModulePositions() {
+    private SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
         for(SwerveModule mod : swerveMods){
             positions[mod.getNumber()] = mod.getPosition();
@@ -186,22 +195,13 @@ public class Swerve extends SubsystemBase {
     public void periodic() {
         swerveOdometry.update(getGyroYaw(), getModulePositions());  
 
-        if(!visionSup.get().isEmpty()) {//Only update vision if an update is provided
+        /* Only update vision if an update is provided */
+        if(!visionSup.get().isEmpty()) {
             VisionPoseMeasurement measurement = visionSup.get().get();
 
             updateVisionLocalization(measurement.pose, measurement.measurementTime);
         }
 
-        for(SwerveModule mod : swerveMods) {//Send swerve module telemetry
-            SmartDashboard.putNumber("Swerve Mod " +  mod.getNumber() + " Cancoder Angle", mod.getCanCoderAngle().getDegrees());
-        }
-        
-        Pose2d currentPose = swerveOdometry.getEstimatedPosition();
-
-        SmartDashboard.putNumber("Swerve Pose X", currentPose.getX());//Send odometry telemetry
-        SmartDashboard.putNumber("Swerve Pose Y", currentPose.getY());
-        SmartDashboard.putNumber("Swerve Pose Rot", currentPose.getRotation().getDegrees());
-
-        field.setRobotPose(currentPose);//Update field view
+        field.setRobotPose(getPose());//Update field view
     }
 }

@@ -5,7 +5,8 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.lib.swerveutil.SwerveModuleConstants;
 import frc.robot.Constants;
 import frc.robot.util.SparkMaxWrapper;
@@ -28,6 +29,8 @@ public class SwerveModule {
     private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
         Constants.SwerveConstants.driveKS, Constants.SwerveConstants.driveKV, Constants.SwerveConstants.driveKA);
 
+    private ShuffleboardTab swerveModuleTab;
+
     public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants) {
         this.moduleNumber = moduleNumber;
         this.angleOffset = moduleConstants.angleOffset;
@@ -49,8 +52,11 @@ public class SwerveModule {
 
         lastAngle = getState().angle;
 
-        SmartDashboard.putData(angleMotor);
-        SmartDashboard.putData(driveMotor);
+        /* Add Telemetry */
+        swerveModuleTab = Shuffleboard.getTab("Module " + moduleNumber);
+        swerveModuleTab.add(angleMotor).withPosition(1, 1).withSize(2, 4);
+        swerveModuleTab.add(driveMotor).withPosition(4, 1).withSize(2, 4);
+        swerveModuleTab.add(angleEncoder).withPosition(7, 1).withSize(2, 4);
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
@@ -104,7 +110,7 @@ public class SwerveModule {
             );
     }
 
-    public Rotation2d getCanCoderAngle() {
+    private Rotation2d getCanCoderAngle() {
         /* In the range (-180, 180] */
         return Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getValue());
     }

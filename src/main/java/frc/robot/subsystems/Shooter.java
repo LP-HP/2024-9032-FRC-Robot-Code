@@ -4,6 +4,8 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -21,6 +23,8 @@ public class Shooter extends SubsystemBase {
 
     private SparkMaxWrapper passthroughStorageMotor;
 
+    private ShuffleboardTab shooterTab = Shuffleboard.getTab("Shooter");
+
     private final DigitalInput beamBreak = new DigitalInput(Constants.ShooterConstants.beamBreakPort);
 
     public Shooter() {
@@ -32,15 +36,15 @@ public class Shooter extends SubsystemBase {
         armMotorFollower.follow(armMotor, Constants.ShooterConstants.invertArmFollower);
         armMotorFollower.config();
 
-        flywheelMotor = new SparkMaxWrapper(Constants.ShooterConstants.shooterFlywheelConstants);
-        flywheelMotor.config();
+        // flywheelMotor = new SparkMaxWrapper(Constants.ShooterConstants.shooterFlywheelConstants);
+        // flywheelMotor.config();
 
-        flywheelMotorFollower = new SparkMaxWrapper(Constants.ShooterConstants.shooterFlywheelFolllowerConstants);
-        flywheelMotorFollower.follow(flywheelMotor, Constants.ShooterConstants.invertFlywheelFollower);
-        flywheelMotorFollower.config();
+        // flywheelMotorFollower = new SparkMaxWrapper(Constants.ShooterConstants.shooterFlywheelFolllowerConstants);
+        // flywheelMotorFollower.follow(flywheelMotor, Constants.ShooterConstants.invertFlywheelFollower);
+        // flywheelMotorFollower.config();
 
-        passthroughStorageMotor = new SparkMaxWrapper(Constants.ShooterConstants.shooterStorageConstants);
-        passthroughStorageMotor.config();
+        // passthroughStorageMotor = new SparkMaxWrapper(Constants.ShooterConstants.shooterStorageConstants);
+        // passthroughStorageMotor.config();
 
          /* Wait for the encoder to initialize before setting to absolute */
         Timer.delay(1.0);
@@ -48,8 +52,8 @@ public class Shooter extends SubsystemBase {
          /* Reset the relative encoder to the absolute encoder value */
         armMotor.relativeEncoder.setPosition(armMotor.getAbsolutePosition());
 
-        SmartDashboard.putData(armMotor);
-        SmartDashboard.putData(flywheelMotor);
+        shooterTab.add(armMotor).withPosition(1, 1).withSize(2, 4);
+        shooterTab.add(flywheelMotor).withPosition(4, 1).withSize(2, 4);
     }
 
     public boolean isBeamBreakTriggered() {

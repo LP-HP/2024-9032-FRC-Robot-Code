@@ -13,10 +13,13 @@ import frc.lib.swerveutil.SwerveModuleConstants;
 import frc.robot.util.SparkMaxConstants;
 import frc.robot.util.SparkMaxConstants.ControlMode;
 import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
-
+ 
+/* HI MILAN, ITS ME ANSH, THE GAY ONE
+ * MILAN OUTLAW, DO YOU AGREE THAT I, ANSH AM GAY?.
+ * YES, I AGREE */
 public final class Constants {
     public static final int driveControllerPort = 0;
-    public static final boolean enablePIDTuning = true;
+    public static final boolean enablePIDTuning = false;//TODO get this working
 
     public static final class TeleopConstants {
         public static final double stickDeadband = 0.05;
@@ -59,11 +62,11 @@ public final class Constants {
             12,
             1.0 / 60.0//TODO make sure this works
         );
-        public static final boolean invertAbsoluteEncoder = false;
+        public static final boolean invertAbsoluteEncoder = true;
         /* Arm Positions */
-        public static final double armPositionGround = -0.029761908575892;
+        public static final double armPositionGround = 0.33;
         public static final double armPositionPassthrough = 0.0;
-        public static final double armPositionAmp = -0.33372887969017;
+        public static final double armPositionAmp = 0.216;
         public static final double armPositionStorage = 0.0;
 
         /* Intake Flywheel */
@@ -104,9 +107,9 @@ public final class Constants {
             shooterArmPID,
             60,
             false,
-            IdleMode.kBrake,
+            IdleMode.kCoast,
             12,
-            1.0 / 60.0//TODO make sure this works
+            1.0 //TODO make sure this works
         );
         public static final SparkMaxConstants shooterArmFolllowerConstants = new SparkMaxConstants(
             16,
@@ -115,12 +118,12 @@ public final class Constants {
             shooterArmPID,
             60,
             false,
-            IdleMode.kBrake,
+            IdleMode.kCoast,
             12,
-            1.0 / 60.0
+            1.0
         );
         public static final boolean invertArmFollower = true;//TODO INVERT OR NO
-        public static final boolean invertAbsoluteEncoder = true;
+        public static final boolean invertAbsoluteEncoder = false;
         /* Arm Positions */
         public static final double armPositionPassthrough = 100.0;
         public static final double armPositionStorage = 80.0;

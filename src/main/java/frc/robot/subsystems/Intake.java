@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -12,6 +14,8 @@ import frc.robot.util.SparkMaxWrapper;
 public class Intake extends SubsystemBase {
     private SparkMaxWrapper armMotor;    
     private SparkMaxWrapper flywheelMotor;
+
+    private ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
 
     private final DigitalInput beamBreak = new DigitalInput(Constants.IntakeConstants.beamBreakPort);
 
@@ -29,8 +33,8 @@ public class Intake extends SubsystemBase {
          /* Reset the relative encoder to the absolute encoder value */
         armMotor.relativeEncoder.setPosition(armMotor.getAbsolutePosition());
 
-        SmartDashboard.putData(armMotor);
-        SmartDashboard.putData(flywheelMotor);
+        intakeTab.add(armMotor).withPosition(1, 1).withSize(2, 4);
+        intakeTab.add(flywheelMotor).withPosition(4, 1).withSize(2, 4);
     }
 
     public boolean isBeamBreakTriggered() {
