@@ -65,18 +65,23 @@ public class SwerveModule {
         /* Reverse the direction if needed to avoid rotating more than 90 degrees - works since PID wrapping is enabled */
         desiredState = SwerveModuleState.optimize(desiredState, currentState.angle);
 
+        /* 
+         * Scale speed by cosine of angle error, which slows down movement perpendicular to the desired direction of travel
+         * Smoothes driving when modules change directions
+         * See: https://github.com/wpilibsuite/allwpilib/pull/5758
+         */
+        double cosineScalar = desiredState.angle.minus(currentState.angle).getCos();
+        if(cosineScalar < 0.0) {
+            System.err.println("Negative cosine scalar!");
+        }
+        desiredState.speedMetersPerSecond *= cosineScalar;
+
         setAngle(desiredState);
-        setSpeed(desiredState, currentState, isOpenLoop);
+        setSpeed(desiredState, isOpenLoop);
     }
 
-    private void setSpeed(SwerveModuleState desiredState, SwerveModuleState currentState, boolean isOpenLoop) {
+    private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
         if (isOpenLoop) {
-            /* Scale speed by cosine of angle error, which slows down movement perpendicular to the desired direction of travel
-             * Smoothes driving when modules change directions
-             * See: https://github.com/wpilibsuite/allwpilib/pull/5758
-             */
-            desiredState.speedMetersPerSecond *= desiredState.angle.minus(currentState.angle).getCos();
-
             double percentOutput = desiredState.speedMetersPerSecond / Constants.SwerveConstants.maxSpeed;
 
             driveMotor.set(percentOutput);
@@ -102,12 +107,8 @@ public class SwerveModule {
     }
 
     private Rotation2d getIntegratedAngle() {
-        return Rotation2d.fromDegrees(Constants.SwerveConstants.integratedEncoderInvert 
-            /* Invert and put the angle in the range (-180, 180] */
-            ? MathUtil.inputModulus(-angleMotor.relativeEncoder.getPosition(), -180.0, 180.0)
-            /* Put the angle in the range (-180, 180] */
-            : MathUtil.inputModulus(angleMotor.relativeEncoder.getPosition(), -180.0, 180.0)
-            );
+        /* Put the angle in the range (-180, 180] */
+        return Rotation2d.fromDegrees(MathUtil.inputModulus(angleMotor.relativeEncoder.getPosition(), -180.0, 180.0));
     }
 
     private Rotation2d getCanCoderAngle() {

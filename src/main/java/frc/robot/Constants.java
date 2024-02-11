@@ -14,12 +14,14 @@ import frc.robot.util.SparkMaxConstants;
 import frc.robot.util.SparkMaxConstants.ControlMode;
 import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
  
-/* HI MILAN, ITS ME ANSH, THE GAY ONE
- * MILAN OUTLAW, DO YOU AGREE THAT I, ANSH AM GAY?.
- * YES, I AGREE */
+/* 
+ * HI MILAN, ITS ME ANSH, THE GAY ONE
+ * MILAN OUTLAW, DO YOU AGREE THAT I, ANSH, AM GAY?.
+ * YES, I AGREE 
+ */
 public final class Constants {
     public static final int driveControllerPort = 0;
-    public static final boolean enablePIDTuning = false;//TODO get this working
+    public static final boolean burnFlash = false;
 
     public static final class TeleopConstants {
         public static final double stickDeadband = 0.05;
@@ -107,7 +109,7 @@ public final class Constants {
             shooterArmPID,
             60,
             false,
-            IdleMode.kCoast,
+            IdleMode.kCoast,//TODO brake
             12,
             1.0 //TODO make sure this works
         );
@@ -149,7 +151,7 @@ public final class Constants {
             shooterFlywheelPID,
             60,
             false,
-            IdleMode.kBrake,
+            IdleMode.kCoast,
             12,
             60.0
         );
@@ -160,7 +162,7 @@ public final class Constants {
             shooterFlywheelPID,
             60,
             false,
-            IdleMode.kBrake,
+            IdleMode.kCoast,
             12,
             60.0
         );
@@ -215,9 +217,8 @@ public final class Constants {
         public static final boolean angleMotorInvert = true;
         public static final boolean driveMotorInvert = false;
 
-        /* Angle Encoder Inverts */
+        /* Angle Encoder Invert */
         public static final SensorDirectionValue canCoderInvert = SensorDirectionValue.CounterClockwise_Positive;
-        public static final boolean integratedEncoderInvert = false;
 
         /* Swerve Voltage Compensation */
         public static final int voltageComp = 12;

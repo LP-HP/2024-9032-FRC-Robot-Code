@@ -49,7 +49,8 @@ public class Swerve extends SubsystemBase {
             new SwerveModule(3, Constants.SwerveConstants.Mod3.constants)
         };
 
-        /* The 1 second wait before setting absolute positions avoids a bug with initializing the motors
+        /* 
+         * The 1 second wait before setting absolute positions avoids a bug with initializing the motors
          * See: https://github.com/Team364/BaseFalconSwerve/issues/8 
          */
         Timer.delay(1.0);

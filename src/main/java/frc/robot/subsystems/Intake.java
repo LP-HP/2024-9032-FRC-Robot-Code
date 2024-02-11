@@ -30,11 +30,14 @@ public class Intake extends SubsystemBase {
         /* Wait for the encoder to initialize before setting to absolute */
         Timer.delay(1.0);
 
-         /* Reset the relative encoder to the absolute encoder value */
+        /* Reset the relative encoder to the absolute encoder value */
         armMotor.relativeEncoder.setPosition(armMotor.getAbsolutePosition());
 
         intakeTab.add(armMotor).withPosition(1, 1).withSize(2, 4);
         intakeTab.add(flywheelMotor).withPosition(4, 1).withSize(2, 4);
+
+        /* Prevent moving to a previous setpoint */
+        armMotor.setClosedLoopTarget(armMotor.relativeEncoder.getPosition());
     }
 
     public boolean isBeamBreakTriggered() {

@@ -36,7 +36,7 @@ public class RobotContainer {
     private final Trigger aprilTagAlignmentTest = driveController.leftBumper().debounce(0.025);//TODO remove
 
     /* Subsystems */
-    private final LimelightVision limelight = new LimelightVision(Constants.VisionConstants.limelightName, false);
+    private final LimelightVision limelight = new LimelightVision(false);
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
     private final Shooter shooter = new Shooter();

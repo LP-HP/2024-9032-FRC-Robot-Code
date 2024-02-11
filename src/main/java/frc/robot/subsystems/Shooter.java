@@ -54,6 +54,10 @@ public class Shooter extends SubsystemBase {
 
         shooterTab.add(armMotor).withPosition(1, 1).withSize(2, 4);
         shooterTab.add(flywheelMotor).withPosition(4, 1).withSize(2, 4);
+
+        /* Prevent moving to a previous setpoint */
+        armMotor.setClosedLoopTarget(armMotor.relativeEncoder.getPosition());
+        // flywheelMotor.setClosedLoopTarget(0.0);
     }
 
     public boolean isBeamBreakTriggered() {
