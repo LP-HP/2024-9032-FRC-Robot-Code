@@ -1,10 +1,6 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
-import frc.robot.Constants.SwerveConstants.Mod0;
-import frc.robot.Constants.SwerveConstants.Mod1;
-import frc.robot.Constants.SwerveConstants.Mod2;
-import frc.robot.Constants.SwerveConstants.Mod3;
 import frc.robot.subsystems.LimelightVision.VisionPoseMeasurement;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
