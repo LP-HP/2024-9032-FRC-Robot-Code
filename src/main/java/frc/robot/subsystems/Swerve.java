@@ -75,14 +75,16 @@ public class Swerve extends SubsystemBase {
                 () -> DriverStation.getAlliance().orElseGet(() -> DriverStation.Alliance.Blue) == DriverStation.Alliance.Red,
                 this);
 
-        swerveTab.add("Field", field).withPosition(1, 4).withSize(10, 10);//Show field view
+        /* Show field view */
+        swerveTab.add("Field", field)
+            .withPosition(1, 4).withSize(10, 10);
 
-        //Send pathplanner target pose to field view
+        /* Send pathplanner target pose to field view */
         PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
             field.getObject("target pose").setPose(pose);
         });
 
-        //Send pathplanner path to field view
+        /* Send pathplanner path to field view */
         PathPlannerLogging.setLogActivePathCallback((poses) -> {
             field.getObject("path").setPoses(poses);
         });

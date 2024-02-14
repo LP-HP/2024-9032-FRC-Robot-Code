@@ -78,7 +78,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command disableStorageMotor() {
-        return runOnce(() -> passthroughStorageMotor.set(0));
+        return runOnce(() -> passthroughStorageMotor.set(0.0));
     }
 
     private Command waitForShooterVelocity(double velocity) {
@@ -93,7 +93,7 @@ public class Shooter extends SubsystemBase {
     }
 
     private Command disableShooterFlywheel() {
-        return runOnce(() -> flywheelMotor.setClosedLoopTarget(0));
+        return runOnce(() -> flywheelMotor.setClosedLoopTarget(0.0));
     }
 
     public Command setShooterVelocityThenWaitThenDisable(double velocity, double waitTime) {

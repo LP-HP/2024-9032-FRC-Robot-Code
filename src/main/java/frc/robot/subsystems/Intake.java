@@ -91,7 +91,7 @@ public class Intake extends SubsystemBase {
     }
 
     public Command disableIntake() {
-        return runOnce(() -> flywheelMotor.set(0));
+        return runOnce(() -> flywheelMotor.set(0.0));
     }
 
     public Command shootIntoAmp() {
