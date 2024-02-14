@@ -1,6 +1,10 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
+import frc.robot.Constants.SwerveConstants.Mod0;
+import frc.robot.Constants.SwerveConstants.Mod1;
+import frc.robot.Constants.SwerveConstants.Mod2;
+import frc.robot.Constants.SwerveConstants.Mod3;
 import frc.robot.subsystems.LimelightVision.VisionPoseMeasurement;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -128,6 +132,12 @@ public class Swerve extends SubsystemBase {
                 rotation
             );
             
+        /* 
+         * Convert speeds from continuous to discrete to improve driving while rotating
+         * See: https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964/5 
+         */
+        ChassisSpeeds.discretize(speeds, 0.02);
+
         /* Kinematics wants module angles in the range (-180, 180] */ 
         SwerveModuleState[] desiredStates = swerveKinematics.toSwerveModuleStates(speeds);
 
