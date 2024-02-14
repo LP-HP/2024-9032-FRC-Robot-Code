@@ -6,44 +6,44 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.util.SparkMaxWrapper;
 
+import static frc.robot.Constants.ShooterConstants.*;
+
 public class Shooter extends SubsystemBase {
-    private SparkMaxWrapper armMotor;    
-    private SparkMaxWrapper armMotorFollower;    
+    private final SparkMaxWrapper armMotor;    
+    private final SparkMaxWrapper armMotorFollower;    
 
-    private SparkMaxWrapper flywheelMotor;
-    private SparkMaxWrapper flywheelMotorFollower;
+    private final SparkMaxWrapper flywheelMotor = null;//TODO add back flywheel code
+    private final SparkMaxWrapper flywheelMotorFollower = null;
 
-    private SparkMaxWrapper passthroughStorageMotor;
+    private final SparkMaxWrapper passthroughStorageMotor = null;
 
-    private ShuffleboardTab shooterTab = Shuffleboard.getTab("Shooter");
+    private final ShuffleboardTab shooterTab = Shuffleboard.getTab("Shooter");
 
-    private final DigitalInput beamBreak = new DigitalInput(Constants.ShooterConstants.beamBreakPort);
+    private final DigitalInput beamBreak = new DigitalInput(beamBreakPort);
 
-    public Shooter() {
-        armMotor = new SparkMaxWrapper(Constants.ShooterConstants.shooterArmConstants);
-        armMotor.configAbsoluteEncoder(Constants.ShooterConstants.invertAbsoluteEncoder);
+    public Shooter() { 
+        armMotor = new SparkMaxWrapper(shooterArmConstants);
+        armMotor.configAbsoluteEncoder(invertAbsoluteEncoder);
         armMotor.config();
 
-        armMotorFollower = new SparkMaxWrapper(Constants.ShooterConstants.shooterArmFolllowerConstants);
-        armMotorFollower.follow(armMotor, Constants.ShooterConstants.invertArmFollower);
+        armMotorFollower = new SparkMaxWrapper(shooterArmFolllowerConstants);
+        armMotorFollower.follow(armMotor, invertArmFollower);
         armMotorFollower.config();
 
-        // flywheelMotor = new SparkMaxWrapper(Constants.ShooterConstants.shooterFlywheelConstants);
+        // flywheelMotor = new SparkMaxWrapper(shooterFlywheelConstants);
         // flywheelMotor.config();
 
-        // flywheelMotorFollower = new SparkMaxWrapper(Constants.ShooterConstants.shooterFlywheelFolllowerConstants);
-        // flywheelMotorFollower.follow(flywheelMotor, Constants.ShooterConstants.invertFlywheelFollower);
+        // flywheelMotorFollower = new SparkMaxWrapper(shooterFlywheelFolllowerConstants);
+        // flywheelMotorFollower.follow(flywheelMotor, invertFlywheelFollower);
         // flywheelMotorFollower.config();
 
-        // passthroughStorageMotor = new SparkMaxWrapper(Constants.ShooterConstants.shooterStorageConstants);
+        // passthroughStorageMotor = new SparkMaxWrapper(shooterStorageConstants);
         // passthroughStorageMotor.config();
 
          /* Wait for the encoder to initialize before setting to absolute */
@@ -52,8 +52,13 @@ public class Shooter extends SubsystemBase {
          /* Reset the relative encoder to the absolute encoder value */
         armMotor.relativeEncoder.setPosition(armMotor.getAbsolutePosition());
 
-        shooterTab.add(armMotor).withPosition(1, 1).withSize(2, 4);
-        shooterTab.add(flywheelMotor).withPosition(4, 1).withSize(2, 4);
+        /* Add Telemetry */
+        shooterTab.add(armMotor)
+            .withPosition(1, 1).withSize(2, 4);
+        // shooterTab.add(flywheelMotor)
+            // .withPosition(4, 1).withSize(2, 4);
+        shooterTab.addBoolean("Beam Break Triggered", this::isBeamBreakTriggered)
+            .withPosition(1, 4).withSize(2, 1);
 
         /* Prevent moving to a previous setpoint */
         armMotor.setClosedLoopTarget(armMotor.relativeEncoder.getPosition());
@@ -65,11 +70,11 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command enableStorageMotorReceiving() {
-        return runOnce(() -> passthroughStorageMotor.set(Constants.ShooterConstants.storageMotorPowerReceiving));
+        return runOnce(() -> passthroughStorageMotor.set(storageMotorPowerReceiving));
     }
 
     private Command enableStorageMotorToFlywheels() {
-        return runOnce(() -> passthroughStorageMotor.set(Constants.ShooterConstants.storageMotorPowerToFlywheels));
+        return runOnce(() -> passthroughStorageMotor.set(storageMotorPowerToFlywheels));
     }
 
     public Command disableStorageMotor() {
@@ -83,7 +88,7 @@ public class Shooter extends SubsystemBase {
         () -> {}, 
         (unused) -> {}, 
         /* We are finished if the flywheel velocity is within our tolerance */
-        () -> Math.abs(flywheelMotor.relativeEncoder.getVelocity() - velocity) < Constants.ShooterConstants.shooterFlywheelVelocityTolerance, 
+        () -> Math.abs(flywheelMotor.relativeEncoder.getVelocity() - velocity) < flywheelVelocityTolerance, 
         this);
     }
 
@@ -100,11 +105,11 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command setToPassthroughPosition() {
-        return runOnce(() -> armMotor.setClosedLoopTarget(Constants.ShooterConstants.armPositionPassthrough)); 
+        return runOnce(() -> armMotor.setClosedLoopTarget(armPositionPassthrough)); 
     }
 
     public Command setToStoragePosition() {
-        return runOnce(() -> armMotor.setClosedLoopTarget(Constants.ShooterConstants.armPositionStorage)); 
+        return runOnce(() -> armMotor.setClosedLoopTarget(armPositionStorage)); 
     }
 
     /* Sets the target and wait until it is achieved */
@@ -115,21 +120,16 @@ public class Shooter extends SubsystemBase {
         () -> {},
         (unused) -> {},
         /* We are finished if the arm position is within our tolerance */
-        () -> Math.abs(armMotor.relativeEncoder.getPosition() - position) < Constants.ShooterConstants.armSetpointTolerance,
+        () -> Math.abs(armMotor.relativeEncoder.getPosition() - position) < armSetpointTolerance,
         this);
     }   
 
     public Command moveArmToPassthroughPosition() {
-        return moveArmToTargetPosition(Constants.ShooterConstants.armPositionPassthrough);
+        return moveArmToTargetPosition(armPositionPassthrough);
     }
 
     public Command moveArmToPositionFromTargetY(DoubleSupplier targetYSup) { 
         /* Sets the target position to an interpolated value from the lookup table */
-        return moveArmToTargetPosition(Constants.ShooterConstants.armPosLookupTableFromTargetY.get(targetYSup.getAsDouble()));
+        return moveArmToTargetPosition(armPosLookupTableFromTargetY.get(targetYSup.getAsDouble()));
     }   
-
-    @Override
-    public void periodic() {
-        SmartDashboard.putBoolean("Shooter Beam Break Triggered", isBeamBreakTriggered());
-    }
 }

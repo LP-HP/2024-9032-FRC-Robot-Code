@@ -9,14 +9,13 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.limelightutil.LimelightHelpers;
 import frc.robot.Constants;
 
-public class LimelightVision extends SubsystemBase {
-    private final String name = Constants.VisionConstants.limelightName;
+import static frc.robot.Constants.VisionConstants.limelightName;;
 
+public class LimelightVision extends SubsystemBase {
     private VisionPoseMeasurement lastPoseEstimate = new VisionPoseMeasurement();
     private AprilTagTarget currentTarget = new AprilTagTarget();
     
@@ -27,17 +26,22 @@ public class LimelightVision extends SubsystemBase {
     public LimelightVision(boolean isLocalizationPipeline) {
         this.isLocalizationPipeline = isLocalizationPipeline;
 
-        limelightTab.addCamera("Limelight View", name, "camera_server://limelight" + name)//TODO does this work
+        limelightTab.addCamera("Limelight View", limelightName, "camera_server://" + limelightName)//TODO does this work
             .withPosition(1, 1).withSize(6, 6);
 
-        limelightTab.add(currentTarget).withPosition(1, 8).withSize(2, 4);
-        limelightTab.add(lastPoseEstimate).withPosition(6, 8).withSize(2, 4);
+        /* Add Telemetry */
+        limelightTab.add(currentTarget)
+            .withPosition(1, 8).withSize(2, 4);
+        limelightTab.add(lastPoseEstimate)
+            .withPosition(6, 8).withSize(2, 4);
+        limelightTab.addBoolean("Localization Pipeline", () -> isLocalizationPipeline)
+            .withPosition(8, 1).withSize(2, 1);;
     }
 
     @Override
     public void periodic() {
         if(isLocalizationPipeline) {
-            Pose2d currentPose = LimelightHelpers.getBotPose2d_wpiBlue(name);//TODO what coordinates? should be wpilib blue
+            Pose2d currentPose = LimelightHelpers.getBotPose2d_wpiBlue(limelightName);//TODO what coordinates? should be wpilib blue
 
             //If we get the same measurement as the last loop then invalidate
             if(currentPose.equals(lastPoseEstimate.pose))
@@ -49,25 +53,23 @@ public class LimelightVision extends SubsystemBase {
 
                 // Subtract the pipeline latency from the starting time to get measurement time
                 lastPoseEstimate.measurementTime = Timer.getFPGATimestamp() -
-                        (LimelightHelpers.getLatency_Pipeline(name) / 1000.0) -
-                        (LimelightHelpers.getLatency_Capture(name) / 1000.0);
+                        (LimelightHelpers.getLatency_Pipeline(limelightName) / 1000.0) -
+                        (LimelightHelpers.getLatency_Capture(limelightName) / 1000.0);
             }
         }
 
         else {
-            currentTarget.xOffset = LimelightHelpers.getTX(name);
-            currentTarget.yOffset = LimelightHelpers.getTY(name);
-            currentTarget.area = LimelightHelpers.getTA(name);
-            currentTarget.isValid = LimelightHelpers.getTV(name);
-            currentTarget.id = LimelightHelpers.getFiducialID(name);
+            currentTarget.xOffset = LimelightHelpers.getTX(limelightName);
+            currentTarget.yOffset = LimelightHelpers.getTY(limelightName);
+            currentTarget.area = LimelightHelpers.getTA(limelightName);
+            currentTarget.isValid = LimelightHelpers.getTV(limelightName);
+            currentTarget.id = LimelightHelpers.getFiducialID(limelightName);
         }
-
-        SmartDashboard.putBoolean("Is localization pipeline", isLocalizationPipeline);
     }
 
     public void switchToTargetPipeline() {
         if(isLocalizationPipeline) {
-            LimelightHelpers.setPipelineIndex(name, Constants.VisionConstants.targetPipelineID);
+            LimelightHelpers.setPipelineIndex(limelightName, Constants.VisionConstants.targetPipelineID);
 
             isLocalizationPipeline = false;
         }
@@ -75,7 +77,7 @@ public class LimelightVision extends SubsystemBase {
 
     public void switchToLocalizationPipeline() {
         if(!isLocalizationPipeline) {
-            LimelightHelpers.setPipelineIndex(name, Constants.VisionConstants.localizationPipelineID);
+            LimelightHelpers.setPipelineIndex(limelightName, Constants.VisionConstants.localizationPipelineID);
 
             isLocalizationPipeline = true;
         }
@@ -140,6 +142,7 @@ public class LimelightVision extends SubsystemBase {
         public void initSendable(SendableBuilder builder) {
             builder.addDoubleProperty("Pose X", () -> pose.getX(), null);
             builder.addDoubleProperty("Pose Y", () -> pose.getY(), null);
+            builder.addDoubleProperty("Measurement Time", () -> measurementTime, null);
             builder.addBooleanProperty("Is Valid", () -> isValid, null); 
         }
     }

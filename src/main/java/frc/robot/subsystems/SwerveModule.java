@@ -7,46 +7,46 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import frc.lib.swerveutil.SwerveModuleConstants;
-import frc.robot.Constants;
 import frc.robot.util.SparkMaxWrapper;
+import frc.robot.util.SwerveModuleConstants;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 
-public class SwerveModule {
-    private int moduleNumber;
+import static frc.robot.Constants.SwerveConstants.*;
 
-    private Rotation2d angleOffset;
+public class SwerveModule {
+    private final int moduleNumber;
+
+    private final Rotation2d angleOffset;
     private Rotation2d lastAngle;
 
-    private SparkMaxWrapper angleMotor;
-    private SparkMaxWrapper driveMotor;
+    private final SparkMaxWrapper angleMotor;
+    private final SparkMaxWrapper driveMotor;
   
-    private CANcoder angleEncoder;
+    private final CANcoder angleEncoder;
 
-    private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
-        Constants.SwerveConstants.driveKS, Constants.SwerveConstants.driveKV, Constants.SwerveConstants.driveKA);
+    private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(driveKS, driveKV, driveKA);
 
-    private ShuffleboardTab swerveModuleTab;
+    private final ShuffleboardTab swerveModuleTab;
 
     public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants) {
         this.moduleNumber = moduleNumber;
-        this.angleOffset = moduleConstants.angleOffset;
+        this.angleOffset = moduleConstants.angleOffset();
         
         /* Angle Encoder Config */
-        angleEncoder = new CANcoder(moduleConstants.cancoderID);
+        angleEncoder = new CANcoder(moduleConstants.canCoderID());
         configAngleEncoder();
 
         /* Angle Motor Config */
-        angleMotor = new SparkMaxWrapper(moduleConstants.angleMotorConstants);
+        angleMotor = new SparkMaxWrapper(moduleConstants.angleMotorConstants());
         /* Wrap in the range (-180, 180] */
         angleMotor.configPIDWrapping(-180.0, 180.0);
         angleMotor.config();
 
         /* Drive Motor Config */
-        driveMotor = new SparkMaxWrapper(moduleConstants.driveMotorConstants);
+        driveMotor = new SparkMaxWrapper(moduleConstants.driveMotorConstants());
         driveMotor.relativeEncoder.setPosition(0.0);
         driveMotor.config();
 
@@ -54,9 +54,12 @@ public class SwerveModule {
 
         /* Add Telemetry */
         swerveModuleTab = Shuffleboard.getTab("Module " + moduleNumber);
-        swerveModuleTab.add(angleMotor).withPosition(1, 1).withSize(2, 4);
-        swerveModuleTab.add(driveMotor).withPosition(4, 1).withSize(2, 4);
-        swerveModuleTab.add(angleEncoder).withPosition(7, 1).withSize(2, 4);
+        swerveModuleTab.add(angleMotor)
+            .withPosition(1, 1).withSize(2, 4);
+        swerveModuleTab.add(angleEncoder)
+            .withPosition(7, 1).withSize(2, 4);        
+        swerveModuleTab.add(driveMotor)
+            .withPosition(4, 1).withSize(2, 4);
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
@@ -82,7 +85,7 @@ public class SwerveModule {
 
     private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
         if (isOpenLoop) {
-            double percentOutput = desiredState.speedMetersPerSecond / Constants.SwerveConstants.maxSpeed;
+            double percentOutput = desiredState.speedMetersPerSecond / maxSpeed;
 
             driveMotor.set(percentOutput);
         } 
@@ -98,7 +101,7 @@ public class SwerveModule {
 
     private void setAngle(SwerveModuleState desiredState) {
         /* Prevent rotating module if speed is less then 1% to prevent jittering */
-        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.SwerveConstants.maxSpeed * 0.01))
+        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (maxSpeed * 0.01))
                 ? lastAngle
                 : desiredState.angle;
 
@@ -131,7 +134,7 @@ public class SwerveModule {
 
         /* Put in the range (-180, 180] and invert if needed */
         cancoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-        cancoderConfig.MagnetSensor.SensorDirection = Constants.SwerveConstants.canCoderInvert;
+        cancoderConfig.MagnetSensor.SensorDirection = canCoderInvert;
         
         angleEncoder.getConfigurator().apply(cancoderConfig);
     }

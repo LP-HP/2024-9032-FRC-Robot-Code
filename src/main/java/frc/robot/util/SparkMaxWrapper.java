@@ -24,6 +24,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
 
     private double closedLoopSetpoint;
     private boolean isConfigured = false;
+    private boolean hasError = false;
 
     public SparkMaxWrapper(SparkMaxConstants constants) {
         super(constants.id(), MotorType.kBrushless);
@@ -45,7 +46,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
         }
 
         absoluteEncoder = getAbsoluteEncoder(Type.kDutyCycle);
-        absoluteEncoder.setInverted(invert);
+        checkError(absoluteEncoder.setInverted(invert));
     }
 
     public void configPIDWrapping(double min, double max) {
@@ -55,9 +56,9 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
             return;
         }
 
-        controller.setPositionPIDWrappingEnabled(true);
-        controller.setPositionPIDWrappingMaxInput(max);
-        controller.setPositionPIDWrappingMinInput(min);
+        checkError(controller.setPositionPIDWrappingEnabled(true));
+        checkError(controller.setPositionPIDWrappingMaxInput(max));
+        checkError(controller.setPositionPIDWrappingMinInput(min));
     }
 
     public void config() {
@@ -109,7 +110,10 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
             System.out.println("Burned the flash of " + constants.name());
         }
 
-        isConfigured = true;
+        System.out.println("Configured " + constants.name());
+
+        if(!hasError)
+            isConfigured = true;
     }      
 
     public void setClosedLoopTarget(double setpoint, double feedforward) {
@@ -167,8 +171,11 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
     }
 
     private void checkError(REVLibError error) {
-        if(error != REVLibError.kOk) 
+        if(error != REVLibError.kOk) {
             System.err.println(constants.name() + " has error " + error);
+
+            hasError = true;
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -9,15 +10,13 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI;
-import frc.lib.swerveutil.SwerveModuleConstants;
 import frc.robot.util.SparkMaxConstants;
+import frc.robot.util.SwerveModuleConstants;
 import frc.robot.util.SparkMaxConstants.ControlMode;
 import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
  
 /* 
- * HI MILAN, ITS ME ANSH, THE GAY ONE
- * MILAN OUTLAW, DO YOU AGREE THAT I, ANSH, AM GAY?.
- * YES, I AGREE 
+ * ...
  */
 public final class Constants {
     public static final int driveControllerPort = 0;
@@ -38,7 +37,7 @@ public final class Constants {
     public static final class VisionConstants {
         public static final double visionPoseTolerance = 1.0;//TODO tune for localization (in meters)
 
-        public static final String limelightName = "9032Limelight";//TODO set name
+        public static final String limelightName = "limelight";//TODO set name to 9032Limeligh
         public static final int targetPipelineID = 1;
         public static final int localizationPipelineID = 0;//TODO make sure this aligns with the limelight config
     }
@@ -137,7 +136,7 @@ public final class Constants {
         }
 
         /* Shooter Flywheels */
-        public static final double shooterFlywheelVelocityTolerance = 0.1;//TODO UNITSSSSS
+        public static final double flywheelVelocityTolerance = 0.1;//TODO UNITSSSSS
         public static final SparkMaxPIDConstants shooterFlywheelPID = new SparkMaxPIDConstants(
             0.0, 
             0.0, 
@@ -383,11 +382,16 @@ public final class Constants {
 
     public static final class ClosedLoopConstants { 
         /* PID Constants for Path Following */
-        public static final double kPTranslation = 1.0; // TODO: TUNE for auto pathplanner
-        public static final double kDTranslation = 0.0;
-
-        public static final double kPRotation = 1.0;
-        public static final double kDRotation = 0.0;
+        public static final PIDConstants translationPID = new PIDConstants(// TODO: TUNE for auto pathplanner
+            0.0, 
+            0.0, 
+            0.0
+        ); 
+        public static final PIDConstants headingPID = new PIDConstants(// TODO: TUNE for auto pathplanner
+            0.0, 
+            0.0, 
+            0.0
+        ); 
 
          /* PID Constants for Rotation to a Target */
         public static final double kPRotationTarget = 1.0;//TODO tune and test
