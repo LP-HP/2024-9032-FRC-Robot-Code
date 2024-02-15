@@ -7,6 +7,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
 import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -22,6 +23,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -40,6 +42,11 @@ public class Swerve extends SubsystemBase {
 
     private Supplier<Optional<VisionPoseMeasurement>> visionSup = Optional::empty;
 
+    private final Notifier odometryThread = new Notifier(this::updateWheelOdometry);
+    private final ReentrantLock odometryThreadLock = new ReentrantLock();
+
+    private Pose2d currentPose;
+
     public Swerve() {
         gyro = new AHRS(gyroPort);//Automatically calibrates
 
@@ -56,8 +63,10 @@ public class Swerve extends SubsystemBase {
          */
         Timer.delay(1.0);
         resetModulesToAbsolute();//Set integrated encoders to the absolute positions using cancoders
-
+        
+        /* Record odometry every 10ms */
         swerveOdometry = new SwerveDrivePoseEstimator(swerveKinematics, getGyroYaw(), getModulePositions(), new Pose2d());
+        odometryThread.startPeriodic(0.01);
 
         /* Sets up pathplanner for auto path following */
         AutoBuilder.configureHolonomic(
@@ -145,11 +154,13 @@ public class Swerve extends SubsystemBase {
     }     
 
     public Pose2d getPose() {
-        return swerveOdometry.getEstimatedPosition();
+        return currentPose;
     }
 
     public void resetOdometry(Pose2d pose) {
+        odometryThreadLock.lock();
         swerveOdometry.resetPosition(getGyroYaw(), getModulePositions(), pose);
+        odometryThreadLock.unlock();
     }
 
     private SwerveModuleState[] getModuleStates() {
@@ -198,17 +209,26 @@ public class Swerve extends SubsystemBase {
         /* Only add the vision update if it is within the tolerance - prevents vision noise */
         if(Math.abs(poseDifference.getX()) < Constants.VisionConstants.visionPoseTolerance
         && Math.abs(poseDifference.getY()) < Constants.VisionConstants.visionPoseTolerance) {
-             swerveOdometry.addVisionMeasurement(visionPose, time);
+            odometryThreadLock.lock(); 
+            swerveOdometry.addVisionMeasurement(visionPose, time);
+            odometryThreadLock.unlock();
         } 
 
         else
             System.err.println("Discarded vision measurement " + visionPose);
     }
 
+    private void updateWheelOdometry() {
+        odometryThreadLock.lock();
+
+        swerveOdometry.update(getGyroYaw(), getModulePositions());  
+        currentPose = swerveOdometry.getEstimatedPosition();
+
+        odometryThreadLock.unlock();
+    }
+
     @Override
     public void periodic() {
-        swerveOdometry.update(getGyroYaw(), getModulePositions());  
-
         /* Only update vision if an update is provided */
         if(!visionSup.get().isEmpty()) {
             VisionPoseMeasurement measurement = visionSup.get().get();
