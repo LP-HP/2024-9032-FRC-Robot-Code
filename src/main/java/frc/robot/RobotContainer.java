@@ -60,9 +60,6 @@ public class RobotContainer {
         //Configure the button bindings
         configureButtonBindings();
 
-        //Configure the subsystem triggers
-        configureSubsystemTriggers();
-
         autoChooser.addOption("Swerve Auto Shakedown", new SwerveShakedown(swerve));
         autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
         autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
@@ -79,6 +76,7 @@ public class RobotContainer {
     /* Only reset variables - don't run any commands here */
     public void teleopInit() {
         limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
+        configureTeleopTriggers();//Configure the subsystem triggers
     }
 
     private void registerPathplannerCommands() {
@@ -129,9 +127,9 @@ public class RobotContainer {
         // );
     }
 
-    private void configureSubsystemTriggers() {
-        /* TODO WILL THESE AFFECT AUTO????
-         * Current triggers:
+    private void configureTeleopTriggers() {
+        /* 
+         * Current triggers (for teleop):
          * 
          * intake beam break -> disable intake and move to storage position and rumble controller
          * shooter beam break -> disable intake and storage motor and move shooter and intake to storage position
