@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.SparkMaxWrapper;
 
+import static frc.robot.Constants.IntakeConstants.absoluteEncoderConversionFactor;
 import static frc.robot.Constants.ShooterConstants.*;
 
 public class Shooter extends SubsystemBase {
@@ -29,7 +30,7 @@ public class Shooter extends SubsystemBase {
 
     public Shooter() { 
         armMotor = new SparkMaxWrapper(shooterArmConstants);
-        armMotor.configAbsoluteEncoder(invertAbsoluteEncoder);
+        armMotor.configAbsoluteEncoder(invertAbsoluteEncoder, absoluteEncoderConversionFactor, absoluteEncoderOffset);
         armMotor.config();
 
         armMotorFollower = new SparkMaxWrapper(shooterArmFolllowerConstants);
@@ -54,14 +55,14 @@ public class Shooter extends SubsystemBase {
 
         /* Add Telemetry */
         shooterTab.add(armMotor)
-            .withPosition(1, 1).withSize(2, 4);
+            .withPosition(0, 0).withSize(2, 2);
         // shooterTab.add(flywheelMotor)
-            // .withPosition(4, 1).withSize(2, 4);
+            // .withPosition(3, 0).withSize(2, 2);
         shooterTab.addBoolean("Beam Break Triggered", this::isBeamBreakTriggered)
-            .withPosition(1, 4).withSize(2, 1);
+            .withPosition(6, 0).withSize(2, 1);
 
         /* Prevent moving to a previous setpoint */
-        armMotor.setClosedLoopTarget(armMotor.relativeEncoder.getPosition());
+        armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
         // flywheelMotor.setClosedLoopTarget(0.0);
     }
 

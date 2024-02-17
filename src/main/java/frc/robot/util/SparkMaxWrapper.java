@@ -24,6 +24,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
 
     private double closedLoopSetpoint;
     private boolean isConfigured = false;
+    private boolean hasAbsoluteEncoder = false;
     private boolean hasError = false;
 
     public SparkMaxWrapper(SparkMaxConstants constants) {
@@ -38,7 +39,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
         SendableRegistry.add(this, constants.name());
     }
 
-    public void configAbsoluteEncoder(boolean invert) {
+    public void configAbsoluteEncoder(boolean invert, double positionConversionFactor, double offset) {
         if(isConfigured) {
             System.err.println("Call config absolute encoder before calling the normal config method");
 
@@ -47,6 +48,10 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
 
         absoluteEncoder = getAbsoluteEncoder(Type.kDutyCycle);
         checkError(absoluteEncoder.setInverted(invert));
+        checkError(absoluteEncoder.setPositionConversionFactor(positionConversionFactor));
+        checkError(absoluteEncoder.setZeroOffset(offset));
+
+        hasAbsoluteEncoder = true;
     }
 
     public void configPIDWrapping(double min, double max) {
@@ -100,6 +105,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
             checkError(controller.setI(constants.pidConstants().kI()));
             checkError(controller.setD(constants.pidConstants().kD()));
             checkError(controller.setFF(constants.pidConstants().kF()));
+            checkError(controller.setOutputRange(-constants.pidConstants().maxOutput(), constants.pidConstants().maxOutput()));
         }
 
         checkError(enableVoltageCompensation(constants.nominalVoltage()));
@@ -169,7 +175,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
     }
 
     public double getAbsolutePosition() {
-        return absoluteEncoder != null ? absoluteEncoder.getPosition() : null;
+        return hasAbsoluteEncoder ? absoluteEncoder.getPosition() : 0.0;
     }
 
     private void checkError(REVLibError error) {
@@ -186,7 +192,8 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
             case position:
             case positionLeader:
                 builder.addDoubleProperty("Position", relativeEncoder::getPosition, null);
-                builder.addDoubleProperty("Absolute Position", this::getAbsolutePosition, null);
+                if(hasAbsoluteEncoder)
+                    builder.addDoubleProperty("Absolute Position", this::getAbsolutePosition, null);
                 builder.addDoubleProperty("Target Position", () -> closedLoopSetpoint, null);
                 break;
             case velocity:
