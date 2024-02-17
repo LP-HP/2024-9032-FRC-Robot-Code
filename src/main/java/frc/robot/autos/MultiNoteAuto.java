@@ -34,7 +34,7 @@ public class MultiNoteAuto extends SequentialCommandGroup {
             new InstantCommand(() -> swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate), swerve, limelight),
             /* Drive to the position to shoot the 1rst note, while setting the arm to the shooting position */
             firstNoteShootAlignment
-                .alongWith(shooter.setToTargetPosition(armPosNote1)),
+                .alongWith(shooter.setTargetPositionAndDisable(armPosNote1)),
             /* Enable shooter, wait, and disable */
             shooter.setShooterVelocityThenWaitThenDisable(shooterVelocityNote1)
         );
@@ -46,7 +46,7 @@ public class MultiNoteAuto extends SequentialCommandGroup {
                 secondNoteAlignment
                     .alongWith(storeNoteSequence
                 /* When the note is stored, move the arm to the correct position */
-                        .andThen(shooter.setToTargetPosition(armPosNote2))),
+                        .andThen(shooter.setTargetPositionAndDisable(armPosNote2))),
                 /* Enable shooter, wait, disable, and store */
                 shooter.setShooterVelocityThenWaitThenDisable(shooterVelocityNote2)
             );

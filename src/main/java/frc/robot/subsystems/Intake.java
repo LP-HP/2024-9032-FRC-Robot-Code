@@ -49,24 +49,31 @@ public class Intake extends SubsystemBase {
         return !beamBreak.get();//TODO true or false?
     }
 
-    /* Just sets the target */
+    /* Sets the target and disables (non-blocking) */
+    private Command setTargetPositionAndDisable(double setpoint) {
+        return runOnce(() -> { 
+            armMotor.setClosedLoopTarget(setpoint);
+            flywheelMotor.set(0.0);
+        });
+    }
+
     public Command setToAmpPosition() {
-        return runOnce(() -> armMotor.setClosedLoopTarget(armPositionAmp));
+        return setTargetPositionAndDisable(armPositionAmp);
     }
 
     public Command setToPassthroughPosition() {
-        return runOnce(() -> armMotor.setClosedLoopTarget(armPositionPassthrough));
+        return setTargetPositionAndDisable(armPositionPassthrough);
     }
 
     public Command setToStoragePosition() {
-        return runOnce(() -> armMotor.setClosedLoopTarget(armPositionStorage));
+        return setTargetPositionAndDisable(armPositionStorage);
     }
 
     /* Sets the target and wait until it is achieved */
     private Command moveToTargetPosition(double position) {
         return new FunctionalCommand(
-        /* Sets the target position at the start */
-        () -> armMotor.setClosedLoopTarget(position),
+        /* Sets the target position and disable at the start */
+        () -> setTargetPositionAndDisable(position),
         () -> {},
         (unused) -> {},
          /* We are finished if the arm position is within our tolerance */
@@ -80,10 +87,6 @@ public class Intake extends SubsystemBase {
 
     public Command moveToPassthroughPosition() {
         return moveToTargetPosition(armPositionPassthrough);
-    }
-
-    public Command disableIntake() {
-        return runOnce(() -> flywheelMotor.set(0.0));
     }
 
     public Command shootIntoAmp() {

@@ -138,15 +138,12 @@ public class RobotContainer {
          * 
          */
         intakeBeamBreakTrigger.onTrue(
-            intake.disableIntake()
-            .andThen(intake.setToStoragePosition())
+            intake.setToStoragePosition()
             .alongWith(setAndDisableRumble())
         );
 
         shooterBeamBreakTrigger.onTrue(
-            shooter.disableStorageMotor()
-            .andThen(intake.disableIntake())
-            .andThen(shooter.setToStoragePosition())
+            shooter.setToStoragePosition()
             .andThen(intake.setToStoragePosition())
         );
     }

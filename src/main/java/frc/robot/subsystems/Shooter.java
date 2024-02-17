@@ -77,10 +77,6 @@ public class Shooter extends SubsystemBase {
         return runOnce(() -> passthroughStorageMotor.set(storageMotorPowerToFlywheels));
     }
 
-    public Command disableStorageMotor() {
-        return runOnce(() -> passthroughStorageMotor.set(0.0));
-    }
-
     private Command waitForShooterVelocity(double velocity) {
         return new FunctionalCommand(
         /* Sets the target velocity at the start */
@@ -92,35 +88,41 @@ public class Shooter extends SubsystemBase {
         this);
     }
 
-    private Command disableShooterFlywheel() {
-        return runOnce(() -> flywheelMotor.setClosedLoopTarget(0.0));
+    private Command disableShooterFlywheels() {
+        return runOnce(() -> { 
+            flywheelMotor.setClosedLoopTarget(0.0);
+            passthroughStorageMotor.set(0.0);
+        });
     }
 
     public Command setShooterVelocityThenWaitThenDisable(double velocity) {
         return waitForShooterVelocity(velocity)
            .andThen(enableStorageMotorToFlywheels())
            .andThen(Commands.waitSeconds(shotWaitTime))
-           .andThen(disableShooterFlywheel())
-           .andThen(disableStorageMotor());
+           .andThen(disableShooterFlywheels());
+    }
+
+    /* Sets the target and disables the storage motor (non-blocking) */
+    public Command setTargetPositionAndDisable(double position) {
+        return runOnce(() -> { 
+            armMotor.setClosedLoopTarget(position);
+            passthroughStorageMotor.set(0.0);
+        }); 
     }
 
     public Command setToPassthroughPosition() {
-        return runOnce(() -> armMotor.setClosedLoopTarget(armPositionPassthrough)); 
+        return setTargetPositionAndDisable(armPositionPassthrough); 
     }
 
     public Command setToStoragePosition() {
-        return runOnce(() -> armMotor.setClosedLoopTarget(armPositionStorage)); 
-    }
-
-    public Command setToTargetPosition(double position) {
-        return runOnce(() -> armMotor.setClosedLoopTarget(position)); 
+        return setTargetPositionAndDisable(armPositionStorage); 
     }
 
     /* Sets the target and wait until it is achieved */
     private Command moveArmToTargetPosition(double position) { 
         return new FunctionalCommand(
         /* Sets the target position at the start */
-        () -> armMotor.setClosedLoopTarget(position),
+        () -> setTargetPositionAndDisable(position),
         () -> {},
         (unused) -> {},
         /* We are finished if the arm position is within our tolerance */
