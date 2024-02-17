@@ -48,7 +48,7 @@ public class RobotContainer {
         swerve.setDefaultCommand(
             new TeleopSwerve(
                 swerve, 
-                () -> -driveController.getLeftY(),//The y axis is inverted by default on the xbox controller, so uninvert it
+                () -> -driveController.getLeftY(),//The axes are inverted by default on the xbox controller, so uninvert them
                 () -> -driveController.getLeftX(),
                 driveController::getRightX
             )
