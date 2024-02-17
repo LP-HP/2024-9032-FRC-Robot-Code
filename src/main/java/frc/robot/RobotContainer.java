@@ -130,7 +130,7 @@ public class RobotContainer {
     }
 
     private void configureSubsystemTriggers() {
-        /* 
+        /* TODO WILL THESE AFFECT AUTO????
          * Current triggers:
          * 
          * intake beam break -> disable intake and move to storage position and rumble controller
