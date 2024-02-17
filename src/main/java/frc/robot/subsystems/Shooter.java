@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.SparkMaxWrapper;
 
-import static frc.robot.Constants.IntakeConstants.absoluteEncoderConversionFactor;
 import static frc.robot.Constants.ShooterConstants.*;
 
 public class Shooter extends SubsystemBase {

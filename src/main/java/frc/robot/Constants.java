@@ -111,10 +111,10 @@ public final class Constants {
             ControlMode.positionLeader,
             shooterArmPID,
             60,
-            false,
+            true,
             IdleMode.kCoast,//TODO brake
             12,
-            70.0 / 3.0 //TODO make sure this works
+            4.0//TODO really 4??
         );
         public static final SparkMaxConstants shooterArmFolllowerConstants = new SparkMaxConstants(
             16,
@@ -125,12 +125,12 @@ public final class Constants {
             false,
             IdleMode.kCoast,
             12,
-            70.0 / 3.0
+            4.0
         );
-        public static final boolean invertArmFollower = true;
+        public static final boolean invertArmFollower = false;
         public static final boolean invertAbsoluteEncoder = true;
         public static final double absoluteEncoderConversionFactor = 360.0;
-        public static final double absoluteEncoderOffset = 1.367;
+        public static final double absoluteEncoderOffset = 267.23;
 
         /* Arm Positions */
         public static final double armPositionPassthrough = 100.0;
