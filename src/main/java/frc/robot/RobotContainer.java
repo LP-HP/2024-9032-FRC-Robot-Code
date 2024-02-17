@@ -109,8 +109,7 @@ public class RobotContainer {
         );
 
         enableIntakeButton.onTrue(
-            intake.setToGroundPosition()
-            .andThen(intake.enableIntake())
+            intake.setToGroundPositionAndEnable()
             .onlyIf(() -> !intake.isBeamBreakTriggered())
         );
 

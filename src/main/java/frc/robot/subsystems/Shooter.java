@@ -18,10 +18,10 @@ public class Shooter extends SubsystemBase {
     private final SparkMaxWrapper armMotor;    
     private final SparkMaxWrapper armMotorFollower;    
 
-    private final SparkMaxWrapper flywheelMotor = null;//TODO add back flywheel code
-    private final SparkMaxWrapper flywheelMotorFollower = null;
+    private final SparkMaxWrapper flywheelMotor;
+    private final SparkMaxWrapper flywheelMotorFollower;
 
-    private final SparkMaxWrapper passthroughStorageMotor = null;
+    private final SparkMaxWrapper passthroughStorageMotor;
 
     private final ShuffleboardTab shooterTab = Shuffleboard.getTab("Shooter");
 
@@ -36,15 +36,15 @@ public class Shooter extends SubsystemBase {
         armMotorFollower.follow(armMotor, invertArmFollower);
         armMotorFollower.config();
 
-        // flywheelMotor = new SparkMaxWrapper(shooterFlywheelConstants);
-        // flywheelMotor.config();
+        flywheelMotor = new SparkMaxWrapper(shooterFlywheelConstants);
+        flywheelMotor.config();
 
-        // flywheelMotorFollower = new SparkMaxWrapper(shooterFlywheelFolllowerConstants);
-        // flywheelMotorFollower.follow(flywheelMotor, invertFlywheelFollower);
-        // flywheelMotorFollower.config();
+        flywheelMotorFollower = new SparkMaxWrapper(shooterFlywheelFolllowerConstants);
+        flywheelMotorFollower.follow(flywheelMotor, invertFlywheelFollower);
+        flywheelMotorFollower.config();
 
-        // passthroughStorageMotor = new SparkMaxWrapper(shooterStorageConstants);
-        // passthroughStorageMotor.config();
+        passthroughStorageMotor = new SparkMaxWrapper(shooterStorageConstants);
+        passthroughStorageMotor.config();
 
          /* Wait for the encoder to initialize before setting to absolute */
         Timer.delay(1.0);
@@ -55,14 +55,14 @@ public class Shooter extends SubsystemBase {
         /* Add Telemetry */
         shooterTab.add(armMotor)
             .withPosition(1, 1).withSize(2, 4);
-        // shooterTab.add(flywheelMotor)
-            // .withPosition(4, 1).withSize(2, 4);
+        shooterTab.add(flywheelMotor)
+            .withPosition(4, 1).withSize(2, 4);
         shooterTab.addBoolean("Beam Break Triggered", this::isBeamBreakTriggered)
             .withPosition(1, 4).withSize(2, 1);
 
         /* Prevent moving to a previous setpoint */
         armMotor.setClosedLoopTarget(armMotor.relativeEncoder.getPosition());
-        // flywheelMotor.setClosedLoopTarget(0.0);
+        flywheelMotor.setClosedLoopTarget(0.0);
     }
 
     public boolean isBeamBreakTriggered() {
@@ -96,10 +96,10 @@ public class Shooter extends SubsystemBase {
         return runOnce(() -> flywheelMotor.setClosedLoopTarget(0.0));
     }
 
-    public Command setShooterVelocityThenWaitThenDisable(double velocity, double waitTime) {
+    public Command setShooterVelocityThenWaitThenDisable(double velocity) {
         return waitForShooterVelocity(velocity)
            .andThen(enableStorageMotorToFlywheels())
-           .andThen(Commands.waitSeconds(waitTime))
+           .andThen(Commands.waitSeconds(shotWaitTime))
            .andThen(disableShooterFlywheel())
            .andThen(disableStorageMotor());
     }
@@ -110,6 +110,10 @@ public class Shooter extends SubsystemBase {
 
     public Command setToStoragePosition() {
         return runOnce(() -> armMotor.setClosedLoopTarget(armPositionStorage)); 
+    }
+
+    public Command setToTargetPosition(double position) {
+        return runOnce(() -> armMotor.setClosedLoopTarget(position)); 
     }
 
     /* Sets the target and wait until it is achieved */

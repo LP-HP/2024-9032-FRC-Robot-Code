@@ -50,10 +50,6 @@ public class Intake extends SubsystemBase {
     }
 
     /* Just sets the target */
-    public Command setToGroundPosition() {
-        return runOnce(() -> armMotor.setClosedLoopTarget(armPositionGround));
-    }
-
     public Command setToAmpPosition() {
         return runOnce(() -> armMotor.setClosedLoopTarget(armPositionAmp));
     }
@@ -85,10 +81,6 @@ public class Intake extends SubsystemBase {
     public Command moveToPassthroughPosition() {
         return moveToTargetPosition(armPositionPassthrough);
     }
-    
-    public Command enableIntake() {
-        return runOnce(() -> flywheelMotor.set(intakePower));
-    }
 
     public Command disableIntake() {
         return runOnce(() -> flywheelMotor.set(0.0));
@@ -100,5 +92,12 @@ public class Intake extends SubsystemBase {
 
     public Command shootIntoShooter() {
         return runOnce(() -> flywheelMotor.set(outtakeToShooterPower));
+    }
+
+    public Command setToGroundPositionAndEnable() {
+        return runOnce(() -> { 
+            armMotor.setClosedLoopTarget(armPositionGround);
+            flywheelMotor.set(intakePower);
+        });
     }
 }

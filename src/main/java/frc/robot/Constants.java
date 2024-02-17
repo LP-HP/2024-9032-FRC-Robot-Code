@@ -82,6 +82,7 @@ public final class Constants {
             12,
             1.0
         );
+        public static final double shotWaitTime = 0.25;
         /* Flyhweel Powers */
         public static final double intakePower = -0.2;
         public static final double outtakeAmpPower = 0.6;
@@ -166,6 +167,7 @@ public final class Constants {
             60.0
         );
         public static final boolean invertFlywheelFollower = true;//TODO INVERT OR NO
+        public static final double shotWaitTime = 0.25;
 
         /* Storage Motor */
         public static final SparkMaxConstants shooterStorageConstants = new SparkMaxConstants(
@@ -396,5 +398,12 @@ public final class Constants {
          /* PID Constants for Rotation to a Target */
         public static final double kPRotationTarget = 1.0;//TODO tune and test
         public static final double kDRotationTarget = 0.0;
+    }
+
+    public static final class AutoConstants { //TODO tune
+        public static final double armPosNote1 = 10.0;
+        public static final double shooterVelocityNote1 = 10.0;
+        public static final double armPosNote2 = 10.0;
+        public static final double shooterVelocityNote2 = 10.0;
     }
 }
