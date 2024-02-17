@@ -1,13 +1,9 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.autos.*;
@@ -62,9 +58,6 @@ public class RobotContainer {
         //Configure the button bindings
         configureButtonBindings();
 
-        //Configure the subsystem triggers
-        configureSubsystemTriggers();
-
         autoChooser.addOption("Swerve Auto Shakedown", new SwerveShakedown(swerve));
         // autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
         // autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
@@ -111,62 +104,6 @@ public class RobotContainer {
         aprilTagAlignmentTest.onTrue(intake.shootIntoAmp());//l bumper
 
         disableIntakeTemp.onTrue(intake.disableIntake());//x
-        // speakerScoreButton.onTrue(
-        //     new SpeakerScoringSequence(swerve, limelight, shooter)
-        //     /* Only run if there is a valid target and it's a speaker tag and we have a note */
-        //     .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.isBeamBreakTriggered())
-        // );
-
-        // enableIntakeButton.onTrue(
-        //     intake.setToGroundPosition()
-        //     .andThen(intake.enableIntake())
-        //     .onlyIf(() -> !intake.isBeamBreakTriggered())
-        // );
-
-        // storeNoteButton.onTrue(
-        //     shooter.moveArmToPassthroughPosition()
-        //     .andThen(shooter.enableStorageMotorReceiving())
-        //     .andThen(intake.shootIntoShooter())
-        //     .onlyIf(intake::isBeamBreakTriggered)
-        // );
-
-        // aprilTagAlignmentTest.onTrue(//TODO move to other class
-        //     new LockToRotationTargetWhileMoving(swerve, 
-        //         () -> limelight.getAprilTagTarget().xOffset, 
-        //         () -> 
-        //             new Translation2d(driveController.getLeftX(), -driveController.getLeftY())
-        //             .times(Constants.TeleopConstants.joystickToSpeedConversionFactor))
-        // );
-    }
-
-    private void configureSubsystemTriggers() {
-        /* 
-         * Current triggers:
-         * 
-         * intake beam break -> disable intake and move to storage position and rumble controller
-         * shooter beam break -> disable intake and storage motor and move shooter and intake to storage position
-         * 
-         */
-        // intakeBeamBreakTrigger.onTrue(
-        //     intake.disableIntake()
-        //     .andThen(intake.setToStoragePosition())
-        //     .alongWith(setAndDisableRumble())
-        // );
-
-        // shooterBeamBreakTrigger.onTrue(
-        //     shooter.disableStorageMotor()
-        //     .andThen(intake.disableIntake())
-        //     .andThen(shooter.setToStoragePosition())
-        //     .andThen(intake.setToStoragePosition())
-        // );
-    }
-
-    private Command setAndDisableRumble() {
-        return new SequentialCommandGroup(
-            new InstantCommand(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 1)),
-            Commands.waitSeconds(0.25),
-            new InstantCommand(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 0))
-        );
     }
 
     /* Only return the auto command here */
