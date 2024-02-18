@@ -66,7 +66,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean isBeamBreakTriggered() {
-        return !beamBreak.get();//TODO true or false?
+        return !beamBreak.get();
     }
 
     public Command enableStorageMotorReceiving() {

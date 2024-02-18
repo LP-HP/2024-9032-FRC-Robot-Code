@@ -126,7 +126,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
 
     public void setClosedLoopTarget(double setpoint, double feedforward) {
         if(!isConfigured) {
-            System.err.println("Motor not configured!");
+            System.err.println(constants.name() + " not configured!");
 
             return;
         }
@@ -151,7 +151,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
 
     public void setClosedLoopTarget(double setpoint) {
         if(!isConfigured) {
-            System.err.println("Motor not configured!");
+            System.err.println(constants.name() + " not configured!");
 
             return;
         }

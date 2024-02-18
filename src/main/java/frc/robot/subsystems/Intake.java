@@ -46,7 +46,7 @@ public class Intake extends SubsystemBase {
     }
 
     public boolean isBeamBreakTriggered() {
-        return !beamBreak.get();//TODO true or false?
+        return !beamBreak.get();
     }
 
     /* Just sets the target */

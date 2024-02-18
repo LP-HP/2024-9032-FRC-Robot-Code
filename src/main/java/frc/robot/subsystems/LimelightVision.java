@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.limelightutil.LimelightHelpers;
 import frc.robot.Constants;
 
-import static frc.robot.Constants.VisionConstants.limelightName;;
+import static frc.robot.Constants.VisionConstants.limelightName;
 
 public class LimelightVision extends SubsystemBase {
     private VisionPoseMeasurement lastPoseEstimate = new VisionPoseMeasurement();

@@ -127,7 +127,7 @@ public final class Constants {
             12,
             4.0
         );
-        public static final boolean invertArmFollower = false;
+        public static final boolean invertArmFollower = true;
         public static final boolean invertAbsoluteEncoder = true;
         public static final double absoluteEncoderConversionFactor = 360.0;
         public static final double absoluteEncoderOffset = 267.23;
@@ -249,7 +249,7 @@ public final class Constants {
             0.0, 
             0.0, 
             0.0,
-            0.0
+            1.0
         );
 
         /* Drive Motor Characterization Values */
