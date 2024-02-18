@@ -31,7 +31,8 @@ public class RobotContainer {
     private final Trigger speakerScoreButton = driveController.y().debounce(0.025);
     private final Trigger enableIntakeButton = driveController.b().debounce(0.025);
     private final Trigger storeNoteButton = driveController.rightBumper().debounce(0.025);
-    // private final Trigger aprilTagAlignmentTest = driveController.leftBumper().debounce(0.025);//TODO remove
+    private final Trigger ampScoreButton = driveController.leftBumper().debounce(0.025);
+    // private final Trigger aprilTagAlignmentTest = driveController.x().debounce(0.025);//TODO remove
 
     /* Subsystems */
     private final LimelightVision limelight = new LimelightVision(false);
@@ -96,6 +97,7 @@ public class RobotContainer {
          * y [must have a valid speaker target and a note] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
          * b -> [must not have a note] set intake to ground position and enable intake
          * right bumper [must have a note in the intake] -> put note into shooter
+         * left bumper [must have a note in the intake] -> shoot into amp
          * 
         */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
@@ -115,6 +117,12 @@ public class RobotContainer {
             shooter.moveArmToPassthroughPosition()
             .andThen(shooter.enableStorageMotorReceiving())
             .andThen(intake.shootIntoShooter())
+            .onlyIf(intake::isBeamBreakTriggered)
+        );
+
+        ampScoreButton.onTrue(
+            intake.shootIntoAmpThenWaitThenDisable()
+            .andThen(intake.setToStoragePosition())
             .onlyIf(intake::isBeamBreakTriggered)
         );
 

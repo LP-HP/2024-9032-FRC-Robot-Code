@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.SparkMaxWrapper;
@@ -89,8 +90,10 @@ public class Intake extends SubsystemBase {
         return moveToTargetPosition(armPositionPassthrough);
     }
 
-    public Command shootIntoAmp() {
-        return runOnce(() -> flywheelMotor.set(outtakeAmpPower));
+    public Command shootIntoAmpThenWaitThenDisable() {
+        return runOnce(() -> flywheelMotor.set(outtakeAmpPower))
+            .andThen(Commands.waitSeconds(shotWaitTime))
+            .andThen(runOnce(() -> flywheelMotor.set(0.0)));
     }
 
     public Command shootIntoShooter() {
