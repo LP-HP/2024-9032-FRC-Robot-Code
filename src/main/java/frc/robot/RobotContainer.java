@@ -115,6 +115,7 @@ public class RobotContainer {
 
         storeNoteButton.onTrue(
             shooter.moveArmToPassthroughPosition()
+                .alongWith(intake.moveToPassthroughPosition())
             .andThen(shooter.enableStorageMotorReceiving())
             .andThen(intake.shootIntoShooter())
             .onlyIf(intake::isBeamBreakTriggered)
