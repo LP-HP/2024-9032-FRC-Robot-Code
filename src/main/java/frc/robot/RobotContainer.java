@@ -91,8 +91,8 @@ public class RobotContainer {
          * a -> zero gyro
          * y [must have a valid speaker target and a note] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
          * b -> [must not have a note] set intake to ground position and enable intake - when a note is gained, then move the intake to storage
-         * right bumper [must have a note in the intake] -> put note into shooter
-         * left bumper [must have a note in the intake] -> shoot into amp
+         * right bumper [must have a note in the intake] -> run store note sequence
+         * left bumper [must have a note in the intake] -> move intake to amp position and shoot into amp
          * 
         */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
@@ -117,7 +117,8 @@ public class RobotContainer {
         );
 
         ampScoreButton.onTrue(
-            intake.shootIntoAmpThenWaitThenDisable()
+            intake.moveToAmpPosition()
+            .andThen(intake.shootIntoAmpThenWaitThenDisable())
             .andThen(intake.setToStoragePosition())
             .onlyIf(intake::isBeamBreakTriggered)
         );
