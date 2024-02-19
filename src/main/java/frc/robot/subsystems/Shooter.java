@@ -111,10 +111,6 @@ public class Shooter extends SubsystemBase {
         }); 
     }
 
-    public Command setToPassthroughPosition() {
-        return setTargetPosition(armPositionPassthrough); 
-    }
-
     public Command setToStoragePosition() {
         return setTargetPosition(armPositionStorage); 
     }
@@ -135,8 +131,8 @@ public class Shooter extends SubsystemBase {
         return moveToTargetPosition(armPositionPassthrough);
     }
 
+    /* Moves to the target position from a vision target y offset */
     public Command moveToTargetPositionFromTargetY(DoubleSupplier targetYSup) { 
-        /* Sets the target position to an interpolated value from the lookup table */
         return moveToTargetPosition(armPosLookupTableFromTargetY.get(targetYSup.getAsDouble()));
     }   
 }

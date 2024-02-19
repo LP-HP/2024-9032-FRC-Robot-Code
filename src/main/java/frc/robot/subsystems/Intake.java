@@ -51,7 +51,7 @@ public class Intake extends SubsystemBase {
     }
 
     /* Sets the target and disables (non-blocking) */
-    private Command setTargetPositionAndDisable(double setpoint) {
+    private Command setTargetPosition(double setpoint) {
         return runOnce(() -> { 
             armMotor.setClosedLoopTarget(setpoint);
             flywheelMotor.set(0.0);
@@ -59,22 +59,18 @@ public class Intake extends SubsystemBase {
     }
 
     public Command setToAmpPosition() {
-        return setTargetPositionAndDisable(armPositionAmp);
-    }
-
-    public Command setToPassthroughPosition() {
-        return setTargetPositionAndDisable(armPositionPassthrough);
+        return setTargetPosition(armPositionAmp);
     }
 
     public Command setToStoragePosition() {
-        return setTargetPositionAndDisable(armPositionStorage);
+        return setTargetPosition(armPositionStorage);
     }
 
     /* Sets the target and wait until it is achieved */
     private Command moveToTargetPosition(double position) {
         return new FunctionalCommand(
         /* Sets the target position and disable at the start */
-        () -> setTargetPositionAndDisable(position),
+        () -> setTargetPosition(position),
         () -> {},
         (unused) -> {},
          /* We are finished if the arm position is within our tolerance */
