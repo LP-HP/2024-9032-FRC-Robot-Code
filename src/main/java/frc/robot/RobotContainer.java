@@ -40,10 +40,6 @@ public class RobotContainer {
     private final Intake intake = new Intake();
     private final Shooter shooter = new Shooter();
 
-    /* Subsystem Triggers */
-    private final Trigger intakeBeamBreakTrigger = new Trigger(intake::isBeamBreakTriggered).debounce(0.025);
-    private final Trigger shooterBeamBreakTrigger = new Trigger(shooter::isBeamBreakTriggered).debounce(0.025);
-  
     public RobotContainer() {
         //Will run the following command when there is no other command set, such as during teleop
         swerve.setDefaultCommand(
@@ -77,7 +73,6 @@ public class RobotContainer {
     /* Only reset variables - don't run any commands here */
     public void teleopInit() {
         limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
-        configureTeleopTriggers();//Configure the subsystem triggers
     }
 
     private void registerPathplannerCommands() {
@@ -95,7 +90,7 @@ public class RobotContainer {
          * 
          * a -> zero gyro
          * y [must have a valid speaker target and a note] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
-         * b -> [must not have a note] set intake to ground position and enable intake
+         * b -> [must not have a note] set intake to ground position and enable intake - when a note is gained, then move the intake to storage
          * right bumper [must have a note in the intake] -> put note into shooter
          * left bumper [must have a note in the intake] -> shoot into amp
          * 
@@ -110,14 +105,14 @@ public class RobotContainer {
 
         enableIntakeButton.onTrue(
             intake.setToGroundPositionAndEnable()
+            .andThen(Commands.waitUntil(intake::isBeamBreakTriggered))
+            .andThen(intake.setToStoragePosition()
+                .alongWith(setAndDisableRumble()))
             .onlyIf(() -> !intake.isBeamBreakTriggered())
         );
 
         storeNoteButton.onTrue(
-            shooter.moveArmToPassthroughPosition()
-                .alongWith(intake.moveToPassthroughPosition())
-            .andThen(shooter.enableStorageMotorReceiving())
-            .andThen(intake.shootIntoShooter())
+            new StoreNoteSequence(intake, shooter)
             .onlyIf(intake::isBeamBreakTriggered)
         );
 
@@ -134,25 +129,6 @@ public class RobotContainer {
         //             new Translation2d(driveController.getLeftX(), -driveController.getLeftY())
         //             .times(Constants.TeleopConstants.joystickToSpeedConversionFactor))
         // );
-    }
-
-    private void configureTeleopTriggers() {
-        /* 
-         * Current triggers (for teleop):
-         * 
-         * intake beam break -> disable intake and move to storage position and rumble controller
-         * shooter beam break -> disable intake and storage motor and move shooter and intake to storage position
-         * 
-         */
-        intakeBeamBreakTrigger.onTrue(
-            intake.setToStoragePosition()
-            .alongWith(setAndDisableRumble())
-        );
-
-        shooterBeamBreakTrigger.onTrue(
-            shooter.setToStoragePosition()
-            .andThen(intake.setToStoragePosition())
-        );
     }
 
     private Command setAndDisableRumble() {

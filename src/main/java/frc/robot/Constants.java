@@ -401,6 +401,9 @@ public final class Constants {
     }
 
     public static final class AutoConstants { //TODO tune
+        /* Seconds */
+        public static final double notePickupTimeout = 2.0;
+
         public static final double armPosNote1 = 10.0;
         public static final double shooterVelocityNote1 = 10.0;
         public static final double armPosNote2 = 10.0;

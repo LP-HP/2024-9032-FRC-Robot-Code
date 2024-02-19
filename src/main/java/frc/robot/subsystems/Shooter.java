@@ -95,15 +95,16 @@ public class Shooter extends SubsystemBase {
         });
     }
 
-    public Command setShooterVelocityThenWaitThenDisable(double velocity) {
+    public Command shootSequence(double velocity) {
         return waitForShooterVelocity(velocity)
            .andThen(enableStorageMotorToFlywheels())
            .andThen(Commands.waitSeconds(shotWaitTime))
-           .andThen(disableShooterFlywheels());
+           .andThen(disableShooterFlywheels())
+           .andThen(setToStoragePosition());
     }
 
     /* Sets the target and disables the storage motor (non-blocking) */
-    public Command setTargetPositionAndDisable(double position) {
+    public Command setTargetPosition(double position) {
         return runOnce(() -> { 
             armMotor.setClosedLoopTarget(position);
             passthroughStorageMotor.set(0.0);
@@ -111,18 +112,18 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command setToPassthroughPosition() {
-        return setTargetPositionAndDisable(armPositionPassthrough); 
+        return setTargetPosition(armPositionPassthrough); 
     }
 
     public Command setToStoragePosition() {
-        return setTargetPositionAndDisable(armPositionStorage); 
+        return setTargetPosition(armPositionStorage); 
     }
 
     /* Sets the target and wait until it is achieved */
-    private Command moveArmToTargetPosition(double position) { 
+    private Command moveToTargetPosition(double position) { 
         return new FunctionalCommand(
         /* Sets the target position at the start */
-        () -> setTargetPositionAndDisable(position),
+        () -> setTargetPosition(position),
         () -> {},
         (unused) -> {},
         /* We are finished if the arm position is within our tolerance */
@@ -130,12 +131,12 @@ public class Shooter extends SubsystemBase {
         this);
     }   
 
-    public Command moveArmToPassthroughPosition() {
-        return moveArmToTargetPosition(armPositionPassthrough);
+    public Command moveToPassthroughPosition() {
+        return moveToTargetPosition(armPositionPassthrough);
     }
 
-    public Command moveArmToPositionFromTargetY(DoubleSupplier targetYSup) { 
+    public Command moveToTargetPositionFromTargetY(DoubleSupplier targetYSup) { 
         /* Sets the target position to an interpolated value from the lookup table */
-        return moveArmToTargetPosition(armPosLookupTableFromTargetY.get(targetYSup.getAsDouble()));
+        return moveToTargetPosition(armPosLookupTableFromTargetY.get(targetYSup.getAsDouble()));
     }   
 }
