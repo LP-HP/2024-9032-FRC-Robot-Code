@@ -104,15 +104,17 @@ public class Shooter extends SubsystemBase {
     }
 
     /* Sets the target and disables the storage motor (non-blocking) */
-    public Command setTargetPosition(double position) {
-        return runOnce(() -> { 
-            armMotor.setClosedLoopTarget(position);
-            passthroughStorageMotor.set(0.0);
-        }); 
+    private void setTargetPosition(double position) {
+        armMotor.setClosedLoopTarget(position);
+        passthroughStorageMotor.set(0.0); 
     }
 
     public Command setToStoragePosition() {
-        return setTargetPosition(armPositionStorage); 
+        return runOnce(() -> setTargetPosition(armPositionStorage)); 
+    }
+
+    public Command setToAutoPosition(double position) {
+        return runOnce(() -> setTargetPosition(position));
     }
 
     /* Sets the target and wait until it is achieved */

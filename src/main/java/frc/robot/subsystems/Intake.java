@@ -51,19 +51,17 @@ public class Intake extends SubsystemBase {
     }
 
     /* Sets the target and disables (non-blocking) */
-    private Command setTargetPosition(double setpoint) {
-        return runOnce(() -> { 
-            armMotor.setClosedLoopTarget(setpoint);
-            flywheelMotor.set(0.0);
-        });
+    private void setTargetPosition(double setpoint) {
+        armMotor.setClosedLoopTarget(setpoint);
+        flywheelMotor.set(0.0);
     }
 
     public Command setToAmpPosition() {
-        return setTargetPosition(armPositionAmp);
+        return runOnce(() -> setTargetPosition(armPositionAmp));
     }
 
     public Command setToStoragePosition() {
-        return setTargetPosition(armPositionStorage);
+        return runOnce(() -> setTargetPosition(armPositionStorage));
     }
 
     /* Sets the target and wait until it is achieved */
