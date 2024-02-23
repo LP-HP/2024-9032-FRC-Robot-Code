@@ -11,7 +11,7 @@ public class StoreNoteFromGroundSequence extends SequentialCommandGroup {
             /* Put the intake on the ground*/
             intake.setToGroundPositionAndEnable(),
             /* Wait until a note is in the intake */
-            Commands.waitUntil(intake::isBeamBreakTriggered),
+            Commands.waitUntil(intake::hasNote),
             /* Store note */
             new StoreNoteSequence(intake, shooter)
         );

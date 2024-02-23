@@ -57,7 +57,7 @@ public class Shooter extends SubsystemBase {
             .withPosition(0, 0).withSize(2, 2);
         shooterTab.add(flywheelMotor)
             .withPosition(3, 0).withSize(2, 2);
-        shooterTab.addBoolean("Beam Break Triggered", this::isBeamBreakTriggered)
+        shooterTab.addBoolean("Has Note", this::hasNote)
             .withPosition(6, 0).withSize(2, 1);
 
         /* Prevent moving to a previous setpoint */
@@ -65,7 +65,7 @@ public class Shooter extends SubsystemBase {
         flywheelMotor.setClosedLoopTarget(0.0);
     }
 
-    public boolean isBeamBreakTriggered() {
+    public boolean hasNote() {
         return !beamBreak.get();
     }
 

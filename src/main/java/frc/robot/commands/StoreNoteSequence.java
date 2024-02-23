@@ -14,7 +14,7 @@ public class StoreNoteSequence extends SequentialCommandGroup {
             /* Move the note into the shooter once they have reached the passthrough position */
             shooter.enableStorageMotorReceiving(),
             intake.shootIntoShooter(),
-            Commands.waitUntil(shooter::isBeamBreakTriggered),
+            Commands.waitUntil(shooter::hasNote),
             /* Make sure to put them back in the storage position when the note arrives in the shooter */
             intake.setToStoragePosition(),
             shooter.setToStoragePosition()

@@ -100,27 +100,27 @@ public class RobotContainer {
         speakerScoreButton.onTrue(
             new SpeakerScoringSequence(swerve, limelight, shooter)
             /* Only run if there is a valid target and it's a speaker tag and we have a note */
-            .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.isBeamBreakTriggered())
+            .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.hasNote())
         );
 
         enableIntakeButton.onTrue(
             intake.setToGroundPositionAndEnable()
-            .andThen(Commands.waitUntil(intake::isBeamBreakTriggered))
+            .andThen(Commands.waitUntil(intake::hasNote))
             .andThen(intake.setToStoragePosition()
                 .alongWith(setAndDisableRumble()))
-            .onlyIf(() -> !intake.isBeamBreakTriggered())
+            .onlyIf(() -> !intake.hasNote())
         );
 
         storeNoteButton.onTrue(
             new StoreNoteSequence(intake, shooter)
-            .onlyIf(intake::isBeamBreakTriggered)
+            .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
         );
 
         ampScoreButton.onTrue(
             intake.moveToAmpPosition()
             .andThen(intake.shootIntoAmpThenWaitThenDisable())
             .andThen(intake.setToStoragePosition())
-            .onlyIf(intake::isBeamBreakTriggered)
+            .onlyIf(intake::hasNote)
         );
 
         // aprilTagAlignmentTest.onTrue(//TODO move to other class

@@ -39,14 +39,14 @@ public class Intake extends SubsystemBase {
             .withPosition(0, 0).withSize(2, 2);
         intakeTab.add(flywheelMotor)
             .withPosition(3, 0).withSize(2, 2);
-        intakeTab.addBoolean("Beam Break Triggered", this::isBeamBreakTriggered)
+        intakeTab.addBoolean("Has Note", this::hasNote)
             .withPosition(6, 0).withSize(2, 1);;
 
         /* Prevent moving to a previous setpoint */
         armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
     }
 
-    public boolean isBeamBreakTriggered() {
+    public boolean hasNote() {
         return !beamBreak.get();
     }
 
