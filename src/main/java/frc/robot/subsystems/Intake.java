@@ -22,7 +22,7 @@ public class Intake extends SubsystemBase {
 
     public Intake() {
         armMotor = new SparkMaxWrapper(intakeArmConstants);
-        armMotor.configAbsoluteEncoder(invertAbsoluteEncoder);
+        armMotor.configAbsoluteEncoder(invertAbsoluteEncoder, absoluteEncoderConversionFactor, absoluteEncoderOffset);
         armMotor.config();
 
         flywheelMotor = new SparkMaxWrapper(intakeFlywheelConstants);
@@ -36,18 +36,18 @@ public class Intake extends SubsystemBase {
 
         /* Add Telemetry */
         intakeTab.add(armMotor)
-            .withPosition(1, 1).withSize(2, 4);
+            .withPosition(0, 0).withSize(2, 2);
         intakeTab.add(flywheelMotor)
-            .withPosition(4, 1).withSize(2, 4);
+            .withPosition(3, 0).withSize(2, 2);
         intakeTab.addBoolean("Beam Break Triggered", this::isBeamBreakTriggered)
-            .withPosition(1, 4).withSize(2, 1);;
+            .withPosition(6, 0).withSize(2, 1);;
 
         /* Prevent moving to a previous setpoint */
-        armMotor.setClosedLoopTarget(armMotor.relativeEncoder.getPosition());
+        armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
     }
 
     public boolean isBeamBreakTriggered() {
-        return !beamBreak.get();//TODO true or false?
+        return !beamBreak.get();
     }
 
     /* Sets the target and disables (non-blocking) */

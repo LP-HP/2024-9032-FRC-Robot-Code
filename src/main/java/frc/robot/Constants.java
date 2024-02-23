@@ -45,12 +45,13 @@ public final class Constants {
     /* Using CANIds 13-14 - 2 motors */
     public static final class IntakeConstants {//TODO tune
         /* Intake Arm */
-        public static final double armSetpointTolerance = 0.1;
+        public static final double armSetpointTolerance = 0.5;
         public static final SparkMaxPIDConstants intakeArmPID = new SparkMaxPIDConstants(
-            1.0, 
+            0.1, 
             0.0, 
-            0.0, 
-            0.0
+            0.01, 
+            0.0,
+            0.6
         );
         public static final SparkMaxConstants intakeArmConstants = new SparkMaxConstants(
             13,
@@ -58,17 +59,19 @@ public final class Constants {
             ControlMode.position,
             intakeArmPID,
             40,
-            false,
+            true,
             IdleMode.kBrake,
             12,
-            1.0 / 60.0//TODO make sure this works
+            1.0
         );
-        public static final boolean invertAbsoluteEncoder = true;
+        public static final boolean invertAbsoluteEncoder = false;
+        public static final double absoluteEncoderConversionFactor = 60.0;
+        public static final double absoluteEncoderOffset = 0.82;
         /* Arm Positions */
-        public static final double armPositionGround = 0.33;
-        public static final double armPositionPassthrough = 0.0;
-        public static final double armPositionAmp = 0.216;
-        public static final double armPositionStorage = 0.0;
+        public static final double armPositionGround = 0.11;
+        public static final double armPositionPassthrough = 2.0;
+        public static final double armPositionAmp = 20.0;
+        public static final double armPositionStorage = 2.0;
 
         /* Intake Flywheel */
         public static final SparkMaxConstants intakeFlywheelConstants = new SparkMaxConstants(
@@ -84,8 +87,8 @@ public final class Constants {
         );
         public static final double shotWaitTime = 0.25;
         /* Flyhweel Powers */
-        public static final double intakePower = -0.2;
-        public static final double outtakeAmpPower = 0.6;
+        public static final double intakePower = -0.3;
+        public static final double outtakeAmpPower = 0.7;
         public static final double outtakeToShooterPower = -0.1;
 
         /* Sensors */
@@ -100,6 +103,7 @@ public final class Constants {
             0.0, 
             0.0, 
             0.0, 
+            0.0,
             0.0
         );
         public static final SparkMaxConstants shooterArmConstants = new SparkMaxConstants(
@@ -108,10 +112,10 @@ public final class Constants {
             ControlMode.positionLeader,
             shooterArmPID,
             60,
-            false,
+            true,
             IdleMode.kCoast,//TODO brake
             12,
-            1.0 //TODO make sure this works
+            4.0//TODO really 4??
         );
         public static final SparkMaxConstants shooterArmFolllowerConstants = new SparkMaxConstants(
             16,
@@ -122,10 +126,13 @@ public final class Constants {
             false,
             IdleMode.kCoast,
             12,
-            1.0
+            4.0
         );
-        public static final boolean invertArmFollower = true;//TODO INVERT OR NO
-        public static final boolean invertAbsoluteEncoder = false;
+        public static final boolean invertArmFollower = true;
+        public static final boolean invertAbsoluteEncoder = true;
+        public static final double absoluteEncoderConversionFactor = 360.0;
+        public static final double absoluteEncoderOffset = 267.23;
+
         /* Arm Positions */
         public static final double armPositionPassthrough = 100.0;
         public static final double armPositionStorage = 80.0;
@@ -142,6 +149,7 @@ public final class Constants {
             0.0, 
             0.0, 
             0.0, 
+            0.0,
             0.0
         );
         public static final SparkMaxConstants shooterFlywheelConstants = new SparkMaxConstants(
@@ -174,7 +182,7 @@ public final class Constants {
             19,
             "Shooter Storage",
             ControlMode.percentOutput,
-            shooterFlywheelPID,
+            null,
             20,
             false,
             IdleMode.kBrake,
@@ -233,7 +241,8 @@ public final class Constants {
             0.06, 
             0.0, 
             0.0, 
-            0.0
+            0.0,
+            1.0
         );
 
         /* Drive Motor PID Values */
@@ -241,7 +250,8 @@ public final class Constants {
             0.05, 
             0.0, 
             0.0, 
-            0.0
+            0.0,
+            1.0
         );
 
         /* Drive Motor Characterization Values */
