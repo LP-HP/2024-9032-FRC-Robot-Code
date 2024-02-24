@@ -1,134 +1,104 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkAbsoluteEncoder;
-import com.revrobotics.SparkPIDController;
-import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkBase.IdleMode;
-
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.swerveutil.CANSparkMaxUtil;
-import frc.lib.swerveutil.CANSparkMaxUtil.Usage;
-import frc.robot.Constants;
+import frc.robot.util.SparkMaxWrapper;
+
+import static frc.robot.Constants.IntakeConstants.*;
 
 public class Intake extends SubsystemBase {
-    private CANSparkMax armMotor;    
-    private SparkPIDController armController;
-    private RelativeEncoder armEncoder;
-    private SparkAbsoluteEncoder armEncoderAbsolute;
+    private final SparkMaxWrapper armMotor;    
+    private final SparkMaxWrapper flywheelMotor;
 
-    private CANSparkMax intakeFlywheelMotor;
+    private final ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
 
-    private final DigitalInput beamBreak = new DigitalInput(Constants.IntakeConstants.beamBreakPort);
+    private final DigitalInput beamBreak = new DigitalInput(beamBreakPort);
 
     public Intake() {
-        armMotor = new CANSparkMax(Constants.IntakeConstants.armMotorID, MotorType.kBrushless);
-        armController = armMotor.getPIDController();
-        armEncoder = armMotor.getEncoder();
-        armEncoderAbsolute = armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
-        configArmMotor();
+        armMotor = new SparkMaxWrapper(intakeArmConstants);
+        armMotor.configAbsoluteEncoder(invertAbsoluteEncoder, absoluteEncoderConversionFactor, absoluteEncoderOffset);
+        armMotor.config();
 
-        intakeFlywheelMotor = new CANSparkMax(Constants.IntakeConstants.intakeFlywheelMotorID, MotorType.kBrushless);
-        configIntakeMotor();
+        flywheelMotor = new SparkMaxWrapper(intakeFlywheelConstants);
+        flywheelMotor.config();
 
-         /* Reset the relative encoder to the absolute encoder value */
-        // armEncoder.setPosition(armMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());//TODO absolute encoder
-    }
+        /* Wait for the encoder to initialize before setting to absolute */
+        Timer.delay(1.0);
 
-    private void configArmMotor() {
-        armMotor.restoreFactoryDefaults();
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(armMotor, Usage.kPositionOnly);
-        armMotor.setSmartCurrentLimit(Constants.IntakeConstants.motorCurrentLimit);
-        armMotor.setIdleMode(IdleMode.kBrake);
-        armEncoder.setPositionConversionFactor(Constants.IntakeConstants.armEncoderConversionFactor);
-        armController.setP(Constants.IntakeConstants.kPArm);
-        armController.setD(Constants.IntakeConstants.kDArm);
-        armMotor.enableVoltageCompensation(Constants.IntakeConstants.motorVoltageComp);
-        armMotor.burnFlash();
-    }
+        /* Reset the relative encoder to the absolute encoder value */
+        armMotor.relativeEncoder.setPosition(armMotor.getAbsolutePosition());
 
-    private void configIntakeMotor() {
-        intakeFlywheelMotor.restoreFactoryDefaults();
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(intakeFlywheelMotor, Usage.kVelocityOnly);
-        intakeFlywheelMotor.setSmartCurrentLimit(Constants.IntakeConstants.motorCurrentLimit);
-        intakeFlywheelMotor.setIdleMode(IdleMode.kBrake);
-        intakeFlywheelMotor.enableVoltageCompensation(Constants.IntakeConstants.motorVoltageComp);
-        intakeFlywheelMotor.burnFlash();
+        /* Add Telemetry */
+        intakeTab.add(armMotor)
+            .withPosition(0, 0).withSize(2, 2);
+        intakeTab.add(flywheelMotor)
+            .withPosition(3, 0).withSize(2, 2);
+        intakeTab.addBoolean("Beam Break Triggered", this::isBeamBreakTriggered)
+            .withPosition(6, 0).withSize(2, 1);;
+
+        /* Prevent moving to a previous setpoint */
+        armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
     }
 
     public boolean isBeamBreakTriggered() {
-        return !beamBreak.get();//TODO true or false?
+        return !beamBreak.get();
     }
 
     /* Just sets the target */
-    private void setArmTargetPosition(double position) {
-        armController.setReference(position, ControlType.kPosition);
+    public Command setToGroundPosition() {
+        return runOnce(() -> armMotor.setClosedLoopTarget(armPositionGround));
     }
 
-    public Command setToGroundPosition() {
-        return runOnce(() -> setArmTargetPosition(Constants.IntakeConstants.armPositionGround));
+    public Command setToAmpPosition() {
+        return runOnce(() -> armMotor.setClosedLoopTarget(armPositionAmp));
     }
 
     public Command setToPassthroughPosition() {
-        return runOnce(() -> setArmTargetPosition(Constants.IntakeConstants.armPositionPassthrough));
+        return runOnce(() -> armMotor.setClosedLoopTarget(armPositionPassthrough));
     }
 
     public Command setToStoragePosition() {
-        return runOnce(() -> setArmTargetPosition(Constants.IntakeConstants.armPositionStorage));
+        return runOnce(() -> armMotor.setClosedLoopTarget(armPositionStorage));
     }
 
     /* Sets the target and wait until it is achieved */
     private Command moveToTargetPosition(double position) {
         return new FunctionalCommand(
         /* Sets the target position at the start */
-        () -> setArmTargetPosition(position),
+        () -> armMotor.setClosedLoopTarget(position),
         () -> {},
         (unused) -> {},
          /* We are finished if the arm position is within our tolerance */
-        () -> Math.abs(armEncoder.getPosition() - position) < Constants.IntakeConstants.armSetpointTolerance,
+        () -> Math.abs(armMotor.relativeEncoder.getPosition() - position) < armSetpointTolerance,
         this);
     } 
 
     public Command moveToAmpPosition() {
-        return moveToTargetPosition(Constants.IntakeConstants.armPositionAmp);
+        return moveToTargetPosition(armPositionAmp);
     }
 
     public Command moveToPassthroughPosition() {
-        return moveToTargetPosition(Constants.IntakeConstants.armPositionPassthrough);
-    }
-
-    private void setIntakePower(double power) {
-        intakeFlywheelMotor.set(power);
+        return moveToTargetPosition(armPositionPassthrough);
     }
     
     public Command enableIntake() {
-        return runOnce(() -> setIntakePower(Constants.IntakeConstants.intakePower));
+        return runOnce(() -> flywheelMotor.set(intakePower));
     }
 
     public Command disableIntake() {
-        return runOnce(() -> setIntakePower(0));
+        return runOnce(() -> flywheelMotor.set(0.0));
     }
 
     public Command shootIntoAmp() {
-        return runOnce(() -> setIntakePower(Constants.IntakeConstants.outtakeAmpPower));
+        return runOnce(() -> flywheelMotor.set(outtakeAmpPower));
     }
 
     public Command shootIntoShooter() {
-        return runOnce(() -> setIntakePower(Constants.IntakeConstants.outtakeToShooterPower));
-    }
-
-    @Override
-    public void periodic() {
-        SmartDashboard.putNumber("Intake Arm Position Relative", armEncoder.getPosition());
-        SmartDashboard.putNumber("Intake Arm Speed", armMotor.getAppliedOutput());
-        SmartDashboard.putNumber("Intake Arm Position Absolute", armEncoderAbsolute.getPosition());
-        SmartDashboard.putNumber("Intake Flywheel Velocity", intakeFlywheelMotor.getEncoder().getVelocity());
-        SmartDashboard.putBoolean("Beam Break Triggered", isBeamBreakTriggered());
+        return runOnce(() -> flywheelMotor.set(outtakeToShooterPower));
     }
 }
