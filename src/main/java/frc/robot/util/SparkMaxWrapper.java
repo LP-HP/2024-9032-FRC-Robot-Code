@@ -22,7 +22,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
 
     private AbsoluteEncoder absoluteEncoder;
 
-    private double closedLoopSetpoint;
+    private double closedLoopSetpoint = 0.0;
     private boolean isConfigured = false;
     private boolean hasAbsoluteEncoder = false;
     private boolean hasError = false;
@@ -184,6 +184,10 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
 
             hasError = true;
         }
+    }
+
+    public double getSetpoint() {
+        return closedLoopSetpoint;
     }
 
     @Override

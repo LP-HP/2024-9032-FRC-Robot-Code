@@ -115,7 +115,7 @@ public final class Constants {
             true,
             IdleMode.kCoast,//TODO brake
             12,
-            4.0//TODO really 4??
+            360.0 / (280 / 3.0)//TODO really 4??
         );
         public static final SparkMaxConstants shooterArmFolllowerConstants = new SparkMaxConstants(
             16,
@@ -126,7 +126,7 @@ public final class Constants {
             false,
             IdleMode.kCoast,
             12,
-            4.0
+            360.0 / (280 / 3.0)
         );
         public static final boolean invertArmFollower = true;
         public static final boolean invertAbsoluteEncoder = true;
@@ -144,13 +144,13 @@ public final class Constants {
         }
 
         /* Shooter Flywheels */
-        public static final double flywheelVelocityTolerance = 0.1;//TODO UNITSSSSS
+        public static final double flywheelVelocityTolerance = 2.0;
         public static final SparkMaxPIDConstants shooterFlywheelPID = new SparkMaxPIDConstants(
+            0.0001, 
             0.0, 
-            0.0, 
-            0.0, 
-            0.0,
-            0.0
+            0.001, 
+            0.000175,
+            1.0
         );
         public static final SparkMaxConstants shooterFlywheelConstants = new SparkMaxConstants(
             17,
@@ -193,7 +193,7 @@ public final class Constants {
         public static final double storageMotorPowerToFlywheels = 1;
 
         /* Sensors */
-        public static final int beamBreakPort = 1;
+        public static final int beamBreakPort = 2;
     }
 
     /* Using CANIds 1-12 - 8 motors and 4 cancoders */

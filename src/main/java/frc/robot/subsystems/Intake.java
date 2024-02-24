@@ -40,7 +40,9 @@ public class Intake extends SubsystemBase {
         intakeTab.add(flywheelMotor)
             .withPosition(3, 0).withSize(2, 2);
         intakeTab.addBoolean("Has Note", this::hasNote)
-            .withPosition(6, 0).withSize(2, 1);;
+            .withPosition(6, 0).withSize(2, 1);
+        intakeTab.addBoolean("At Setpoint", this::armAtSetpoint)
+            .withPosition(6, 1).withSize(2, 1);
 
         /* Prevent moving to a previous setpoint */
         armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
@@ -72,7 +74,7 @@ public class Intake extends SubsystemBase {
         () -> {},
         (unused) -> {},
          /* We are finished if the arm position is within our tolerance */
-        () -> Math.abs(armMotor.relativeEncoder.getPosition() - position) < armSetpointTolerance,
+        this::armAtSetpoint,
         this);
     } 
 
@@ -99,5 +101,9 @@ public class Intake extends SubsystemBase {
             armMotor.setClosedLoopTarget(armPositionGround);
             flywheelMotor.set(intakePower);
         });
+    }
+
+    private boolean armAtSetpoint() {
+        return Math.abs(armMotor.relativeEncoder.getPosition() - armMotor.getSetpoint()) < armSetpointTolerance;
     }
 }
