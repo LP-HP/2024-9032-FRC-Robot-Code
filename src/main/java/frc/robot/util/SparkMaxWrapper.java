@@ -105,7 +105,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
             checkError(controller.setI(constants.pidConstants().kI()));
             checkError(controller.setD(constants.pidConstants().kD()));
             checkError(controller.setFF(constants.pidConstants().kF()));
-            checkError(controller.setOutputRange(-constants.pidConstants().maxOutput(), constants.pidConstants().maxOutput()));
+            checkError(controller.setOutputRange(constants.pidConstants().minOutput(), constants.pidConstants().maxOutput()));
         }
 
         checkError(enableVoltageCompensation(constants.nominalVoltage()));

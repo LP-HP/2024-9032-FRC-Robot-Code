@@ -38,8 +38,8 @@ public final class Constants {
         public static final double visionPoseTolerance = 1.0;//TODO tune for localization (in meters)
 
         public static final String limelightName = "limelight";//TODO set name to 9032Limeligh
-        public static final int targetPipelineID = 1;
-        public static final int localizationPipelineID = 0;//TODO make sure this aligns with the limelight config
+        public static final int targetPipelineID = 0;
+        public static final int localizationPipelineID = 1;//TODO make sure this aligns with the limelight config
     }
 
     /* Using CANIds 13-14 - 2 motors */
@@ -51,6 +51,7 @@ public final class Constants {
             0.0, 
             0.01, 
             0.0,
+            -0.6,
             0.6
         );
         public static final SparkMaxConstants intakeArmConstants = new SparkMaxConstants(
@@ -71,7 +72,7 @@ public final class Constants {
         public static final double armPositionGround = 0.11;
         public static final double armPositionPassthrough = 2.0;
         public static final double armPositionAmp = 20.0;
-        public static final double armPositionStorage = 2.0;
+        public static final double armPositionStorage = 24.0;
 
         /* Intake Flywheel */
         public static final SparkMaxConstants intakeFlywheelConstants = new SparkMaxConstants(
@@ -100,11 +101,12 @@ public final class Constants {
         /* Shooter Arm */
         public static final double armSetpointTolerance = 0.1;
         public static final SparkMaxPIDConstants shooterArmPID = new SparkMaxPIDConstants(
+            0.05, 
             0.0, 
-            0.0, 
-            0.0, 
+            0.01, 
             0.0,
-            0.0
+            -0.1,
+            0.1//TODO set max
         );
         public static final SparkMaxConstants shooterArmConstants = new SparkMaxConstants(
             15,
@@ -113,9 +115,9 @@ public final class Constants {
             shooterArmPID,
             60,
             true,
-            IdleMode.kCoast,//TODO brake
+            IdleMode.kBrake,
             12,
-            360.0 / (280 / 3.0)//TODO really 4??
+            360.0 / (280 / 3.0)
         );
         public static final SparkMaxConstants shooterArmFolllowerConstants = new SparkMaxConstants(
             16,
@@ -124,7 +126,7 @@ public final class Constants {
             shooterArmPID,
             60,
             false,
-            IdleMode.kCoast,
+            IdleMode.kBrake,
             12,
             360.0 / (280 / 3.0)
         );
@@ -150,6 +152,7 @@ public final class Constants {
             0.0, 
             0.001, 
             0.000175,
+            -1.0,
             1.0
         );
         public static final SparkMaxConstants shooterFlywheelConstants = new SparkMaxConstants(
@@ -242,6 +245,7 @@ public final class Constants {
             0.0, 
             0.0, 
             0.0,
+            -1.0,
             1.0
         );
 
@@ -251,6 +255,7 @@ public final class Constants {
             0.0, 
             0.0, 
             0.0,
+            -1.0,
             1.0
         );
 

@@ -35,7 +35,7 @@ public class RobotContainer {
     // private final Trigger aprilTagAlignmentTest = driveController.x().debounce(0.025);//TODO remove
 
     /* Subsystems */
-    private final LimelightVision limelight = new LimelightVision(false);
+    // private final LimelightVision limelight = new LimelightVision(false);
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
     private final Shooter shooter = new Shooter();
@@ -58,21 +58,21 @@ public class RobotContainer {
         configureButtonBindings();
 
         autoChooser.addOption("Swerve Auto Shakedown", new SwerveShakedown(swerve));
-        autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
-        autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
-        autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
-        autoChooser.addOption("Align with April Tag", new AlignWithRotationTarget(swerve, () -> limelight.getAprilTagTarget().xOffset));
+        // autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
+        // autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
+        // autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
+        // autoChooser.addOption("Align with April Tag", new AlignWithRotationTarget(swerve, () -> limelight.getAprilTagTarget().xOffset));
         SmartDashboard.putData("Choose an Auto:", autoChooser);//Let us choose autos through the dashboard
     }
 
     /* Only reset variables - don't run any commands here */
     public void autonomousInit() {
-        limelight.switchToLocalizationPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
+        // limelight.switchToLocalizationPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
     }
 
     /* Only reset variables - don't run any commands here */
     public void teleopInit() {
-        limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
+        // limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
     }
 
     private void registerPathplannerCommands() {
@@ -97,11 +97,11 @@ public class RobotContainer {
         */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
 
-        speakerScoreButton.onTrue(
-            new SpeakerScoringSequence(swerve, limelight, shooter)
-            /* Only run if there is a valid target and it's a speaker tag and we have a note */
-            .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.hasNote())
-        );
+        // speakerScoreButton.onTrue(
+        //     new SpeakerScoringSequence(swerve, limelight, shooter)
+        //     /* Only run if there is a valid target and it's a speaker tag and we have a note */
+        //     .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.hasNote())
+        // );
 
         enableIntakeButton.onTrue(
             intake.setToGroundPositionAndEnable()
@@ -120,7 +120,7 @@ public class RobotContainer {
             intake.moveToAmpPosition()
             .andThen(intake.shootIntoAmpThenWaitThenDisable())
             .andThen(intake.setToStoragePosition())
-            .onlyIf(intake::hasNote)
+            // .onlyIf(intake::hasNote) //TODO use a state
         );
 
         // aprilTagAlignmentTest.onTrue(//TODO move to other class
