@@ -1,0 +1,55 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1rst path"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootNote1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootNote2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootNote3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootNote4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootNote5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StoreNoteFromGround"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

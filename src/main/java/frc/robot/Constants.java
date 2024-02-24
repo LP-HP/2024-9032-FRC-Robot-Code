@@ -23,7 +23,7 @@ public final class Constants {
     public static final boolean burnFlash = false;
 
     public static final class TeleopConstants {
-        public static final double stickDeadband = 0.05;
+        public static final double stickDeadband = 0.02;
         public static final boolean isFieldCentric = true;
         /* Meters per Second */
         public static final double joystickToSpeedConversionFactor = 1;
