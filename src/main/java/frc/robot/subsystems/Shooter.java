@@ -57,6 +57,8 @@ public class Shooter extends SubsystemBase {
             .withPosition(0, 0).withSize(2, 2);
         shooterTab.add(flywheelMotor)
             .withPosition(3, 0).withSize(2, 2);
+        shooterTab.add(passthroughStorageMotor)
+            .withPosition(3, 3).withSize(2, 2);
         shooterTab.addBoolean("Has Note", this::hasNote)
             .withPosition(6, 0).withSize(2, 1);
         shooterTab.addBoolean("At Setpoint", this::armAtSetpoint)

@@ -70,7 +70,7 @@ public final class Constants {
         public static final double absoluteEncoderOffset = 0.82;
         /* Arm Positions */
         public static final double armPositionGround = 0.11;
-        public static final double armPositionPassthrough = 2.0;
+        public static final double armPositionPassthrough = 33.0;
         public static final double armPositionAmp = 20.0;
         public static final double armPositionStorage = 24.0;
 
@@ -90,7 +90,7 @@ public final class Constants {
         /* Flyhweel Powers */
         public static final double intakePower = -0.3;
         public static final double outtakeAmpPower = 0.7;
-        public static final double outtakeToShooterPower = -0.1;
+        public static final double outtakeToShooterPower = 0.3;
 
         /* Sensors */
         public static final int beamBreakPort = 0;
@@ -99,14 +99,14 @@ public final class Constants {
     /* Using CANIds 15-19 - 5 motors */
     public static final class ShooterConstants {//TODO tune
         /* Shooter Arm */
-        public static final double armSetpointTolerance = 0.1;
+        public static final double armSetpointTolerance = 1.0;
         public static final SparkMaxPIDConstants shooterArmPID = new SparkMaxPIDConstants(
             0.05, 
             0.0, 
             0.01, 
             0.0,
-            -0.1,
-            0.1//TODO set max
+            -0.3,
+            0.5//TODO set max
         );
         public static final SparkMaxConstants shooterArmConstants = new SparkMaxConstants(
             15,
@@ -136,8 +136,8 @@ public final class Constants {
         public static final double absoluteEncoderOffset = 267.23;
 
         /* Arm Positions */
-        public static final double armPositionPassthrough = 100.0;
-        public static final double armPositionStorage = 80.0;
+        public static final double armPositionPassthrough = 150.0;
+        public static final double armPositionStorage = 160.0;
         /* Key - Target Y Offset : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap armPosLookupTableFromTargetY = new InterpolatingDoubleTreeMap();
         static {
@@ -161,7 +161,7 @@ public final class Constants {
             ControlMode.velocityLeader,
             shooterFlywheelPID,
             60,
-            false,
+            true,
             IdleMode.kCoast,
             12,
             60.0
@@ -187,13 +187,13 @@ public final class Constants {
             ControlMode.percentOutput,
             null,
             20,
-            false,
+            true,
             IdleMode.kBrake,
             12,
             1.0
         );
-        public static final double storageMotorPowerReceiving = 0.5;
-        public static final double storageMotorPowerToFlywheels = 1;
+        public static final double storageMotorPowerReceiving = 0.1;
+        public static final double storageMotorPowerToFlywheels = 0.5;
 
         /* Sensors */
         public static final int beamBreakPort = 2;

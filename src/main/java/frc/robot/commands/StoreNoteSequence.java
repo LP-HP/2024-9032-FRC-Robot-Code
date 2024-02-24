@@ -11,6 +11,7 @@ public class StoreNoteSequence extends SequentialCommandGroup {
             /* Move the intake and shooter to the passthrough position to align them */
             intake.moveToPassthroughPosition()
                 .alongWith(shooter.moveToPassthroughPosition()),
+            Commands.waitSeconds(0.5),//TODO remove
             /* Move the note into the shooter once they have reached the passthrough position */
             shooter.enableStorageMotorReceiving(),
             intake.shootIntoShooter(),

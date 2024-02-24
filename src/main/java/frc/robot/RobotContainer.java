@@ -102,7 +102,7 @@ public class RobotContainer {
         //     /* Only run if there is a valid target and it's a speaker tag and we have a note */
         //     .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.hasNote())
         // );
-
+        speakerScoreButton.onTrue(shooter.shootSequence(3000.0));
         enableIntakeButton.onTrue(
             intake.setToGroundPositionAndEnable()
             .andThen(Commands.waitUntil(intake::hasNote))
@@ -113,7 +113,7 @@ public class RobotContainer {
 
         storeNoteButton.onTrue(
             new StoreNoteSequence(intake, shooter)
-            .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
+            // .onlyIf(() -> intake.hasNote() && !shooter.hasNote()) TODO use a state
         );
 
         ampScoreButton.onTrue(
