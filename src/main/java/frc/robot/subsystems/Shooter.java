@@ -58,15 +58,16 @@ public class Shooter extends SubsystemBase {
         shooterTab.add(flywheelMotor)
             .withPosition(3, 0).withSize(2, 2);
         shooterTab.add(passthroughStorageMotor)
-            .withPosition(3, 3).withSize(2, 2);
+            .withPosition(0, 3).withSize(2, 2);
         shooterTab.addBoolean("Has Note", this::hasNote)
             .withPosition(6, 0).withSize(2, 1);
-        shooterTab.addBoolean("At Setpoint", this::armAtSetpoint)
+        shooterTab.addBoolean("Arm At Setpoint", this::armAtSetpoint)
             .withPosition(6, 1).withSize(2, 1);
+        shooterTab.addBoolean("Flywheels At Setpoint", this::flywheelsAtSetpoint)
+            .withPosition(6, 2).withSize(2, 1);
 
         /* Prevent moving to a previous setpoint */
-        armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
-        flywheelMotor.setClosedLoopTarget(0.0);
+        reset();
     }
 
     public boolean hasNote() {
@@ -88,7 +89,7 @@ public class Shooter extends SubsystemBase {
         () -> {}, 
         (unused) -> {}, 
         /* We are finished if the flywheel velocity is within our tolerance */
-        () -> Math.abs(flywheelMotor.relativeEncoder.getVelocity() - velocity) < flywheelVelocityTolerance, 
+        this::flywheelsAtSetpoint, 
         this);
     }
 
@@ -144,5 +145,19 @@ public class Shooter extends SubsystemBase {
 
     private boolean armAtSetpoint() {
         return Math.abs(armMotor.relativeEncoder.getPosition() - armMotor.getSetpoint()) < armSetpointTolerance;
+    }
+
+    private boolean flywheelsAtSetpoint() {
+        return Math.abs(flywheelMotor.relativeEncoder.getVelocity() - flywheelMotor.getSetpoint()) < flywheelVelocityTolerance;
+    }
+
+    private void reset() {
+        armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
+        flywheelMotor.setClosedLoopTarget(0.0);
+        passthroughStorageMotor.set(0.0);
+    }
+
+    public Command resetMotors() {
+        return runOnce(this::reset);
     }
 }

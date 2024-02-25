@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -28,6 +29,7 @@ public class RobotContainer {
 
     /* Driver Buttons */
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
+    private final Trigger resetCommandsButton = driveController.x().debounce(0.025);
     private final Trigger speakerScoreButton = driveController.y().debounce(0.025);
     private final Trigger enableIntakeButton = driveController.b().debounce(0.025);
     private final Trigger storeNoteButton = driveController.rightBumper().debounce(0.025);
@@ -102,18 +104,18 @@ public class RobotContainer {
         //     /* Only run if there is a valid target and it's a speaker tag and we have a note */
         //     .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.hasNote())
         // );
-        speakerScoreButton.onTrue(shooter.shootSequence(3000.0));
+
         enableIntakeButton.onTrue(
             intake.setToGroundPositionAndEnable()
             .andThen(Commands.waitUntil(intake::hasNote))
             .andThen(intake.setToStoragePosition()
                 .alongWith(setAndDisableRumble()))
-            .onlyIf(() -> !intake.hasNote())
+            // .onlyIf(() -> !intake.hasNote()) //TODO use a state
         );
 
         storeNoteButton.onTrue(
             new StoreNoteSequence(intake, shooter)
-            // .onlyIf(() -> intake.hasNote() && !shooter.hasNote()) TODO use a state
+            // .onlyIf(() -> intake.hasNote() && !shooter.hasNote()) //TODO use a state
         );
 
         ampScoreButton.onTrue(
@@ -121,6 +123,12 @@ public class RobotContainer {
             .andThen(intake.shootIntoAmpThenWaitThenDisable())
             .andThen(intake.setToStoragePosition())
             // .onlyIf(intake::hasNote) //TODO use a state
+        );
+
+        resetCommandsButton.onTrue(
+            intake.resetMotors()
+                .alongWith(shooter.resetMotors())
+            .andThen(new InstantCommand(() -> CommandScheduler.getInstance().cancelAll(), intake, shooter, swerve))//, limelight))
         );
 
         // aprilTagAlignmentTest.onTrue(//TODO move to other class

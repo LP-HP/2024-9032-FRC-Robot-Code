@@ -45,7 +45,7 @@ public class Intake extends SubsystemBase {
             .withPosition(6, 1).withSize(2, 1);
 
         /* Prevent moving to a previous setpoint */
-        armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
+        reset();
     }
 
     public boolean hasNote() {
@@ -105,5 +105,14 @@ public class Intake extends SubsystemBase {
 
     private boolean armAtSetpoint() {
         return Math.abs(armMotor.relativeEncoder.getPosition() - armMotor.getSetpoint()) < armSetpointTolerance;
+    }
+
+    private void reset() {
+        armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
+        flywheelMotor.set(0.0);
+    }
+
+    public Command resetMotors() {
+        return runOnce(this::reset);
     }
 }
