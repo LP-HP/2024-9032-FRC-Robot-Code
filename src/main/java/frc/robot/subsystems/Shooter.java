@@ -58,7 +58,7 @@ public class Shooter extends SubsystemBase {
         shooterTab.add(flywheelMotor)
             .withPosition(3, 0).withSize(2, 2);
         shooterTab.add(passthroughStorageMotor)
-            .withPosition(0, 3).withSize(2, 1);
+            .withPosition(0, 2).withSize(2, 1);
         shooterTab.addBoolean("Has Note", this::hasNote)
             .withPosition(6, 0).withSize(2, 1);
         shooterTab.addBoolean("Arm At Setpoint", this::armAtSetpoint)
@@ -66,21 +66,21 @@ public class Shooter extends SubsystemBase {
         shooterTab.addBoolean("Flywheels At Setpoint", this::flywheelsAtSetpoint)
             .withPosition(6, 2).withSize(2, 1);
         shooterTab.add(this)
-            .withPosition(0, 5).withSize(2, 1);
+            .withPosition(0, 4).withSize(2, 1);
 
         /* Add Command Testing Butons */
         shooterTab.add(enableStorageMotorReceiving())
-            .withPosition(0, 4).withSize(1, 1);
+            .withPosition(0, 3).withSize(1, 1);
         shooterTab.add(enableStorageMotorToFlywheels())
-            .withPosition(1, 4).withSize(1, 1);
+            .withPosition(1, 3).withSize(1, 1);
         shooterTab.add(shootSequence(4000.0))
-            .withPosition(2, 4).withSize(1, 1);
+            .withPosition(2, 3).withSize(1, 1);
         shooterTab.add(resetMotors())
-            .withPosition(3, 4).withSize(1, 1);
+            .withPosition(3, 3).withSize(1, 1);
         shooterTab.add(setToStoragePosition())
-            .withPosition(4, 4).withSize(1, 1);
+            .withPosition(4, 3).withSize(1, 1);
         shooterTab.add(moveToPassthroughPosition())
-            .withPosition(5, 4).withSize(1, 1);
+            .withPosition(5, 3).withSize(1, 1);
 
         /* Prevent moving to a previous setpoint */
         reset();
@@ -91,11 +91,11 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command enableStorageMotorReceiving() {
-        return runOnce(() -> passthroughStorageMotor.set(storageMotorPowerReceiving));
+        return runOnce(() -> passthroughStorageMotor.set(storageMotorPowerReceiving)).withName("Storage receive");
     }
 
     private Command enableStorageMotorToFlywheels() {
-        return runOnce(() -> passthroughStorageMotor.set(storageMotorPowerToFlywheels));
+        return runOnce(() -> passthroughStorageMotor.set(storageMotorPowerToFlywheels)).withName("Storage flywheels");
     }
 
     private Command waitForShooterVelocity(double velocity) {
@@ -121,7 +121,7 @@ public class Shooter extends SubsystemBase {
            .andThen(enableStorageMotorToFlywheels())
            .andThen(Commands.waitSeconds(shotWaitTime))
            .andThen(disableShooterFlywheels())
-           .andThen(setToStoragePosition());
+           .andThen(setToStoragePosition()).withName("Shoot");
     }
 
     /* Sets the target and disables the storage motor (non-blocking) */
@@ -131,11 +131,11 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command setToStoragePosition() {
-        return runOnce(() -> setTargetPosition(armPositionStorage)); 
+        return runOnce(() -> setTargetPosition(armPositionStorage)).withName("Set to storage"); 
     }
 
     public Command setToAutoPosition(double position) {
-        return runOnce(() -> setTargetPosition(position));
+        return runOnce(() -> setTargetPosition(position)).withName("Set to auto");
     }
 
     /* Sets the target and wait until it is achieved */
@@ -151,12 +151,12 @@ public class Shooter extends SubsystemBase {
     }   
 
     public Command moveToPassthroughPosition() {
-        return moveToTargetPosition(armPositionPassthrough);
+        return moveToTargetPosition(armPositionPassthrough).withName("Move to pass");
     }
 
     /* Moves to the target position from a vision target y offset */
     public Command moveToTargetPositionFromTargetY(DoubleSupplier targetYSup) { 
-        return moveToTargetPosition(armPosLookupTableFromTargetY.get(targetYSup.getAsDouble()));
+        return moveToTargetPosition(armPosLookupTableFromTargetY.get(targetYSup.getAsDouble())).withName("Move to LLT");
     }   
 
     private boolean armAtSetpoint() {
@@ -175,7 +175,7 @@ public class Shooter extends SubsystemBase {
             getCurrentCommand().cancel();
     }
 
-    public Command resetMotors() {
-        return runOnce(this::reset);
+    private Command resetMotors() {
+        return runOnce(this::reset).withName("Reset");
     }
 }

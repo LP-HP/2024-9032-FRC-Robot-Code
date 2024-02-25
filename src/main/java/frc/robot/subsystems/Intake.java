@@ -79,11 +79,11 @@ public class Intake extends SubsystemBase {
     }
 
     public Command setToAmpPosition() {
-        return runOnce(() -> setTargetPosition(armPositionAmp));
+        return runOnce(() -> setTargetPosition(armPositionAmp)).withName("Set to amp");
     }
 
     public Command setToStoragePosition() {
-        return runOnce(() -> setTargetPosition(armPositionStorage));
+        return runOnce(() -> setTargetPosition(armPositionStorage)).withName("Set to storage");
     }
 
     /* Sets the target and wait until it is achieved */
@@ -99,28 +99,28 @@ public class Intake extends SubsystemBase {
     } 
 
     public Command moveToAmpPosition() {
-        return moveToTargetPosition(armPositionAmp);
+        return moveToTargetPosition(armPositionAmp).withName("Move to amp");
     }
 
     public Command moveToPassthroughPosition() {
-        return moveToTargetPosition(armPositionPassthrough);
+        return moveToTargetPosition(armPositionPassthrough).withName("Move to pass");
     }
 
     public Command shootIntoAmpThenWaitThenDisable() {
         return runOnce(() -> flywheelMotor.set(outtakeAmpPower))
             .andThen(Commands.waitSeconds(shotWaitTime))
-            .andThen(runOnce(() -> flywheelMotor.set(0.0)));
+            .andThen(runOnce(() -> flywheelMotor.set(0.0))).withName("Shoot into amp");
     }
 
     public Command shootIntoShooter() {
-        return runOnce(() -> flywheelMotor.set(outtakeToShooterPower));
+        return runOnce(() -> flywheelMotor.set(outtakeToShooterPower)).withName("Shoot to shooter");
     }
 
     public Command setToGroundPositionAndEnable() {
         return runOnce(() -> { 
             armMotor.setClosedLoopTarget(armPositionGround);
             flywheelMotor.set(intakePower);
-        });
+        }).withName("Set to ground");
     }
 
     private boolean armAtSetpoint() {
@@ -134,7 +134,7 @@ public class Intake extends SubsystemBase {
             this.getCurrentCommand().cancel();
     }
 
-    public Command resetMotors() {
-        return runOnce(this::reset);
+    private Command resetMotors() {
+        return runOnce(this::reset).withName("Reset");
     }
 }
