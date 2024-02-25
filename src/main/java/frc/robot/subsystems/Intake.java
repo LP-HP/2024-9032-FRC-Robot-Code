@@ -38,7 +38,7 @@ public class Intake extends SubsystemBase {
         intakeTab.add(armMotor)
             .withPosition(0, 0).withSize(2, 2);
         intakeTab.add(flywheelMotor)
-            .withPosition(3, 0).withSize(2, 2);
+            .withPosition(3, 0).withSize(2, 1);
         intakeTab.addBoolean("Has Note", this::hasNote)
             .withPosition(6, 0).withSize(2, 1);
         intakeTab.addBoolean("At Setpoint", this::armAtSetpoint)
@@ -130,6 +130,8 @@ public class Intake extends SubsystemBase {
     private void reset() {
         armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
         flywheelMotor.set(0.0);
+        if(this.getCurrentCommand() != null) 
+            this.getCurrentCommand().cancel();
     }
 
     public Command resetMotors() {

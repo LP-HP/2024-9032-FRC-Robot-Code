@@ -58,7 +58,7 @@ public class Shooter extends SubsystemBase {
         shooterTab.add(flywheelMotor)
             .withPosition(3, 0).withSize(2, 2);
         shooterTab.add(passthroughStorageMotor)
-            .withPosition(0, 3).withSize(2, 2);
+            .withPosition(0, 3).withSize(2, 1);
         shooterTab.addBoolean("Has Note", this::hasNote)
             .withPosition(6, 0).withSize(2, 1);
         shooterTab.addBoolean("Arm At Setpoint", this::armAtSetpoint)
@@ -171,6 +171,8 @@ public class Shooter extends SubsystemBase {
         armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
         flywheelMotor.setClosedLoopTarget(0.0);
         passthroughStorageMotor.set(0.0);
+        if(getCurrentCommand() != null) 
+            getCurrentCommand().cancel();
     }
 
     public Command resetMotors() {

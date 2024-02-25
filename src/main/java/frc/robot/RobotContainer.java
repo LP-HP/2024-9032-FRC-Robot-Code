@@ -29,7 +29,6 @@ public class RobotContainer {
 
     /* Driver Buttons */
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
-    private final Trigger resetCommandsButton = driveController.x().debounce(0.025);
     private final Trigger speakerScoreButton = driveController.y().debounce(0.025);
     private final Trigger enableIntakeButton = driveController.b().debounce(0.025);
     private final Trigger storeNoteButton = driveController.rightBumper().debounce(0.025);
@@ -123,12 +122,6 @@ public class RobotContainer {
             .andThen(intake.shootIntoAmpThenWaitThenDisable())
             .andThen(intake.setToStoragePosition())
             // .onlyIf(intake::hasNote) //TODO use a state
-        );
-
-        resetCommandsButton.onTrue(
-            intake.resetMotors()
-                .alongWith(shooter.resetMotors())
-            .andThen(new InstantCommand(() -> CommandScheduler.getInstance().cancelAll(), intake, shooter, swerve))//, limelight))
         );
 
         // aprilTagAlignmentTest.onTrue(//TODO move to other class
