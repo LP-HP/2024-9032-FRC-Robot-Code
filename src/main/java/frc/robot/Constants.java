@@ -136,8 +136,8 @@ public final class Constants {
         public static final double absoluteEncoderOffset = 267.23;
 
         /* Arm Positions */
-        public static final double armPositionPassthrough = 150.0;
-        public static final double armPositionStorage = 160.0;
+        public static final double armPositionPassthrough = 140.0;
+        public static final double armPositionStorage = 150.0;
         /* Key - Target Y Offset : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap armPosLookupTableFromTargetY = new InterpolatingDoubleTreeMap();
         static {
@@ -146,7 +146,7 @@ public final class Constants {
         }
 
         /* Shooter Flywheels */
-        public static final double flywheelVelocityTolerance = 2.0;
+        public static final double flywheelVelocityTolerance = 50.0;
         public static final SparkMaxPIDConstants shooterFlywheelPID = new SparkMaxPIDConstants(
             0.0001, 
             0.0, 
