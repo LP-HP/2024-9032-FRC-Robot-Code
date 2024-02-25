@@ -65,6 +65,22 @@ public class Shooter extends SubsystemBase {
             .withPosition(6, 1).withSize(2, 1);
         shooterTab.addBoolean("Flywheels At Setpoint", this::flywheelsAtSetpoint)
             .withPosition(6, 2).withSize(2, 1);
+        shooterTab.add(this)
+            .withPosition(0, 5).withSize(2, 1);
+
+        /* Add Command Testing Butons */
+        shooterTab.add(enableStorageMotorReceiving())
+            .withPosition(0, 4).withSize(1, 1);
+        shooterTab.add(enableStorageMotorToFlywheels())
+            .withPosition(1, 4).withSize(1, 1);
+        shooterTab.add(shootSequence(4000.0))
+            .withPosition(2, 4).withSize(1, 1);
+        shooterTab.add(resetMotors())
+            .withPosition(3, 4).withSize(1, 1);
+        shooterTab.add(setToStoragePosition())
+            .withPosition(4, 4).withSize(1, 1);
+        shooterTab.add(moveToPassthroughPosition())
+            .withPosition(5, 4).withSize(1, 1);
 
         /* Prevent moving to a previous setpoint */
         reset();

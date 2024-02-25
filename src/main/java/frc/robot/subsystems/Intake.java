@@ -43,7 +43,27 @@ public class Intake extends SubsystemBase {
             .withPosition(6, 0).withSize(2, 1);
         intakeTab.addBoolean("At Setpoint", this::armAtSetpoint)
             .withPosition(6, 1).withSize(2, 1);
+        intakeTab.add(this)
+            .withPosition(0, 3).withSize(2, 1);
 
+        /* Add Command Testing Butons */
+        intakeTab.add(setToAmpPosition())
+            .withPosition(0, 2).withSize(1, 1);
+        intakeTab.add(setToStoragePosition())
+            .withPosition(1, 2).withSize(1, 1);
+        intakeTab.add(moveToAmpPosition())
+            .withPosition(2, 2).withSize(1, 1);
+        intakeTab.add(moveToPassthroughPosition())
+            .withPosition(3, 2).withSize(1, 1);
+        intakeTab.add(shootIntoAmpThenWaitThenDisable())
+            .withPosition(4, 2).withSize(1, 1);
+        intakeTab.add(shootIntoShooter())
+            .withPosition(5, 2).withSize(1, 1);
+        intakeTab.add(setToGroundPositionAndEnable())
+            .withPosition(6, 2).withSize(1, 1);
+        intakeTab.add(resetMotors())
+            .withPosition(7, 2).withSize(1, 1);
+        
         /* Prevent moving to a previous setpoint */
         reset();
     }
