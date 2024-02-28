@@ -39,10 +39,10 @@ public class TeleopSwerve extends Command {
 
         /* Multiply by conversion factor to get the joystick value in m/s and apply acceleration limits */
         translationVal *= joystickToSpeedConversionFactor;
-        translationVal = accelerationLimiterTranslation.calculate(translationVal);
+        translationVal = Math.signum(translationVal) * accelerationLimiterTranslation.calculate(Math.abs(translationVal));
 
         strafeVal *= joystickToSpeedConversionFactor;
-        strafeVal = accelerationLimiterStrafe.calculate(strafeVal);
+        strafeVal = Math.signum(strafeVal) * accelerationLimiterStrafe.calculate(Math.abs(strafeVal));
 
         //Run the open loop drive using speed values and apply rotation conversion factor
         swerve.driveOpenLoop(

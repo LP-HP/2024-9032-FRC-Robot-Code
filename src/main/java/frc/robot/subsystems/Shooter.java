@@ -18,10 +18,10 @@ public class Shooter extends SubsystemBase {
     private final SparkMaxWrapper armMotor;    
     private final SparkMaxWrapper armMotorFollower;    
 
-    private final SparkMaxWrapper flywheelMotor = null;//TODO add back flywheel code
-    private final SparkMaxWrapper flywheelMotorFollower = null;
+    private final SparkMaxWrapper flywheelMotor;
+    private final SparkMaxWrapper flywheelMotorFollower;
 
-    private final SparkMaxWrapper passthroughStorageMotor = null;
+    private final SparkMaxWrapper passthroughStorageMotor;
 
     private final ShuffleboardTab shooterTab = Shuffleboard.getTab("Shooter");
 
@@ -36,15 +36,15 @@ public class Shooter extends SubsystemBase {
         armMotorFollower.follow(armMotor, invertArmFollower);
         armMotorFollower.config();
 
-        // flywheelMotor = new SparkMaxWrapper(shooterFlywheelConstants);
-        // flywheelMotor.config();
+        flywheelMotor = new SparkMaxWrapper(shooterFlywheelConstants);
+        flywheelMotor.config();
 
-        // flywheelMotorFollower = new SparkMaxWrapper(shooterFlywheelFolllowerConstants);
-        // flywheelMotorFollower.follow(flywheelMotor, invertFlywheelFollower);
-        // flywheelMotorFollower.config();
+        flywheelMotorFollower = new SparkMaxWrapper(shooterFlywheelFolllowerConstants);
+        flywheelMotorFollower.follow(flywheelMotor, invertFlywheelFollower);
+        flywheelMotorFollower.config();
 
-        // passthroughStorageMotor = new SparkMaxWrapper(shooterStorageConstants);
-        // passthroughStorageMotor.config();
+        passthroughStorageMotor = new SparkMaxWrapper(shooterStorageConstants);
+        passthroughStorageMotor.config();
 
          /* Wait for the encoder to initialize before setting to absolute */
         Timer.delay(1.0);
@@ -55,30 +55,47 @@ public class Shooter extends SubsystemBase {
         /* Add Telemetry */
         shooterTab.add(armMotor)
             .withPosition(0, 0).withSize(2, 2);
-        // shooterTab.add(flywheelMotor)
-            // .withPosition(3, 0).withSize(2, 2);
-        shooterTab.addBoolean("Beam Break Triggered", this::isBeamBreakTriggered)
+        shooterTab.add(flywheelMotor)
+            .withPosition(3, 0).withSize(2, 2);
+        shooterTab.add(passthroughStorageMotor)
+            .withPosition(0, 2).withSize(2, 1);
+        shooterTab.addBoolean("Has Note", this::hasNote)
             .withPosition(6, 0).withSize(2, 1);
+        shooterTab.addBoolean("Arm At Setpoint", this::armAtSetpoint)
+            .withPosition(6, 1).withSize(2, 1);
+        shooterTab.addBoolean("Flywheels At Setpoint", this::flywheelsAtSetpoint)
+            .withPosition(6, 2).withSize(2, 1);
+        shooterTab.add(this)
+            .withPosition(0, 4).withSize(2, 1);
+
+        /* Add Command Testing Butons */
+        shooterTab.add(enableStorageMotorReceiving())
+            .withPosition(0, 3).withSize(1, 1);
+        shooterTab.add(enableStorageMotorToFlywheels())
+            .withPosition(1, 3).withSize(1, 1);
+        shooterTab.add(shootSequence(4000.0))
+            .withPosition(2, 3).withSize(1, 1);
+        shooterTab.add(resetMotors())
+            .withPosition(3, 3).withSize(1, 1);
+        shooterTab.add(setToStoragePosition())
+            .withPosition(4, 3).withSize(1, 1);
+        shooterTab.add(moveToPassthroughPosition())
+            .withPosition(5, 3).withSize(1, 1);
 
         /* Prevent moving to a previous setpoint */
-        armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
-        // flywheelMotor.setClosedLoopTarget(0.0);
+        reset();
     }
 
-    public boolean isBeamBreakTriggered() {
+    public boolean hasNote() {
         return !beamBreak.get();
     }
 
     public Command enableStorageMotorReceiving() {
-        return runOnce(() -> passthroughStorageMotor.set(storageMotorPowerReceiving));
+        return runOnce(() -> passthroughStorageMotor.set(storageMotorPowerReceiving)).withName("Storage receive");
     }
 
     private Command enableStorageMotorToFlywheels() {
-        return runOnce(() -> passthroughStorageMotor.set(storageMotorPowerToFlywheels));
-    }
-
-    public Command disableStorageMotor() {
-        return runOnce(() -> passthroughStorageMotor.set(0.0));
+        return runOnce(() -> passthroughStorageMotor.set(storageMotorPowerToFlywheels)).withName("Storage flywheels");
     }
 
     private Command waitForShooterVelocity(double velocity) {
@@ -88,48 +105,77 @@ public class Shooter extends SubsystemBase {
         () -> {}, 
         (unused) -> {}, 
         /* We are finished if the flywheel velocity is within our tolerance */
-        () -> Math.abs(flywheelMotor.relativeEncoder.getVelocity() - velocity) < flywheelVelocityTolerance, 
+        this::flywheelsAtSetpoint, 
         this);
     }
 
-    private Command disableShooterFlywheel() {
-        return runOnce(() -> flywheelMotor.setClosedLoopTarget(0.0));
+    private Command disableShooterFlywheels() {
+        return runOnce(() -> { 
+            flywheelMotor.setClosedLoopTarget(0.0);
+            passthroughStorageMotor.set(0.0);
+        });
     }
 
-    public Command setShooterVelocityThenWaitThenDisable(double velocity, double waitTime) {
+    public Command shootSequence(double velocity) {
         return waitForShooterVelocity(velocity)
            .andThen(enableStorageMotorToFlywheels())
-           .andThen(Commands.waitSeconds(waitTime))
-           .andThen(disableShooterFlywheel())
-           .andThen(disableStorageMotor());
+           .andThen(Commands.waitSeconds(shotWaitTime))
+           .andThen(disableShooterFlywheels())
+           .andThen(setToStoragePosition()).withName("Shoot");
     }
 
-    public Command setToPassthroughPosition() {
-        return runOnce(() -> armMotor.setClosedLoopTarget(armPositionPassthrough)); 
+    /* Sets the target and disables the storage motor (non-blocking) */
+    private void setTargetPosition(double position) {
+        armMotor.setClosedLoopTarget(position);
+        passthroughStorageMotor.set(0.0); 
     }
 
     public Command setToStoragePosition() {
-        return runOnce(() -> armMotor.setClosedLoopTarget(armPositionStorage)); 
+        return runOnce(() -> setTargetPosition(armPositionStorage)).withName("Set to storage"); 
+    }
+
+    public Command setToAutoPosition(double position) {
+        return runOnce(() -> setTargetPosition(position)).withName("Set to auto");
     }
 
     /* Sets the target and wait until it is achieved */
-    private Command moveArmToTargetPosition(double position) { 
+    private Command moveToTargetPosition(double position) { 
         return new FunctionalCommand(
         /* Sets the target position at the start */
-        () -> armMotor.setClosedLoopTarget(position),
+        () -> setTargetPosition(position),
         () -> {},
         (unused) -> {},
         /* We are finished if the arm position is within our tolerance */
-        () -> Math.abs(armMotor.relativeEncoder.getPosition() - position) < armSetpointTolerance,
+        this::armAtSetpoint,
         this);
     }   
 
-    public Command moveArmToPassthroughPosition() {
-        return moveArmToTargetPosition(armPositionPassthrough);
+    public Command moveToPassthroughPosition() {
+        return moveToTargetPosition(armPositionPassthrough).withName("Move to pass");
     }
 
-    public Command moveArmToPositionFromTargetY(DoubleSupplier targetYSup) { 
-        /* Sets the target position to an interpolated value from the lookup table */
-        return moveArmToTargetPosition(armPosLookupTableFromTargetY.get(targetYSup.getAsDouble()));
+    /* Moves to the target position from a vision target y offset */
+    public Command moveToTargetPositionFromTargetY(DoubleSupplier targetYSup) { 
+        return moveToTargetPosition(armPosLookupTableFromTargetY.get(targetYSup.getAsDouble())).withName("Move to LLT");
     }   
+
+    private boolean armAtSetpoint() {
+        return Math.abs(armMotor.relativeEncoder.getPosition() - armMotor.getSetpoint()) < armSetpointTolerance;
+    }
+
+    private boolean flywheelsAtSetpoint() {
+        return Math.abs(flywheelMotor.relativeEncoder.getVelocity() - flywheelMotor.getSetpoint()) < flywheelVelocityTolerance;
+    }
+
+    private void reset() {
+        armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
+        flywheelMotor.setClosedLoopTarget(0.0);
+        passthroughStorageMotor.set(0.0);
+        if(getCurrentCommand() != null) 
+            getCurrentCommand().cancel();
+    }
+
+    private Command resetMotors() {
+        return runOnce(this::reset).withName("Reset");
+    }
 }

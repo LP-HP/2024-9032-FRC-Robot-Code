@@ -23,7 +23,7 @@ public final class Constants {
     public static final boolean burnFlash = false;
 
     public static final class TeleopConstants {
-        public static final double stickDeadband = 0.05;
+        public static final double stickDeadband = 0.02;
         public static final boolean isFieldCentric = true;
         /* Meters per Second */
         public static final double joystickToSpeedConversionFactor = 1;
@@ -38,8 +38,8 @@ public final class Constants {
         public static final double visionPoseTolerance = 1.0;//TODO tune for localization (in meters)
 
         public static final String limelightName = "limelight";//TODO set name to 9032Limeligh
-        public static final int targetPipelineID = 1;
-        public static final int localizationPipelineID = 0;//TODO make sure this aligns with the limelight config
+        public static final int targetPipelineID = 0;
+        public static final int localizationPipelineID = 1;//TODO make sure this aligns with the limelight config
     }
 
     /* Using CANIds 13-14 - 2 motors */
@@ -51,6 +51,7 @@ public final class Constants {
             0.0, 
             0.01, 
             0.0,
+            -0.6,
             0.6
         );
         public static final SparkMaxConstants intakeArmConstants = new SparkMaxConstants(
@@ -69,9 +70,9 @@ public final class Constants {
         public static final double absoluteEncoderOffset = 0.82;
         /* Arm Positions */
         public static final double armPositionGround = 0.11;
-        public static final double armPositionPassthrough = 2.0;
+        public static final double armPositionPassthrough = 33.0;
         public static final double armPositionAmp = 20.0;
-        public static final double armPositionStorage = 2.0;
+        public static final double armPositionStorage = 24.0;
 
         /* Intake Flywheel */
         public static final SparkMaxConstants intakeFlywheelConstants = new SparkMaxConstants(
@@ -85,10 +86,11 @@ public final class Constants {
             12,
             1.0
         );
+        public static final double shotWaitTime = 0.25;
         /* Flyhweel Powers */
         public static final double intakePower = -0.3;
         public static final double outtakeAmpPower = 0.7;
-        public static final double outtakeToShooterPower = -0.1;
+        public static final double outtakeToShooterPower = 0.3;
 
         /* Sensors */
         public static final int beamBreakPort = 0;
@@ -97,13 +99,14 @@ public final class Constants {
     /* Using CANIds 15-19 - 5 motors */
     public static final class ShooterConstants {//TODO tune
         /* Shooter Arm */
-        public static final double armSetpointTolerance = 0.1;
+        public static final double armSetpointTolerance = 1.0;
         public static final SparkMaxPIDConstants shooterArmPID = new SparkMaxPIDConstants(
+            0.05, 
             0.0, 
-            0.0, 
-            0.0, 
+            0.01, 
             0.0,
-            0.0
+            -0.3,
+            0.5//TODO set max
         );
         public static final SparkMaxConstants shooterArmConstants = new SparkMaxConstants(
             15,
@@ -112,9 +115,9 @@ public final class Constants {
             shooterArmPID,
             60,
             true,
-            IdleMode.kCoast,//TODO brake
+            IdleMode.kBrake,
             12,
-            4.0//TODO really 4??
+            360.0 / (280 / 3.0)
         );
         public static final SparkMaxConstants shooterArmFolllowerConstants = new SparkMaxConstants(
             16,
@@ -123,9 +126,9 @@ public final class Constants {
             shooterArmPID,
             60,
             false,
-            IdleMode.kCoast,
+            IdleMode.kBrake,
             12,
-            4.0
+            360.0 / (280 / 3.0)
         );
         public static final boolean invertArmFollower = true;
         public static final boolean invertAbsoluteEncoder = true;
@@ -133,8 +136,8 @@ public final class Constants {
         public static final double absoluteEncoderOffset = 267.23;
 
         /* Arm Positions */
-        public static final double armPositionPassthrough = 100.0;
-        public static final double armPositionStorage = 80.0;
+        public static final double armPositionPassthrough = 140.0;
+        public static final double armPositionStorage = 150.0;
         /* Key - Target Y Offset : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap armPosLookupTableFromTargetY = new InterpolatingDoubleTreeMap();
         static {
@@ -143,13 +146,14 @@ public final class Constants {
         }
 
         /* Shooter Flywheels */
-        public static final double flywheelVelocityTolerance = 0.1;//TODO UNITSSSSS
+        public static final double flywheelVelocityTolerance = 50.0;
         public static final SparkMaxPIDConstants shooterFlywheelPID = new SparkMaxPIDConstants(
+            0.0001, 
             0.0, 
-            0.0, 
-            0.0, 
-            0.0,
-            0.0
+            0.001, 
+            0.000175,
+            -1.0,
+            1.0
         );
         public static final SparkMaxConstants shooterFlywheelConstants = new SparkMaxConstants(
             17,
@@ -157,7 +161,7 @@ public final class Constants {
             ControlMode.velocityLeader,
             shooterFlywheelPID,
             60,
-            false,
+            true,
             IdleMode.kCoast,
             12,
             60.0
@@ -174,6 +178,7 @@ public final class Constants {
             60.0
         );
         public static final boolean invertFlywheelFollower = true;//TODO INVERT OR NO
+        public static final double shotWaitTime = 0.25;
 
         /* Storage Motor */
         public static final SparkMaxConstants shooterStorageConstants = new SparkMaxConstants(
@@ -182,16 +187,16 @@ public final class Constants {
             ControlMode.percentOutput,
             null,
             20,
-            false,
+            true,
             IdleMode.kBrake,
             12,
             1.0
         );
-        public static final double storageMotorPowerReceiving = 0.5;
-        public static final double storageMotorPowerToFlywheels = 1;
+        public static final double storageMotorPowerReceiving = 0.1;
+        public static final double storageMotorPowerToFlywheels = 0.5;
 
         /* Sensors */
-        public static final int beamBreakPort = 1;
+        public static final int beamBreakPort = 2;
     }
 
     /* Using CANIds 1-12 - 8 motors and 4 cancoders */
@@ -240,6 +245,7 @@ public final class Constants {
             0.0, 
             0.0, 
             0.0,
+            -1.0,
             1.0
         );
 
@@ -249,6 +255,7 @@ public final class Constants {
             0.0, 
             0.0, 
             0.0,
+            -1.0,
             1.0
         );
 
@@ -406,5 +413,15 @@ public final class Constants {
          /* PID Constants for Rotation to a Target */
         public static final double kPRotationTarget = 1.0;//TODO tune and test
         public static final double kDRotationTarget = 0.0;
+    }
+
+    public static final class AutoConstants { //TODO tune
+        /* Seconds */
+        public static final double notePickupTimeout = 2.0;
+
+        public static final double armPosNote1 = 10.0;
+        public static final double shooterVelocityNote1 = 10.0;
+        public static final double armPosNote2 = 10.0;
+        public static final double shooterVelocityNote2 = 10.0;
     }
 }

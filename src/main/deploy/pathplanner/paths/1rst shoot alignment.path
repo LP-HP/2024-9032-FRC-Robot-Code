@@ -8,66 +8,42 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.3479282065452507,
-        "y": 6.971077125052112
+        "x": 1.2069872572793579,
+        "y": 6.876162812154685
       },
-      "isLocked": true,
+      "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.137658622110595,
-        "y": 6.493338972426163
+        "x": 1.6162826627647557,
+        "y": 6.1979018544931685
       },
       "prevControl": {
-        "x": 1.2796798990272582,
-        "y": 6.610336071028437
+        "x": 1.0432690950851986,
+        "y": 6.572114796651246
       },
       "nextControl": null,
-      "isLocked": true,
+      "isLocked": false,
       "linkedName": "Path 1 end"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [
-    {
-      "name": "Move Shooter Arm and Lower Intake",
-      "waypointRelativePos": 0.35,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "ShooterArmNote1"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "IntakeToGround"
-              }
-            }
-          ]
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.0,
-    "maxAcceleration": 3.0,
+    "maxAcceleration": 16.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 33.690067525979885,
+    "rotation": 41.185925165709605,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "MultiNoteAuto",
   "previewStartingState": null,
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }
