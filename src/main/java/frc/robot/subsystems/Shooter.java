@@ -147,7 +147,7 @@ public class Shooter extends SubsystemBase {
 
     /* Moves to the target position from a vision target y offset */
     public Command setToTargetPositionFromTargetY(DoubleSupplier targetYSup, boolean waitUntilAchieved) { 
-        return setTargetPosition(armPosLookupTableFromTargetY.get(targetYSup.getAsDouble()), waitUntilAchieved).withName("Move to LLT");
+        return setTargetPosition(armPosLookupTableFromTargetY.get(targetYSup.getAsDouble()), waitUntilAchieved).withName("To LLT");
     }   
 
     public boolean hasNote() {
@@ -166,7 +166,7 @@ public class Shooter extends SubsystemBase {
         armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
         flywheelMotor.setClosedLoopTarget(0.0);
         storageMotor.set(0.0);
-        
+
         if(getCurrentCommand() != null) 
             getCurrentCommand().cancel();
     }
