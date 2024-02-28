@@ -85,10 +85,6 @@ public class Shooter extends SubsystemBase {
         reset();
     }
 
-    public boolean hasNote() {
-        return !beamBreak.get();
-    }
-
     private Command setStorageMotorPower(double power) {
         return runOnce(() -> storageMotor.set(power));
     }
@@ -115,7 +111,7 @@ public class Shooter extends SubsystemBase {
         return setStorageMotorPower(storageMotorPowerToFlywheels).withName("Storage flywheels");
     }
 
-    private Command disableShooterFlywheels() {
+    private Command disableFlywheels() {
         return runOnce(() -> { 
             flywheelMotor.setClosedLoopTarget(0.0);
             storageMotor.set(0.0);
@@ -125,14 +121,14 @@ public class Shooter extends SubsystemBase {
     public Command receiveNoteFromIntake() {
         return enableStorageMotorReceiving()
             .andThen(Commands.waitUntil(this::hasNote))
-            .andThen(disableShooterFlywheels());
+            .andThen(disableFlywheels());
     }
 
     public Command shootSequence(double velocity) {
         return setFlywheelVelocity(velocity, true)
            .andThen(enableStorageMotorToFlywheels())
            .andThen(Commands.waitSeconds(shotWaitTime))
-           .andThen(disableShooterFlywheels())
+           .andThen(disableFlywheels())
            .andThen(setToStoragePosition(false))
            .withName("Shoot");
     }
@@ -154,6 +150,10 @@ public class Shooter extends SubsystemBase {
         return setTargetPosition(armPosLookupTableFromTargetY.get(targetYSup.getAsDouble()), waitUntilAchieved).withName("Move to LLT");
     }   
 
+    public boolean hasNote() {
+        return !beamBreak.get();
+    }
+
     private boolean armAtSetpoint() {
         return Math.abs(armMotor.relativeEncoder.getPosition() - armMotor.getSetpoint()) < armSetpointTolerance;
     }
@@ -166,6 +166,7 @@ public class Shooter extends SubsystemBase {
         armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
         flywheelMotor.setClosedLoopTarget(0.0);
         storageMotor.set(0.0);
+        
         if(getCurrentCommand() != null) 
             getCurrentCommand().cancel();
     }
