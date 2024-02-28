@@ -9,7 +9,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.StoreNoteFromGroundSequence;
+import frc.robot.commands.StoreNoteSequence;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LimelightVision;
 import frc.robot.subsystems.Shooter;
@@ -25,7 +25,7 @@ public class MultiNoteAuto extends SequentialCommandGroup {
         Command firstNoteShootAlignment = AutoBuilder.followPath(paths.get(0));
         Command secondNoteAlignment = AutoBuilder.followPath(paths.get(1));
         
-        Command getNoteFromGround = new StoreNoteFromGroundSequence(intake, shooter);
+        Command getNoteFromGround = intake.getNoteFromGround().andThen(new StoreNoteSequence(intake, shooter));
 
         //Add at least 1 note
         addCommands(

@@ -90,7 +90,7 @@ public final class Constants {
         /* Flyhweel Powers */
         public static final double intakePower = -0.3;
         public static final double outtakeAmpPower = 0.7;
-        public static final double outtakeToShooterPower = 0.3;
+        public static final double transferToShooterPower = 0.3;
 
         /* Sensors */
         public static final int beamBreakPort = 0;

@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -105,11 +104,9 @@ public class RobotContainer {
         // );
 
         enableIntakeButton.onTrue(
-            intake.setToGroundPositionAndEnable()
-            .andThen(Commands.waitUntil(intake::hasNote))
-            .andThen(intake.setToStoragePosition()
-                .alongWith(setAndDisableRumble()))
-            // .onlyIf(() -> !intake.hasNote()) //TODO use a state
+            intake.getNoteFromGround()
+            .andThen(setAndDisableRumble())
+            .onlyIf(() -> !intake.hasNote())
         );
 
         storeNoteButton.onTrue(
@@ -118,10 +115,8 @@ public class RobotContainer {
         );
 
         ampScoreButton.onTrue(
-            intake.moveToAmpPosition()
-            .andThen(intake.shootIntoAmpThenWaitThenDisable())
-            .andThen(intake.setToStoragePosition())
-            // .onlyIf(intake::hasNote) //TODO use a state
+            intake.shootIntoAmp()
+            .onlyIf(intake::hasNote)
         );
 
         // aprilTagAlignmentTest.onTrue(//TODO move to other class
