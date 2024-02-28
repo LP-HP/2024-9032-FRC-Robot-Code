@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.SparkMaxWrapper;
 
@@ -21,7 +20,7 @@ public class Shooter extends SubsystemBase {
     private final SparkMaxWrapper flywheelMotor;
     private final SparkMaxWrapper flywheelMotorFollower;
 
-    private final SparkMaxWrapper passthroughStorageMotor;
+    private final SparkMaxWrapper storageMotor;
 
     private final ShuffleboardTab shooterTab = Shuffleboard.getTab("Shooter");
 
@@ -43,8 +42,8 @@ public class Shooter extends SubsystemBase {
         flywheelMotorFollower.follow(flywheelMotor, invertFlywheelFollower);
         flywheelMotorFollower.config();
 
-        passthroughStorageMotor = new SparkMaxWrapper(shooterStorageConstants);
-        passthroughStorageMotor.config();
+        storageMotor = new SparkMaxWrapper(shooterStorageConstants);
+        storageMotor.config();
 
          /* Wait for the encoder to initialize before setting to absolute */
         Timer.delay(1.0);
@@ -57,7 +56,7 @@ public class Shooter extends SubsystemBase {
             .withPosition(0, 0).withSize(2, 2);
         shooterTab.add(flywheelMotor)
             .withPosition(3, 0).withSize(2, 2);
-        shooterTab.add(passthroughStorageMotor)
+        shooterTab.add(storageMotor)
             .withPosition(0, 2).withSize(2, 1);
         shooterTab.addBoolean("Has Note", this::hasNote)
             .withPosition(6, 0).withSize(2, 1);
@@ -75,11 +74,11 @@ public class Shooter extends SubsystemBase {
             .withPosition(1, 3).withSize(1, 1);
         shooterTab.add(shootSequence(4000.0))
             .withPosition(2, 3).withSize(1, 1);
-        shooterTab.add(resetMotors())
+        shooterTab.add(resetState())
             .withPosition(3, 3).withSize(1, 1);
-        shooterTab.add(setToStoragePosition())
+        shooterTab.add(setToStoragePosition(true))
             .withPosition(4, 3).withSize(1, 1);
-        shooterTab.add(moveToPassthroughPosition())
+        shooterTab.add(setToPassthroughPosition(true))
             .withPosition(5, 3).withSize(1, 1);
 
         /* Prevent moving to a previous setpoint */
@@ -90,73 +89,69 @@ public class Shooter extends SubsystemBase {
         return !beamBreak.get();
     }
 
-    public Command enableStorageMotorReceiving() {
-        return runOnce(() -> passthroughStorageMotor.set(storageMotorPowerReceiving)).withName("Storage receive");
+    private Command setStorageMotorPower(double power) {
+        return runOnce(() -> storageMotor.set(power));
+    }
+
+    /* Sets the target and if blocking, waits until the setpoint is achieved */
+    private Command setFlywheelVelocity(double setpoint, boolean blocking) {
+        Command setTargetCommand = runOnce(() -> flywheelMotor.setClosedLoopTarget(setpoint));
+
+        return blocking ? setTargetCommand.andThen(Commands.waitUntil(this::flywheelsAtSetpoint)) : setTargetCommand;
+    }
+
+    /* Sets the target and if blocking, waits until the setpoint is achieved */
+    private Command setTargetPosition(double setpoint, boolean blocking) {
+        Command setTargetCommand = runOnce(() -> armMotor.setClosedLoopTarget(setpoint));
+
+        return blocking ? setTargetCommand.andThen(Commands.waitUntil(this::armAtSetpoint)) : setTargetCommand;
+    }
+
+    private Command enableStorageMotorReceiving() {
+        return setStorageMotorPower(storageMotorPowerReceiving).withName("Storage receive");
     }
 
     private Command enableStorageMotorToFlywheels() {
-        return runOnce(() -> passthroughStorageMotor.set(storageMotorPowerToFlywheels)).withName("Storage flywheels");
-    }
-
-    private Command waitForShooterVelocity(double velocity) {
-        return new FunctionalCommand(
-        /* Sets the target velocity at the start */
-        () -> flywheelMotor.setClosedLoopTarget(velocity), 
-        () -> {}, 
-        (unused) -> {}, 
-        /* We are finished if the flywheel velocity is within our tolerance */
-        this::flywheelsAtSetpoint, 
-        this);
+        return setStorageMotorPower(storageMotorPowerToFlywheels).withName("Storage flywheels");
     }
 
     private Command disableShooterFlywheels() {
         return runOnce(() -> { 
             flywheelMotor.setClosedLoopTarget(0.0);
-            passthroughStorageMotor.set(0.0);
+            storageMotor.set(0.0);
         });
     }
 
+    public Command receiveNoteFromIntake() {
+        return enableStorageMotorReceiving()
+            .andThen(Commands.waitUntil(this::hasNote))
+            .andThen(disableShooterFlywheels());
+    }
+
     public Command shootSequence(double velocity) {
-        return waitForShooterVelocity(velocity)
+        return setFlywheelVelocity(velocity, true)
            .andThen(enableStorageMotorToFlywheels())
            .andThen(Commands.waitSeconds(shotWaitTime))
            .andThen(disableShooterFlywheels())
-           .andThen(setToStoragePosition()).withName("Shoot");
+           .andThen(setToStoragePosition(false))
+           .withName("Shoot");
     }
 
-    /* Sets the target and disables the storage motor (non-blocking) */
-    private void setTargetPosition(double position) {
-        armMotor.setClosedLoopTarget(position);
-        passthroughStorageMotor.set(0.0); 
+    public Command setToStoragePosition(boolean waitUntilAchieved) {
+        return setTargetPosition(armPositionStorage, waitUntilAchieved).withName("To storage"); 
     }
 
-    public Command setToStoragePosition() {
-        return runOnce(() -> setTargetPosition(armPositionStorage)).withName("Set to storage"); 
+    public Command setToPassthroughPosition(boolean waitUntilAchieved) {
+        return setTargetPosition(armPositionStorage, waitUntilAchieved).withName("To storage"); 
     }
 
-    public Command setToAutoPosition(double position) {
-        return runOnce(() -> setTargetPosition(position)).withName("Set to auto");
-    }
-
-    /* Sets the target and wait until it is achieved */
-    private Command moveToTargetPosition(double position) { 
-        return new FunctionalCommand(
-        /* Sets the target position at the start */
-        () -> setTargetPosition(position),
-        () -> {},
-        (unused) -> {},
-        /* We are finished if the arm position is within our tolerance */
-        this::armAtSetpoint,
-        this);
-    }   
-
-    public Command moveToPassthroughPosition() {
-        return moveToTargetPosition(armPositionPassthrough).withName("Move to pass");
+    public Command setToAutoPosition(double position, boolean waitUntilAchieved) {
+        return setTargetPosition(position, waitUntilAchieved).withName("To auto pos");
     }
 
     /* Moves to the target position from a vision target y offset */
-    public Command moveToTargetPositionFromTargetY(DoubleSupplier targetYSup) { 
-        return moveToTargetPosition(armPosLookupTableFromTargetY.get(targetYSup.getAsDouble())).withName("Move to LLT");
+    public Command setToTargetPositionFromTargetY(DoubleSupplier targetYSup, boolean waitUntilAchieved) { 
+        return setTargetPosition(armPosLookupTableFromTargetY.get(targetYSup.getAsDouble()), waitUntilAchieved).withName("Move to LLT");
     }   
 
     private boolean armAtSetpoint() {
@@ -170,12 +165,12 @@ public class Shooter extends SubsystemBase {
     private void reset() {
         armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
         flywheelMotor.setClosedLoopTarget(0.0);
-        passthroughStorageMotor.set(0.0);
+        storageMotor.set(0.0);
         if(getCurrentCommand() != null) 
             getCurrentCommand().cancel();
     }
 
-    private Command resetMotors() {
+    private Command resetState() {
         return runOnce(this::reset).withName("Reset");
     }
 }

@@ -47,7 +47,7 @@ public class Intake extends SubsystemBase {
         intakeTab.addBoolean("At Setpoint", this::armAtSetpoint)
             .withPosition(6, 1).withSize(2, 1);
         intakeTab.add(this)
-            .withPosition(0, 3).withSize(2, 1);
+            .withPosition(0, 4).withSize(2, 1);
 
         /* Add Command Testing Butons */
         intakeTab.add(setToGroundPosition(true))
