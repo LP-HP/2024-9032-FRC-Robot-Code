@@ -9,16 +9,16 @@ public class StoreNoteSequence extends SequentialCommandGroup {
     public StoreNoteSequence(Intake intake, Shooter shooter) {
         addCommands(
             /* Move the intake and shooter to the passthrough position to align them */
-            intake.moveToPassthroughPosition()
-                .alongWith(shooter.moveToPassthroughPosition()),
+            intake.setToPassthroughPosition(true)
+                .alongWith(shooter.setToPassthroughPosition(true)),
             Commands.waitSeconds(0.25),//TODO fix
             /* Move the note into the shooter once they have reached the passthrough position */
-            shooter.enableStorageMotorReceiving(),
-            intake.shootIntoShooter(),
-            Commands.waitUntil(shooter::hasNote),
-            /* Make sure to put them back in the storage position when the note arrives in the shooter */
-            intake.setToStoragePosition(),
-            shooter.setToStoragePosition()
+            intake.enableTransferToShooter(),
+            shooter.receiveNoteFromIntake(),
+            /* Make sure to put them back in the storage position and disable when the note arrives in the shooter */
+            intake.disableFlywheels(),
+            intake.setToStoragePosition(false),
+            shooter.setToStoragePosition(false)
         );
     }
 }

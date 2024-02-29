@@ -104,23 +104,20 @@ public class RobotContainer {
         // );
 
         enableIntakeButton.onTrue(
-            intake.setToGroundPositionAndEnable()
-            .andThen(Commands.waitUntil(intake::hasNote))
-            .andThen(intake.setToStoragePosition()
-                .alongWith(setAndDisableRumble()))
-            // .onlyIf(() -> !intake.hasNote()) //TODO use a state
+            shooter.setToPassthroughPosition(false)
+            .andThen(intake.getNoteFromGround())
+            .andThen(setAndDisableRumble())
+            .onlyIf(() -> !intake.hasNote() && !shooter.hasNote())
         );
 
         storeNoteButton.onTrue(
             new StoreNoteSequence(intake, shooter)
-            // .onlyIf(() -> intake.hasNote() && !shooter.hasNote()) //TODO use a state
+            .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
         );
 
         ampScoreButton.onTrue(
-            intake.moveToAmpPosition()
-            .andThen(intake.shootIntoAmpThenWaitThenDisable())
-            .andThen(intake.setToStoragePosition())
-            // .onlyIf(intake::hasNote) //TODO use a state
+            intake.shootIntoAmp()
+            .onlyIf(intake::hasNote)
         );
 
         // aprilTagAlignmentTest.onTrue(//TODO move to other class

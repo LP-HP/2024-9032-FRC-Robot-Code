@@ -14,7 +14,7 @@ import frc.robot.util.SparkMaxConstants;
 import frc.robot.util.SwerveModuleConstants;
 import frc.robot.util.SparkMaxConstants.ControlMode;
 import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
- 
+
 /* 
  * ...
  */
@@ -43,16 +43,16 @@ public final class Constants {
     }
 
     /* Using CANIds 13-14 - 2 motors */
-    public static final class IntakeConstants {//TODO tune
+    public static final class IntakeConstants {
         /* Intake Arm */
-        public static final double armSetpointTolerance = 0.5;
+        public static final double armSetpointTolerance = 5.0;
         public static final SparkMaxPIDConstants intakeArmPID = new SparkMaxPIDConstants(
-            0.1, 
+            0.02, //TODO this response can be uppped later when the intake is properly mounted
             0.0, 
-            0.01, 
+            0.0, 
             0.0,
-            -0.6,
-            0.6
+            -0.5,
+            0.5
         );
         public static final SparkMaxConstants intakeArmConstants = new SparkMaxConstants(
             13,
@@ -63,16 +63,16 @@ public final class Constants {
             true,
             IdleMode.kBrake,
             12,
-            1.0
+            360.0 / 60.0
         );
         public static final boolean invertAbsoluteEncoder = false;
-        public static final double absoluteEncoderConversionFactor = 60.0;
-        public static final double absoluteEncoderOffset = 0.82;
+        public static final double absoluteEncoderConversionFactor = 360.0;
+        public static final double absoluteEncoderOffset = 98.1747508;
         /* Arm Positions */
-        public static final double armPositionGround = 0.11;
-        public static final double armPositionPassthrough = 33.0;
-        public static final double armPositionAmp = 20.0;
-        public static final double armPositionStorage = 24.0;
+        public static final double armPositionGround = 26.5;
+        public static final double armPositionPassthrough = 225.0;
+        public static final double armPositionAmp = 160.0;
+        public static final double armPositionStorage = 225.0;
 
         /* Intake Flywheel */
         public static final SparkMaxConstants intakeFlywheelConstants = new SparkMaxConstants(
@@ -90,7 +90,7 @@ public final class Constants {
         /* Flyhweel Powers */
         public static final double intakePower = -0.3;
         public static final double outtakeAmpPower = 0.7;
-        public static final double outtakeToShooterPower = 0.3;
+        public static final double transferToShooterPower = 0.4;
 
         /* Sensors */
         public static final int beamBreakPort = 0;
@@ -136,8 +136,8 @@ public final class Constants {
         public static final double absoluteEncoderOffset = 267.23;
 
         /* Arm Positions */
-        public static final double armPositionPassthrough = 140.0;
-        public static final double armPositionStorage = 150.0;
+        public static final double armPositionPassthrough = 130.0;
+        public static final double armPositionStorage = 140.0;
         /* Key - Target Y Offset : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap armPosLookupTableFromTargetY = new InterpolatingDoubleTreeMap();
         static {
@@ -192,7 +192,7 @@ public final class Constants {
             12,
             1.0
         );
-        public static final double storageMotorPowerReceiving = 0.1;
+        public static final double storageMotorPowerReceiving = 0.15;
         public static final double storageMotorPowerToFlywheels = 0.5;
 
         /* Sensors */

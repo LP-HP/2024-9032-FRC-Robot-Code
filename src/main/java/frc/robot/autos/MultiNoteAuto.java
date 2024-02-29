@@ -9,7 +9,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.StoreNoteFromGroundSequence;
+import frc.robot.commands.StoreNoteSequence;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LimelightVision;
 import frc.robot.subsystems.Shooter;
@@ -25,7 +25,7 @@ public class MultiNoteAuto extends SequentialCommandGroup {
         Command firstNoteShootAlignment = AutoBuilder.followPath(paths.get(0));
         Command secondNoteAlignment = AutoBuilder.followPath(paths.get(1));
         
-        Command getNoteFromGround = new StoreNoteFromGroundSequence(intake, shooter);
+        Command storeNoteFromGround = intake.getNoteFromGround().andThen(new StoreNoteSequence(intake, shooter));
 
         //Add at least 1 note
         addCommands(
@@ -34,7 +34,7 @@ public class MultiNoteAuto extends SequentialCommandGroup {
             new InstantCommand(() -> swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate), swerve, limelight),
             /* Drive to the position to shoot the 1rst note, while setting the arm to the shooting position */
             firstNoteShootAlignment
-                .alongWith(shooter.setToAutoPosition(armPosNote1)),
+                .alongWith(shooter.setToAutoPosition(armPosNote1, true)),
             /* Enable shooter, wait, and disable */
             shooter.shootSequence(shooterVelocityNote1)
         );
@@ -44,9 +44,9 @@ public class MultiNoteAuto extends SequentialCommandGroup {
             addCommands(
                 /* Drive to the position to intake and shoot the 2nd note, while running the full sequence for storing a note */
                 secondNoteAlignment
-                    .alongWith(getNoteFromGround
+                    .alongWith(storeNoteFromGround
                         /* When the note is stored, set the arm to the correct position */
-                        .andThen(shooter.setToAutoPosition(armPosNote2))
+                        .andThen(shooter.setToAutoPosition(armPosNote2, true))
                         /* If we take too long, timeout to prevent blocking*/
                         .withTimeout(notePickupTimeout)),
                 /* Enable shooter, wait, disable, and store */
