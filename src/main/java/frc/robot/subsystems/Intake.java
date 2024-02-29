@@ -125,11 +125,11 @@ public class Intake extends SubsystemBase {
     public Command getNoteFromGround() {
         return setTargetPosition(armPositionGround, false)
             .andThen(setFlywheelPower(intakePower))
-            .andThen(Commands.waitUntil(this::beamBreakTriggered)
+            .andThen(Commands.waitUntil(this::beamBreakTriggered))
             .andThen(disableFlywheels())
             .andThen(setNoteState(true))
             .andThen(setToStoragePosition(false))
-            .withName("Get note"));
+            .withName("Get note");
     }
 
     public boolean hasNote() {

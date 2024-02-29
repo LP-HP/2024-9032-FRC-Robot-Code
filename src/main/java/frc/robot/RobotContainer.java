@@ -104,9 +104,10 @@ public class RobotContainer {
         // );
 
         enableIntakeButton.onTrue(
-            intake.getNoteFromGround()
+            shooter.setToPassthroughPosition(false)
+            .andThen(intake.getNoteFromGround())
             .andThen(setAndDisableRumble())
-            .onlyIf(() -> !intake.hasNote())
+            .onlyIf(() -> !intake.hasNote() && !shooter.hasNote())
         );
 
         storeNoteButton.onTrue(
