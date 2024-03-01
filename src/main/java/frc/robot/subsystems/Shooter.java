@@ -175,7 +175,7 @@ public class Shooter extends SubsystemBase {
         return Math.abs(flywheelMotor.relativeEncoder.getVelocity() - flywheelMotor.getSetpoint()) < flywheelVelocityTolerance;
     }
 
-    private void reset() {
+    public void reset() {
         armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
         flywheelMotor.setClosedLoopTarget(0.0);
         storageMotor.set(0.0);
