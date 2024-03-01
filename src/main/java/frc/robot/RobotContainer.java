@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,26 +30,22 @@ public class RobotContainer {
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
     private final Trigger speakerScoreButton = driveController.y().debounce(0.025);
     private final Trigger enableIntakeButton = driveController.b().debounce(0.025);
-    private final Trigger disableIntakeTemp = driveController.x().debounce(0.025);//TODO remove
     private final Trigger storeNoteButton = driveController.rightBumper().debounce(0.025);
-    private final Trigger aprilTagAlignmentTest = driveController.leftBumper().debounce(0.025);//TODO remove
+    private final Trigger ampScoreButton = driveController.leftBumper().debounce(0.025);
+    // private final Trigger aprilTagAlignmentTest = driveController.x().debounce(0.025);//TODO remove
 
     /* Subsystems */
-    private final LimelightVision limelight = new LimelightVision(false);
+    // private final LimelightVision limelight = new LimelightVision(false);
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
     private final Shooter shooter = new Shooter();
 
-    /* Subsystem Triggers */
-    // private final Trigger intakeBeamBreakTrigger = new Trigger(intake::isBeamBreakTriggered).debounce(0.025);
-    // private final Trigger shooterBeamBreakTrigger = new Trigger(shooter::isBeamBreakTriggered).debounce(0.025);
-  
     public RobotContainer() {
         //Will run the following command when there is no other command set, such as during teleop
         swerve.setDefaultCommand(
             new TeleopSwerve(
                 swerve, 
-                () -> -driveController.getLeftY(),//The y axis is inverted by default on the xbox controller, so uninvert it
+                () -> -driveController.getLeftY(),//The axes are inverted by default on the xbox controller, so uninvert them
                 () -> -driveController.getLeftX(),
                 driveController::getRightX
             )
@@ -62,25 +57,22 @@ public class RobotContainer {
         //Configure the button bindings
         configureButtonBindings();
 
-        //Configure the subsystem triggers
-        configureSubsystemTriggers();
-
         autoChooser.addOption("Swerve Auto Shakedown", new SwerveShakedown(swerve));
         // autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
         // autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
         // autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
-        autoChooser.addOption("Align with April Tag", new AlignWithRotationTarget(swerve, () -> limelight.getAprilTagTarget().xOffset));
+        // autoChooser.addOption("Align with April Tag", new AlignWithRotationTarget(swerve, () -> limelight.getAprilTagTarget().xOffset));
         SmartDashboard.putData("Choose an Auto:", autoChooser);//Let us choose autos through the dashboard
     }
 
     /* Only reset variables - don't run any commands here */
     public void autonomousInit() {
-        limelight.switchToLocalizationPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
+        // limelight.switchToLocalizationPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
     }
 
     /* Only reset variables - don't run any commands here */
     public void teleopInit() {
-        limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
+        // limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
     }
 
     private void registerPathplannerCommands() {
@@ -98,37 +90,35 @@ public class RobotContainer {
          * 
          * a -> zero gyro
          * y [must have a valid speaker target and a note] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
-         * b -> [must not have a note] set intake to ground position and enable intake
-         * right bumper [must have a note in the intake] -> put note into shooter
+         * b -> [must not have a note] set intake to ground position and enable intake - when a note is gained, then move the intake to storage
+         * right bumper [must have a note in the intake] -> run store note sequence
+         * left bumper [must have a note in the intake] -> move intake to amp position and shoot into amp
          * 
         */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
 
-        //TODO remove 
-        enableIntakeButton.onTrue(intake.enableIntake());//b
-        speakerScoreButton.onTrue(intake.setToAmpPosition());//y 
-        storeNoteButton.onTrue(intake.setToGroundPosition());//r bumper
-        aprilTagAlignmentTest.onTrue(intake.shootIntoAmp());//l bumper
-
-        disableIntakeTemp.onTrue(intake.disableIntake());//x
         // speakerScoreButton.onTrue(
         //     new SpeakerScoringSequence(swerve, limelight, shooter)
         //     /* Only run if there is a valid target and it's a speaker tag and we have a note */
-        //     .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.isBeamBreakTriggered())
+        //     .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.hasNote())
         // );
 
-        // enableIntakeButton.onTrue(
-        //     intake.setToGroundPosition()
-        //     .andThen(intake.enableIntake())
-        //     .onlyIf(() -> !intake.isBeamBreakTriggered())
-        // );
+        enableIntakeButton.onTrue(
+            shooter.setToPassthroughPosition(false)
+            .andThen(intake.getNoteFromGround())
+            .andThen(setAndDisableRumble())
+            .onlyIf(() -> !intake.hasNote() && !shooter.hasNote())
+        );
 
-        // storeNoteButton.onTrue(
-        //     shooter.moveArmToPassthroughPosition()
-        //     .andThen(shooter.enableStorageMotorReceiving())
-        //     .andThen(intake.shootIntoShooter())
-        //     .onlyIf(intake::isBeamBreakTriggered)
-        // );
+        storeNoteButton.onTrue(
+            new StoreNoteSequence(intake, shooter)
+            .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
+        );
+
+        ampScoreButton.onTrue(
+            intake.shootIntoAmp()
+            .onlyIf(intake::hasNote)
+        );
 
         // aprilTagAlignmentTest.onTrue(//TODO move to other class
         //     new LockToRotationTargetWhileMoving(swerve, 
@@ -136,28 +126,6 @@ public class RobotContainer {
         //         () -> 
         //             new Translation2d(driveController.getLeftX(), -driveController.getLeftY())
         //             .times(Constants.TeleopConstants.joystickToSpeedConversionFactor))
-        // );
-    }
-
-    private void configureSubsystemTriggers() {
-        /* 
-         * Current triggers:
-         * 
-         * intake beam break -> disable intake and move to storage position and rumble controller
-         * shooter beam break -> disable intake and storage motor and move shooter and intake to storage position
-         * 
-         */
-        // intakeBeamBreakTrigger.onTrue(
-        //     intake.disableIntake()
-        //     .andThen(intake.setToStoragePosition())
-        //     .alongWith(setAndDisableRumble())
-        // );
-
-        // shooterBeamBreakTrigger.onTrue(
-        //     shooter.disableStorageMotor()
-        //     .andThen(intake.disableIntake())
-        //     .andThen(shooter.setToStoragePosition())
-        //     .andThen(intake.setToStoragePosition())
         // );
     }
 

@@ -55,11 +55,11 @@ public class SwerveModule {
         /* Add Telemetry */
         swerveModuleTab = Shuffleboard.getTab("Module " + moduleNumber);
         swerveModuleTab.add(angleMotor)
-            .withPosition(1, 1).withSize(2, 4);
+            .withPosition(1, 1).withSize(2, 2);
         swerveModuleTab.add(angleEncoder)
-            .withPosition(7, 1).withSize(2, 4);        
+            .withPosition(7, 1).withSize(2, 2);        
         swerveModuleTab.add(driveMotor)
-            .withPosition(4, 1).withSize(2, 4);
+            .withPosition(4, 1).withSize(2, 2);
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {

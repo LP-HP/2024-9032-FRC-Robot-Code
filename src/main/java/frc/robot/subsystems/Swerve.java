@@ -77,7 +77,7 @@ public class Swerve extends SubsystemBase {
 
         /* Show field view */
         swerveTab.add("Field", field)
-            .withPosition(1, 4).withSize(10, 10);
+            .withPosition(0, 0).withSize(10, 4);
 
         /* Send pathplanner target pose to field view */
         PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
@@ -91,11 +91,11 @@ public class Swerve extends SubsystemBase {
 
         /* Add Telemetry */
         swerveTab.addDouble("Pose X", () -> getPose().getX())
-            .withPosition(1, 1).withSize(1, 1);
+            .withPosition(0, 5).withSize(2, 1);
         swerveTab.addDouble("Pose Y", () -> getPose().getY())
-            .withPosition(2, 1).withSize(1, 1);
+            .withPosition(2,5).withSize(2, 1);
         swerveTab.addDouble("Pose Heading", () -> getPose().getRotation().getDegrees())
-            .withPosition(3, 1).withSize(1, 1);
+            .withPosition(4, 5).withSize(2, 1);
     }
 
     public void driveClosedLoopFromSpeeds(ChassisSpeeds speeds) {

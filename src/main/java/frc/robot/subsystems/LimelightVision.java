@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.limelightutil.LimelightHelpers;
 import frc.robot.Constants;
 
-import static frc.robot.Constants.VisionConstants.limelightName;;
+import static frc.robot.Constants.VisionConstants.limelightName;
 
 public class LimelightVision extends SubsystemBase {
     private VisionPoseMeasurement lastPoseEstimate = new VisionPoseMeasurement();
@@ -27,15 +27,15 @@ public class LimelightVision extends SubsystemBase {
         this.isLocalizationPipeline = isLocalizationPipeline;
 
         limelightTab.addCamera("Limelight View", limelightName, "camera_server://" + limelightName)//TODO does this work
-            .withPosition(1, 1).withSize(6, 6);
+            .withPosition(0, 0).withSize(5, 5);
 
         /* Add Telemetry */
         limelightTab.add(currentTarget)
-            .withPosition(1, 8).withSize(2, 4);
+            .withPosition(6, 0).withSize(2, 2);
         limelightTab.add(lastPoseEstimate)
-            .withPosition(6, 8).withSize(2, 4);
+            .withPosition(8, 0).withSize(2, 2);
         limelightTab.addBoolean("Localization Pipeline", () -> isLocalizationPipeline)
-            .withPosition(8, 1).withSize(2, 1);;
+            .withPosition(8, 3).withSize(2, 1);;
     }
 
     @Override
