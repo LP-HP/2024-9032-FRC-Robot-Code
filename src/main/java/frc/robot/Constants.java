@@ -410,9 +410,11 @@ public final class Constants {
             0.0
         ); 
 
-         /* PID Constants for Rotation to a Target */
-        public static final double kPRotationTarget = 1.0;//TODO tune and test
-        public static final double kDRotationTarget = 0.0;
+        /* PID Constants for rotation and movement to a vision target */
+        public static final double kPRotationTarget = 0.01;//TODO tune and test
+        public static final double kPTranslationTarget = 0.01;//TODO tune and test
+        public static final double rotationSetpointTolerance = 0.5;
+        public static final double translationSetpointTolerance = 0.5;
     }
 
     public static final class AutoConstants { //TODO tune
