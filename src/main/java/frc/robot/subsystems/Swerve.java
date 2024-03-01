@@ -64,7 +64,7 @@ public class Swerve extends SubsystemBase {
                 this::getPose,
                 this::resetOdometry,
                 this::getSpeeds, 
-                this::driveClosedLoopFromSpeeds,
+                (speeds) -> driveFromSpeeds(speeds, false),
                 new HolonomicPathFollowerConfig(
                     Constants.ClosedLoopConstants.translationPID,
                     Constants.ClosedLoopConstants.headingPID, 
@@ -98,18 +98,26 @@ public class Swerve extends SubsystemBase {
             .withPosition(4, 5).withSize(2, 1);
     }
 
-    public void driveClosedLoopFromSpeeds(ChassisSpeeds speeds) {
+    private void driveFromSpeeds(ChassisSpeeds speeds, boolean openLoop) {
+        /* 
+         * Convert speeds from continuous to discrete to improve driving while rotating
+         * See: https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964/5 
+         */
+        speeds = ChassisSpeeds.discretize(speeds, 0.02);
+
+        /* Convert from robots speeds to module speeds and rotations - Kinematics wants module angles in the range (-180, 180] */ 
         SwerveModuleState[] desiredStates = swerveKinematics.toSwerveModuleStates(speeds);
 
+        /* Ensure that no module goes above the max speed */
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxSpeed);
 
         for(SwerveModule mod : swerveMods){
-            mod.setDesiredState(desiredStates[mod.getNumber()], false);
+            mod.setDesiredState(desiredStates[mod.getNumber()], openLoop);
         }
     }
 
     public void driveClosedLoop(Translation2d translation, double rotation) {
-        driveClosedLoopFromSpeeds(new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
+        driveFromSpeeds(new ChassisSpeeds(translation.getX(), translation.getY(), rotation), false);
     }
 
     public void driveOpenLoop(Translation2d translation, double rotation, boolean fieldCentric) {
@@ -128,20 +136,7 @@ public class Swerve extends SubsystemBase {
                 rotation
             );
             
-        /* 
-         * Convert speeds from continuous to discrete to improve driving while rotating
-         * See: https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964/5 
-         */
-        speeds = ChassisSpeeds.discretize(speeds, 0.02);
-
-        /* Kinematics wants module angles in the range (-180, 180] */ 
-        SwerveModuleState[] desiredStates = swerveKinematics.toSwerveModuleStates(speeds);
-
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxSpeed);
-
-        for(SwerveModule mod : swerveMods) {
-            mod.setDesiredState(desiredStates[mod.getNumber()], true);
-        }
+        driveFromSpeeds(speeds, true);
     }     
 
     public Pose2d getPose() {
