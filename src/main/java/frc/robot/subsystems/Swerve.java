@@ -132,7 +132,7 @@ public class Swerve extends SubsystemBase {
          * Convert speeds from continuous to discrete to improve driving while rotating
          * See: https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964/5 
          */
-        ChassisSpeeds.discretize(speeds, 0.02);
+        speeds = ChassisSpeeds.discretize(speeds, 0.02);
 
         /* Kinematics wants module angles in the range (-180, 180] */ 
         SwerveModuleState[] desiredStates = swerveKinematics.toSwerveModuleStates(speeds);
