@@ -32,10 +32,15 @@ public class TeleopSwerve extends Command {
 
     @Override
     public void execute() {
-        //Use joystick deadband to prevent small drifts
+        /* Use joystick deadband to prevent small drifts */
         double translationVal = MathUtil.applyDeadband(translationSup.getAsDouble(), stickDeadband);
         double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), stickDeadband);
         double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), stickDeadband);
+
+        /* Curve inputs to allow for more control closer to the lower range of the joystick */
+        translationVal = applyInputCurve(translationVal);
+        strafeVal = applyInputCurve(strafeVal);
+        rotationVal = applyInputCurve(rotationVal);
 
         /* Multiply by conversion factor to get the joystick value in m/s and apply acceleration limits */
         translationVal *= joystickToSpeedConversionFactor;
@@ -44,11 +49,17 @@ public class TeleopSwerve extends Command {
         strafeVal *= joystickToSpeedConversionFactor;
         strafeVal = Math.signum(strafeVal) * accelerationLimiterStrafe.calculate(Math.abs(strafeVal));
 
-        //Run the open loop drive using speed values and apply rotation conversion factor
+        rotationVal *= joystickToAngularVelocityConversionFactor;
+
+        /* Run the open loop drive using speed values  */
         swerve.driveOpenLoop(
             new Translation2d(translationVal, strafeVal), 
-            rotationVal * joystickToAngularVelocityConversionFactor, 
+            rotationVal, 
             isFieldCentric
         );
+    }
+
+    private double applyInputCurve(double joystickInput) {
+        return Math.copySign(Math.pow(joystickInput, 2), joystickInput);
     }
 }
