@@ -223,7 +223,7 @@ public class Swerve extends SubsystemBase {
         swerveOdometry.setVisionMeasurementStdDevs(
             VecBuilder.fill(xyStandardDeviation, xyStandardDeviation, Units.degreesToRadians(headingStandardDeviation))
         );
-        swerveOdometry.addVisionMeasurement(poseEstimate.pose, Timer.getFPGATimestamp() - poseEstimate.latency);
+        swerveOdometry.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
     }
 
     @Override
