@@ -15,7 +15,7 @@ import frc.robot.Constants;
 import static frc.robot.Constants.VisionConstants.limelightName;
 
 public class LimelightVision extends SubsystemBase {
-    private PoseEstimate currentPose;
+    private LimelightPoseEstimate currentPose = new LimelightPoseEstimate();
     private AprilTagTarget currentTarget = new AprilTagTarget();
     
     private boolean isLocalizationPipeline;//Whether we are localizing or tracking a target
@@ -31,8 +31,8 @@ public class LimelightVision extends SubsystemBase {
         /* Add Telemetry */
         limelightTab.add(currentTarget)
             .withPosition(6, 0).withSize(2, 2);
-        // limelightTab.add(lastPoseEstimate)
-        //     .withPosition(8, 0).withSize(2, 2);
+        limelightTab.add(currentPose)
+            .withPosition(8, 0).withSize(2, 2);
         limelightTab.addBoolean("Localization Pipeline", () -> isLocalizationPipeline)
             .withPosition(8, 3).withSize(2, 1);;
     }
@@ -40,7 +40,7 @@ public class LimelightVision extends SubsystemBase {
     @Override
     public void periodic() {
         if(isLocalizationPipeline) 
-            currentPose = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
+            currentPose.poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
 
         else {
             currentTarget.xOffset = LimelightHelpers.getTX(limelightName);
@@ -68,12 +68,15 @@ public class LimelightVision extends SubsystemBase {
     }
 
     public Optional<PoseEstimate> getPoseEstimate() {
+        PoseEstimate currentReading = currentPose.poseEstimate;
         /* Do not return an estimate if we are in the wrong pipeline or the estimate is invalid */
         if(isLocalizationPipeline 
-            && currentPose != null 
-            && currentPose.tagCount != 0 
-            && !(currentPose.pose.getX() == 0.0 && currentPose.pose.getY() == 0.0))
-            return Optional.of(currentPose);
+            && currentReading != null 
+            && currentReading.tagCount != 0 
+            && !(currentReading.pose.getX() == 0.0 && currentReading.pose.getY() == 0.0)
+        ) {
+            return Optional.of(currentReading);
+        }
 
         else
             return Optional.empty();
@@ -113,6 +116,24 @@ public class LimelightVision extends SubsystemBase {
             builder.addDoubleProperty("ID", () -> id, null);
             builder.addDoubleProperty("Area", () -> area, null);
             builder.addBooleanProperty("Is Valid", () -> isValid, null);
+        }
+    }
+
+    public static final class LimelightPoseEstimate implements Sendable {
+        public PoseEstimate poseEstimate;
+
+        public LimelightPoseEstimate() {
+            SendableRegistry.add(this, "Limelight Pose Estimate");
+        }
+
+        @Override
+        public void initSendable(SendableBuilder builder) {
+            builder.addDoubleProperty("Pose X", () -> poseEstimate.pose.getX(), null);
+            builder.addDoubleProperty("Pose Y", () -> poseEstimate.pose.getY(), null);
+            builder.addDoubleProperty("Pose Heading", () -> poseEstimate.pose.getRotation().getDegrees(), null);
+            builder.addDoubleProperty("Tag Count", () -> poseEstimate.tagCount, null);
+            builder.addDoubleProperty("Tag Area", () -> poseEstimate.avgTagArea, null);
+            builder.addDoubleProperty("Timestamp", () -> poseEstimate.timestampSeconds, null);
         }
     }
 }   
