@@ -35,11 +35,14 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        public static final double visionPoseTolerance = 1.0;//TODO tune for localization (in meters)
-
         public static final String limelightName = "limelight";//TODO set name to 9032Limeligh
         public static final int targetPipelineID = 0;
         public static final int localizationPipelineID = 1;//TODO make sure this aligns with the limelight config
+
+        /* Distance Constants */
+        public static final double tagHeight = Units.inchesToMeters(60.0);
+        public static final double mountingHeight = Units.inchesToMeters(10.0);
+        public static final double mountingAngle = Units.degreesToRadians(18.0);
     }
 
     /* Using CANIds 13-14 - 2 motors */
@@ -140,13 +143,13 @@ public final class Constants {
         /* Arm Positions */
         public static final double armPositionPassthrough = 130.0;
         public static final double armPositionStorage = 140.0;
-        /* Key - Target Y Offset : Value - Arm Position */
-        public static final InterpolatingDoubleTreeMap armPosLookupTableFromTargetY = new InterpolatingDoubleTreeMap();
+        /* Key - Distance : Value - Arm Position */
+        public static final InterpolatingDoubleTreeMap distanceToArmPosTable = new InterpolatingDoubleTreeMap();
         static {
-            armPosLookupTableFromTargetY.put(-3.34, 128.0);
-            armPosLookupTableFromTargetY.put(-0.12, 129.0);
-            armPosLookupTableFromTargetY.put(4.58, 132.0);
-            armPosLookupTableFromTargetY.put(15.51, 142.0);
+            distanceToArmPosTable.put(-3.34, 128.0);
+            distanceToArmPosTable.put(-0.12, 129.0);
+            distanceToArmPosTable.put(4.58, 132.0);
+            distanceToArmPosTable.put(15.51, 142.0);
         }
 
         /* Shooter Flywheels */

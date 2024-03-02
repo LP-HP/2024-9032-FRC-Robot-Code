@@ -163,18 +163,18 @@ public class Shooter extends SubsystemBase {
     }
 
     /* Moves to the target position from a vision target y offset */
-    public Command setToTargetPositionFromTargetY(DoubleSupplier targetYSup, boolean waitUntilAchieved) {
-        Command setTargetCommand = runOnce(() -> setArmSetpoint(applyLookupTable(targetYSup.getAsDouble())));
+    public Command setToTargetPositionFromDistance(DoubleSupplier distanceSup, boolean waitUntilAchieved) {
+        Command setTargetCommand = runOnce(() -> setArmSetpoint(applyLookupTable(distanceSup.getAsDouble())));
                 
         setTargetCommand = waitUntilAchieved ? setTargetCommand.andThen(Commands.waitUntil(this::armAtSetpoint)) : setTargetCommand;
 
-        return setTargetCommand.withName("To target y pos");
+        return setTargetCommand.withName("To distance pos");
     }   
 
-    private double applyLookupTable(double yOffset) {
-        double targetPos = armPosLookupTableFromTargetY.get(yOffset);
+    private double applyLookupTable(double distance) {
+        double targetPos = distanceToArmPosTable.get(distance);
 
-        System.out.println("Target pos " + targetPos + " at y " + yOffset);
+        System.out.println("Target pos " + targetPos + " at distance " + distance);
 
         return targetPos;
     }

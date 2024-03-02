@@ -13,7 +13,7 @@ import frc.lib.limelightutil.LimelightHelpers;
 import frc.lib.limelightutil.LimelightHelpers.PoseEstimate;
 import frc.robot.Constants;
 
-import static frc.robot.Constants.VisionConstants.limelightName;
+import static frc.robot.Constants.VisionConstants.*;
 
 public class LimelightVision extends SubsystemBase {
     private LimelightPoseEstimate currentPose = new LimelightPoseEstimate();
@@ -49,6 +49,8 @@ public class LimelightVision extends SubsystemBase {
             currentTarget.area = LimelightHelpers.getTA(limelightName);
             currentTarget.isValid = LimelightHelpers.getTV(limelightName);
             currentTarget.id = LimelightHelpers.getFiducialID(limelightName);
+
+            currentTarget.distance = (tagHeight - mountingHeight) / Math.tan(currentTarget.yOffset + mountingAngle);
         }
     }
 
@@ -92,11 +94,12 @@ public class LimelightVision extends SubsystemBase {
     }
 
     public static final class AprilTagTarget implements Sendable {
-        public double xOffset = 0;
-        public double yOffset = 0;
-        public double id;
-        public double area = 0;
+        public double xOffset = 0.0;
+        public double yOffset = 0.0;
+        public double id = 0.0;
+        public double area = 0.0;
         public boolean isValid = false;
+        public double distance = 0.0;
 
         public AprilTagTarget() {
             SendableRegistry.add(this, "April Tag Target");
@@ -117,6 +120,7 @@ public class LimelightVision extends SubsystemBase {
             builder.addDoubleProperty("ID", () -> id, null);
             builder.addDoubleProperty("Area", () -> area, null);
             builder.addBooleanProperty("Is Valid", () -> isValid, null);
+            builder.addDoubleProperty("Distance", () -> distance, null);
         }
     }
 
