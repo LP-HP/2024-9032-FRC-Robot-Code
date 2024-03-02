@@ -100,8 +100,10 @@ public class RobotContainer {
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
 
         speakerScoreButton.onTrue(
-            new SpeakerScoringSequence(swerve, limelight, shooter)
-            /* Only run if there is a valid target and it's a speaker tag and we have a note */
+            shooter.setToTargetPositionFromTargetY(() -> limelight.getAprilTagTarget().yOffset, true)
+            .andThen(shooter.shootSequence(4500.0))
+            // new SpeakerScoringSequence(swerve, limelight, shooter) //TODO use this instead
+             /* Only run if there is a valid target and it's a speaker tag and we have a note */
             .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.hasNote())
         );
 

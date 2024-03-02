@@ -143,17 +143,19 @@ public final class Constants {
         /* Key - Target Y Offset : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap armPosLookupTableFromTargetY = new InterpolatingDoubleTreeMap();
         static {
-            armPosLookupTableFromTargetY.put(-3.65, 127.0);
-            armPosLookupTableFromTargetY.put(1.0, 4.0);
+            armPosLookupTableFromTargetY.put(-3.34, 128.0);
+            armPosLookupTableFromTargetY.put(-0.12, 129.0);
+            armPosLookupTableFromTargetY.put(4.58, 132.0);
+            armPosLookupTableFromTargetY.put(15.51, 142.0);
         }
 
         /* Shooter Flywheels */
         public static final double flywheelVelocityTolerance = 50.0;
         public static final SparkMaxPIDConstants shooterFlywheelPID = new SparkMaxPIDConstants(
-            0.0001, 
+            0.0003, 
             0.0, 
             0.001, 
-            0.000175,
+            0.000165,
             -1.0,
             1.0
         );
@@ -163,7 +165,7 @@ public final class Constants {
             ControlMode.velocityLeader,
             shooterFlywheelPID,
             60,
-            true,
+            false,
             IdleMode.kCoast,
             12,
             60.0
@@ -195,7 +197,7 @@ public final class Constants {
             1.0
         );
         public static final double storageMotorPowerReceiving = 0.15;
-        public static final double storageMotorPowerToFlywheels = 0.5;
+        public static final double storageMotorPowerToFlywheels = 0.75;
 
         /* Sensors */
         public static final int beamBreakPort = 2;

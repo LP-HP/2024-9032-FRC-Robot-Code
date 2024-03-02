@@ -163,9 +163,19 @@ public class Shooter extends SubsystemBase {
     }
 
     /* Moves to the target position from a vision target y offset */
-    public Command setToTargetPositionFromTargetY(DoubleSupplier targetYSup, boolean waitUntilAchieved) { 
-        return setTargetPosition(armPosLookupTableFromTargetY.get(targetYSup.getAsDouble()), waitUntilAchieved).withName("To LLT");
+    public Command setToTargetPositionFromTargetY(DoubleSupplier targetYSup, boolean waitUntilAchieved) { //TODO use wait until achieved and clean up
+        return runOnce(() -> setArmSetpoint(lookupTable(targetYSup.getAsDouble())))
+            .andThen(Commands.waitUntil(this::armAtSetpoint))
+            .withName("To LLT");
     }   
+
+    private double lookupTable(double yOffset) {
+        double targetPos = armPosLookupTableFromTargetY.get(yOffset);
+
+        System.out.println("Target pos " + targetPos + " at y " + yOffset);
+
+        return targetPos;
+    }
 
     public boolean hasNote() {
         return !beamBreak.get();
