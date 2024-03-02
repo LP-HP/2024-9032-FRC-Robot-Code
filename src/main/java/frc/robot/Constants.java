@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.SerialPort.Port;
 import frc.robot.util.SparkMaxConstants;
 import frc.robot.util.SwerveModuleConstants;
 import frc.robot.util.SparkMaxConstants.ControlMode;
@@ -208,7 +208,7 @@ public final class Constants {
     /* Using CANIds 1-12 - 8 motors and 4 cancoders */
     public static final class SwerveConstants {
         public static final boolean invertGyro = true;
-        public static final SPI.Port gyroPort = SPI.Port.kMXP;
+        public static final Port gyroPort = Port.kUSB;
 
         /* Drivetrain Constants */
         public static final double trackWidth = Units.inchesToMeters(24.5); 
