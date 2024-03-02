@@ -61,13 +61,13 @@ public class RobotContainer {
         // autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
         // autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
         // autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
-        autoChooser.addOption("Rotate To April Tag", new AlignWithVisionTarget(swerve, limelight, false, false));
+        autoChooser.addOption("Rotate To April Tag", new AlignWithVisionTarget(swerve, limelight, true, false));
         SmartDashboard.putData("Choose an Auto:", autoChooser);//Let us choose autos through the dashboard
     }
 
     /* Only reset variables - don't run any commands here */
     public void autonomousInit() {
-        limelight.switchToLocalizationPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
+        // limelight.switchToLocalizationPipeline();//Ensures that the limelight is never stuck in the wrong pipeline //TODO fix
     }
 
     /* Only reset variables - don't run any commands here */
@@ -100,9 +100,7 @@ public class RobotContainer {
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
 
         speakerScoreButton.onTrue(
-            shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().yOffset, true)//TODO back to distance
-            .andThen(shooter.shootSequence(4500.0))
-            // new SpeakerScoringSequence(swerve, limelight, shooter) //TODO use this instead
+            new SpeakerScoringSequence(swerve, limelight, shooter)
              /* Only run if there is a valid target and it's a speaker tag and we have a note */
             .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.hasNote())
         );

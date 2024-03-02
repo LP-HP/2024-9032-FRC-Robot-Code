@@ -25,8 +25,11 @@ public class AlignWithVisionTarget extends Command {
 
         swerveRotController = new PIDController(ClosedLoopConstants.kPRotationTarget, 0, 0.0);
         swerveRotController.setTolerance(ClosedLoopConstants.rotationSetpointTolerance);
+        swerveRotController.setSetpoint(0.0);
+        
         swerveTranslationController = new PIDController(ClosedLoopConstants.kPTranslationTarget, 0, 0.0); 
         swerveTranslationController.setTolerance(ClosedLoopConstants.translationSetpointTolerance);
+        swerveTranslationController.setSetpoint(0.0);
 
         addRequirements(swerve, limelight);
     }
@@ -34,21 +37,21 @@ public class AlignWithVisionTarget extends Command {
     @Override
     public void execute() {
         if (rotateOnly) {
-            swerve.driveClosedLoop(
+            swerve.driveOpenLoop(//TODO use closed loop
                 new Translation2d(),
-                swerveRotController.calculate(limelight.getAprilTagTarget().xOffset));
+                swerveRotController.calculate(limelight.getAprilTagTarget().xOffset), false);
         }
 
         else {
             swerve.driveClosedLoop(
-                new Translation2d(swerveTranslationController.calculate(limelight.getAprilTagTarget().yOffset), 0.0),
+                new Translation2d(swerveTranslationController.calculate(limelight.getAprilTagTarget().yOffset), 0.0),//TODO use distance
                 swerveRotController.calculate(limelight.getAprilTagTarget().xOffset));
         }
     }
 
     @Override
     public boolean isFinished() {
-        if(rotateOnly)
+        if(rotateOnly) 
             return endAtTarget ? swerveRotController.atSetpoint() : false;
 
         else 

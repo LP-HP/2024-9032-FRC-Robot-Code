@@ -36,7 +36,7 @@ public class Shooter extends SubsystemBase {
         armMotorFollower.follow(armMotor, invertArmFollower);
         armMotorFollower.config();
 
-        flywheelMotor = new SparkMaxWrapper(shooterFlywheelConstants);System.out.println(flywheelMotor.relativeEncoder.getAverageDepth());
+        flywheelMotor = new SparkMaxWrapper(shooterFlywheelConstants);
         flywheelMotor.relativeEncoder.setAverageDepth(1);
         flywheelMotor.config();
 
@@ -90,7 +90,7 @@ public class Shooter extends SubsystemBase {
             .withPosition(7, 3).withSize(1, 1);
 
         /* Prevent moving to a previous setpoint */
-        reset();System.out.println(flywheelMotor.relativeEncoder.getAverageDepth());
+        reset();
     }
 
     private Command setStorageMotorPower(double power) {
@@ -144,7 +144,6 @@ public class Shooter extends SubsystemBase {
 
     public Command shootSequence(double velocity) {
         return setFlywheelVelocity(velocity, true)
-           .andThen(Commands.waitSeconds(0.5))
            .andThen(enableStorageMotorToFlywheels())
            .andThen(Commands.waitSeconds(shotWaitTime))
            .andThen(disableFlywheels())

@@ -55,19 +55,15 @@ public class LimelightVision extends SubsystemBase {
     }
 
     public void switchToTargetPipeline() {
-        if(isLocalizationPipeline) {
-            LimelightHelpers.setPipelineIndex(limelightName, Constants.VisionConstants.targetPipelineID);
+        LimelightHelpers.setPipelineIndex(limelightName, Constants.VisionConstants.targetPipelineID);
 
-            isLocalizationPipeline = false;
-        }
+        isLocalizationPipeline = false;
     }
 
     public void switchToLocalizationPipeline() {
-        if(!isLocalizationPipeline) {
-            LimelightHelpers.setPipelineIndex(limelightName, Constants.VisionConstants.localizationPipelineID);
-
-            isLocalizationPipeline = true;
-        }
+        LimelightHelpers.setPipelineIndex(limelightName, Constants.VisionConstants.localizationPipelineID);
+        
+        isLocalizationPipeline = true;
     }
 
     public Optional<PoseEstimate> getPoseEstimate() {
