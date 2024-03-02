@@ -1,10 +1,10 @@
 package frc.robot.subsystems;
 
-import frc.robot.Constants;
-import frc.robot.subsystems.LimelightVision.VisionPoseMeasurement;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import static frc.robot.Constants.SwerveConstants.driveRadius;
+import static frc.robot.Constants.SwerveConstants.gyroPort;
+import static frc.robot.Constants.SwerveConstants.invertGyro;
+import static frc.robot.Constants.SwerveConstants.maxSpeed;
+import static frc.robot.Constants.SwerveConstants.swerveKinematics;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -15,20 +15,28 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import static frc.robot.Constants.SwerveConstants.*;
+import frc.lib.limelightutil.LimelightHelpers.PoseEstimate;
+import frc.robot.Constants;
+import frc.robot.Constants.SwerveConstants.Mod0;
+import frc.robot.Constants.SwerveConstants.Mod1;
+import frc.robot.Constants.SwerveConstants.Mod2;
+import frc.robot.Constants.SwerveConstants.Mod3;
 
 public class Swerve extends SubsystemBase {
     private final SwerveDrivePoseEstimator swerveOdometry;
@@ -38,7 +46,7 @@ public class Swerve extends SubsystemBase {
     private final Field2d field = new Field2d();
     private final ShuffleboardTab swerveTab = Shuffleboard.getTab("Swerve");
 
-    private Supplier<Optional<VisionPoseMeasurement>> visionSup = Optional::empty;
+    private Supplier<Optional<PoseEstimate>> visionSup = Optional::empty;
 
     public Swerve() {
         gyro = new AHRS(gyroPort);//Automatically calibrates
@@ -182,21 +190,40 @@ public class Swerve extends SubsystemBase {
         }
     }
 
-    public void addOptionalVisionPoseSupplier(Supplier<Optional<VisionPoseMeasurement>> poseSupplier) {
+    public void addOptionalVisionPoseSupplier(Supplier<Optional<PoseEstimate>> poseSupplier) {
         visionSup = poseSupplier;
     }
 
-    private void updateVisionLocalization(Pose2d visionPose, double time) {
-        Transform2d poseDifference = visionPose.minus(swerveOdometry.getEstimatedPosition());
+    private void updateVisionLocalization(PoseEstimate poseEstimate) {
+        double poseDifference = swerveOdometry.getEstimatedPosition().getTranslation().getDistance(poseEstimate.pose.getTranslation());
 
-        /* Only add the vision update if it is within the tolerance - prevents vision noise */
-        if(Math.abs(poseDifference.getX()) < Constants.VisionConstants.visionPoseTolerance
-        && Math.abs(poseDifference.getY()) < Constants.VisionConstants.visionPoseTolerance) {
-             swerveOdometry.addVisionMeasurement(visionPose, time);
-        } 
+        double xyStandardDeviation;
+        double headingStandardDeviation;
+        /* Multiple targets detected means a lower standard deviation */
+        if (poseEstimate.tagCount >= 2) {
+            xyStandardDeviation = 0.5;
+            headingStandardDeviation = 6;
+        }
+        /* 1 target with large area and close to estimated pose */
+        else if (poseEstimate.avgTagArea > 0.8 && poseDifference < 0.5) {
+            xyStandardDeviation = 1.0;
+            headingStandardDeviation = 12;
+        }
+        /* 1 target farther away and estimated pose is close */
+        else if (poseEstimate.avgTagArea > 0.1 && poseDifference < 0.3) {
+            xyStandardDeviation = 2.0;
+            headingStandardDeviation = 30;
+        }
+        else {
+            System.err.println("Discarded pose estimate " + poseEstimate.pose);
 
-        else
-            System.err.println("Discarded vision measurement " + visionPose);
+            return;
+        }        
+
+        swerveOdometry.setVisionMeasurementStdDevs(
+            VecBuilder.fill(xyStandardDeviation, xyStandardDeviation, Units.degreesToRadians(headingStandardDeviation))
+        );
+        swerveOdometry.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
     }
 
     @Override
@@ -204,12 +231,9 @@ public class Swerve extends SubsystemBase {
         swerveOdometry.update(getGyroYaw(), getModulePositions());  
 
         /* Only update vision if an update is provided */
-        if(!visionSup.get().isEmpty()) {
-            VisionPoseMeasurement measurement = visionSup.get().get();
-
-            updateVisionLocalization(measurement.pose, measurement.measurementTime);
-        }
-
+        if(!visionSup.get().isEmpty()) 
+            updateVisionLocalization(visionSup.get().get());
+        
         field.setRobotPose(getPose());//Update field view
     }
 }

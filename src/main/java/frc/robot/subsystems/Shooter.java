@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -72,7 +73,7 @@ public class Shooter extends SubsystemBase {
             .withPosition(0, 3).withSize(1, 1);
         shooterTab.add(enableStorageMotorToFlywheels())
             .withPosition(1, 3).withSize(1, 1);
-        shooterTab.add(shootSequence(4000.0))
+        shooterTab.add(shootSequence(4500.0))
             .withPosition(2, 3).withSize(1, 1);
         shooterTab.add(resetState())
             .withPosition(3, 3).withSize(1, 1);
@@ -80,12 +81,11 @@ public class Shooter extends SubsystemBase {
             .withPosition(4, 3).withSize(1, 1);
         shooterTab.add(setToPassthroughPosition(true))
             .withPosition(5, 3).withSize(1, 1);
-        /* Add buttons to modify the setpoint */
-        Command increaseSetpoint = runOnce(() -> setArmSetpoint(armMotor.getSetpoint() + 1)).withName("Setpoint +1");
-        shooterTab.add(increaseSetpoint)
-            .withPosition(6, 3).withSize(1, 1);
-        Command decreaseSetpoint = runOnce(() -> setArmSetpoint(armMotor.getSetpoint() - 1)).withName("Setpoint -1");
-        shooterTab.add(decreaseSetpoint)
+        /* Add widget to modify the setpoint */
+        GenericEntry armSetpointEntry = shooterTab.add("Arm Override", 0.0)
+            .withPosition(6, 3).withSize(1, 1)
+            .getEntry();
+        shooterTab.add(runOnce(() -> setArmSetpoint(armSetpointEntry.getDouble(armMotor.getSetpoint()))).withName("Apply Setpoint"))
             .withPosition(7, 3).withSize(1, 1);
 
         /* Prevent moving to a previous setpoint */
@@ -163,9 +163,19 @@ public class Shooter extends SubsystemBase {
     }
 
     /* Moves to the target position from a vision target y offset */
-    public Command setToTargetPositionFromTargetY(DoubleSupplier targetYSup, boolean waitUntilAchieved) { 
-        return setTargetPosition(armPosLookupTableFromTargetY.get(targetYSup.getAsDouble()), waitUntilAchieved).withName("To LLT");
+    public Command setToTargetPositionFromTargetY(DoubleSupplier targetYSup, boolean waitUntilAchieved) { //TODO use wait until achieved and clean up
+        return runOnce(() -> setArmSetpoint(lookupTable(targetYSup.getAsDouble())))
+            .andThen(Commands.waitUntil(this::armAtSetpoint))
+            .withName("To LLT");
     }   
+
+    private double lookupTable(double yOffset) {
+        double targetPos = armPosLookupTableFromTargetY.get(yOffset);
+
+        System.out.println("Target pos " + targetPos + " at y " + yOffset);
+
+        return targetPos;
+    }
 
     public boolean hasNote() {
         return !beamBreak.get();

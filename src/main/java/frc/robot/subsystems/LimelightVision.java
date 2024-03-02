@@ -6,17 +6,17 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.limelightutil.LimelightHelpers;
+import frc.lib.limelightutil.LimelightHelpers.PoseEstimate;
 import frc.robot.Constants;
 
 import static frc.robot.Constants.VisionConstants.limelightName;
 
 public class LimelightVision extends SubsystemBase {
-    private VisionPoseMeasurement lastPoseEstimate = new VisionPoseMeasurement();
+    private LimelightPoseEstimate currentPose = new LimelightPoseEstimate();
     private AprilTagTarget currentTarget = new AprilTagTarget();
     
     private boolean isLocalizationPipeline;//Whether we are localizing or tracking a target
@@ -32,7 +32,7 @@ public class LimelightVision extends SubsystemBase {
         /* Add Telemetry */
         limelightTab.add(currentTarget)
             .withPosition(6, 0).withSize(2, 2);
-        limelightTab.add(lastPoseEstimate)
+        limelightTab.add(currentPose)
             .withPosition(8, 0).withSize(2, 2);
         limelightTab.addBoolean("Localization Pipeline", () -> isLocalizationPipeline)
             .withPosition(8, 3).withSize(2, 1);;
@@ -40,23 +40,8 @@ public class LimelightVision extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if(isLocalizationPipeline) {
-            Pose2d currentPose = LimelightHelpers.getBotPose2d_wpiBlue(limelightName);//TODO what coordinates? should be wpilib blue
-
-            //If we get the same measurement as the last loop then invalidate
-            if(currentPose.equals(lastPoseEstimate.pose))
-                lastPoseEstimate.isValid = false;
-
-            else {
-                lastPoseEstimate.pose = currentPose;
-                lastPoseEstimate.isValid = true;
-
-                // Subtract the pipeline latency from the starting time to get measurement time
-                lastPoseEstimate.measurementTime = Timer.getFPGATimestamp() -
-                        (LimelightHelpers.getLatency_Pipeline(limelightName) / 1000.0) -
-                        (LimelightHelpers.getLatency_Capture(limelightName) / 1000.0);
-            }
-        }
+        if(isLocalizationPipeline) 
+            currentPose.poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
 
         else {
             currentTarget.xOffset = LimelightHelpers.getTX(limelightName);
@@ -83,10 +68,16 @@ public class LimelightVision extends SubsystemBase {
         }
     }
 
-    public Optional<VisionPoseMeasurement> getPoseEstimate() {
-        //Do not return an estimate if we are in the wrong pipeline or the estimate is invalid
-        if(isLocalizationPipeline && lastPoseEstimate.isValid)
-            return Optional.of(lastPoseEstimate);
+    public Optional<PoseEstimate> getPoseEstimate() {
+        PoseEstimate currentReading = currentPose.poseEstimate;
+        /* Do not return an estimate if we are in the wrong pipeline or the estimate is invalid */
+        if(isLocalizationPipeline 
+            && currentReading != null 
+            && currentReading.tagCount != 0 
+            && !(currentReading.pose.getX() == 0.0 && currentReading.pose.getY() == 0.0)
+        ) {
+            return Optional.of(currentReading);
+        }
 
         else
             return Optional.empty();
@@ -129,21 +120,21 @@ public class LimelightVision extends SubsystemBase {
         }
     }
 
-    public static final class VisionPoseMeasurement implements Sendable {
-        public Pose2d pose = new Pose2d();
-        public double measurementTime = 0;
-        public boolean isValid = false;
+    public static final class LimelightPoseEstimate implements Sendable {
+        public PoseEstimate poseEstimate = new PoseEstimate(new Pose2d(), 0, 0, 0, 0, 0, 0);
 
-        public VisionPoseMeasurement() {
-            SendableRegistry.add(this, "Vision Pose");
+        public LimelightPoseEstimate() {
+            SendableRegistry.add(this, "Limelight Pose Estimate");
         }
 
         @Override
         public void initSendable(SendableBuilder builder) {
-            builder.addDoubleProperty("Pose X", () -> pose.getX(), null);
-            builder.addDoubleProperty("Pose Y", () -> pose.getY(), null);
-            builder.addDoubleProperty("Measurement Time", () -> measurementTime, null);
-            builder.addBooleanProperty("Is Valid", () -> isValid, null); 
+            builder.addDoubleProperty("Pose X", () -> poseEstimate.pose.getX(), null);
+            builder.addDoubleProperty("Pose Y", () -> poseEstimate.pose.getY(), null);
+            builder.addDoubleProperty("Pose Heading", () -> poseEstimate.pose.getRotation().getDegrees(), null);
+            builder.addDoubleProperty("Tag Count", () -> poseEstimate.tagCount, null);
+            builder.addDoubleProperty("Tag Area", () -> poseEstimate.avgTagArea, null);
+            builder.addDoubleProperty("Timestamp", () -> poseEstimate.timestampSeconds, null);
         }
     }
 }   
