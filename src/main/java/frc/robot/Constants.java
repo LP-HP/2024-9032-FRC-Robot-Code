@@ -75,7 +75,6 @@ public final class Constants {
         public static final double armPositionGround = 26.5;
         public static final double armPositionPassthrough = 225.0;
         public static final double armPositionAmp = 160.0;
-        public static final double armPositionStorage = 225.0;
 
         /* Intake Flywheel */
         public static final SparkMaxConstants intakeFlywheelConstants = new SparkMaxConstants(
@@ -100,7 +99,7 @@ public final class Constants {
     }
 
     /* Using CANIds 15-19 - 5 motors */
-    public static final class ShooterConstants {//TODO tune
+    public static final class ShooterConstants {
         /* Shooter Arm */
         public static final double armSetpointTolerance = 1.0;
         public static final double minSetpoint = 90.0;
@@ -111,7 +110,7 @@ public final class Constants {
             0.01, 
             0.0,
             -0.3,
-            0.5//TODO set max
+            0.5
         );
         public static final SparkMaxConstants shooterArmConstants = new SparkMaxConstants(
             15,
@@ -184,7 +183,7 @@ public final class Constants {
             12,
             60.0
         );
-        public static final boolean invertFlywheelFollower = true;//TODO INVERT OR NO
+        public static final boolean invertFlywheelFollower = true;
         public static final double shotWaitTime = 0.25;
 
         /* Storage Motor */
