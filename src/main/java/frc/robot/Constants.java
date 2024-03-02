@@ -157,7 +157,7 @@ public final class Constants {
             0.0003, 
             0.0, 
             0.001, 
-            0.000165,
+            0.000175,
             -1.0,
             1.0
         );
@@ -184,7 +184,7 @@ public final class Constants {
             60.0
         );
         public static final boolean invertFlywheelFollower = true;
-        public static final double shotWaitTime = 0.25;
+        public static final double shotWaitTime = 1.0;//TODO change
 
         /* Storage Motor */
         public static final SparkMaxConstants shooterStorageConstants = new SparkMaxConstants(

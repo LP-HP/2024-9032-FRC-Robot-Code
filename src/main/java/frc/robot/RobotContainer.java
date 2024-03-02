@@ -100,7 +100,7 @@ public class RobotContainer {
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
 
         speakerScoreButton.onTrue(
-            shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, true)
+            shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().yOffset, true)//TODO back to distance
             .andThen(shooter.shootSequence(4500.0))
             // new SpeakerScoringSequence(swerve, limelight, shooter) //TODO use this instead
              /* Only run if there is a valid target and it's a speaker tag and we have a note */
