@@ -144,7 +144,7 @@ public class Intake extends SubsystemBase {
         return !beamBreak.get();
     }
 
-    private void reset() {
+    public void reset() {
         armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
         flywheelMotor.set(0.0);
 
