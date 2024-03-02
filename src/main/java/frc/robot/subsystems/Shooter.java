@@ -130,8 +130,8 @@ public class Shooter extends SubsystemBase {
 
     private Command disableFlywheels() {
         return runOnce(() -> { 
-            flywheelMotor.setClosedLoopTarget(0.0);
-            storageMotor.set(0.0);
+            flywheelMotor.disable();
+            storageMotor.disable();
         });
     }
 
