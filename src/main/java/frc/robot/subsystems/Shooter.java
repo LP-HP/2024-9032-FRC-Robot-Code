@@ -81,10 +81,10 @@ public class Shooter extends SubsystemBase {
         shooterTab.add(setToPassthroughPosition(true))
             .withPosition(5, 3).withSize(1, 1);
         /* Add buttons to modify the setpoint */
-        Command increaseSetpoint = setTargetPosition(armMotor.getSetpoint() + 1, false).withName("Setpoint +1");
+        Command increaseSetpoint = runOnce(() -> setArmSetpoint(armMotor.getSetpoint() + 1)).withName("Setpoint +1");
         shooterTab.add(increaseSetpoint)
             .withPosition(6, 3).withSize(1, 1);
-        Command decreaseSetpoint = setTargetPosition(armMotor.getSetpoint() - 1, false).withName("Setpoint -1");
+        Command decreaseSetpoint = runOnce(() -> setArmSetpoint(armMotor.getSetpoint() - 1)).withName("Setpoint -1");
         shooterTab.add(decreaseSetpoint)
             .withPosition(7, 3).withSize(1, 1);
 
@@ -105,15 +105,19 @@ public class Shooter extends SubsystemBase {
 
     /* Sets the target and if blocking, waits until the setpoint is achieved */
     private Command setTargetPosition(double setpoint, boolean blocking) {
+        Command setTargetCommand = runOnce(() -> setArmSetpoint(setpoint));
+
+        return blocking ? setTargetCommand.andThen(Commands.waitUntil(this::armAtSetpoint)) : setTargetCommand;
+    }
+
+    private void setArmSetpoint(double setpoint) {
         if(setpoint > maxSetpoint || setpoint < minSetpoint) {
             System.err.println("Shooter setpoint " + setpoint + " is out of bounds!");
 
-            return Commands.none();
+            return;
         }
 
-        Command setTargetCommand = runOnce(() -> armMotor.setClosedLoopTarget(setpoint));
-
-        return blocking ? setTargetCommand.andThen(Commands.waitUntil(this::armAtSetpoint)) : setTargetCommand;
+        armMotor.setClosedLoopTarget(setpoint);
     }
 
     private Command enableStorageMotorReceiving() {
