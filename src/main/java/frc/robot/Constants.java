@@ -100,6 +100,8 @@ public final class Constants {
     public static final class ShooterConstants {//TODO tune
         /* Shooter Arm */
         public static final double armSetpointTolerance = 1.0;
+        public static final double minSetpoint = 90.0;
+        public static final double maxSetpoint = 180.0;
         public static final SparkMaxPIDConstants shooterArmPID = new SparkMaxPIDConstants(
             0.05, 
             0.0, 

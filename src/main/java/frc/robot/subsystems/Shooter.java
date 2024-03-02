@@ -80,6 +80,13 @@ public class Shooter extends SubsystemBase {
             .withPosition(4, 3).withSize(1, 1);
         shooterTab.add(setToPassthroughPosition(true))
             .withPosition(5, 3).withSize(1, 1);
+        /* Add buttons to modify the setpoint */
+        Command increaseSetpoint = runOnce(() -> setArmSetpoint(armMotor.getSetpoint() + 1)).withName("Setpoint +1");
+        shooterTab.add(increaseSetpoint)
+            .withPosition(6, 3).withSize(1, 1);
+        Command decreaseSetpoint = runOnce(() -> setArmSetpoint(armMotor.getSetpoint() - 1)).withName("Setpoint -1");
+        shooterTab.add(decreaseSetpoint)
+            .withPosition(7, 3).withSize(1, 1);
 
         /* Prevent moving to a previous setpoint */
         reset();
@@ -98,9 +105,19 @@ public class Shooter extends SubsystemBase {
 
     /* Sets the target and if blocking, waits until the setpoint is achieved */
     private Command setTargetPosition(double setpoint, boolean blocking) {
-        Command setTargetCommand = runOnce(() -> armMotor.setClosedLoopTarget(setpoint));
+        Command setTargetCommand = runOnce(() -> setArmSetpoint(setpoint));
 
         return blocking ? setTargetCommand.andThen(Commands.waitUntil(this::armAtSetpoint)) : setTargetCommand;
+    }
+
+    private void setArmSetpoint(double setpoint) {
+        if(setpoint > maxSetpoint || setpoint < minSetpoint) {
+            System.err.println("Shooter setpoint " + setpoint + " is out of bounds!");
+
+            return;
+        }
+
+        armMotor.setClosedLoopTarget(setpoint);
     }
 
     private Command enableStorageMotorReceiving() {
@@ -162,7 +179,7 @@ public class Shooter extends SubsystemBase {
         return Math.abs(flywheelMotor.relativeEncoder.getVelocity() - flywheelMotor.getSetpoint()) < flywheelVelocityTolerance;
     }
 
-    private void reset() {
+    public void reset() {
         armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
         flywheelMotor.setClosedLoopTarget(0.0);
         storageMotor.set(0.0);
