@@ -163,13 +163,15 @@ public class Shooter extends SubsystemBase {
     }
 
     /* Moves to the target position from a vision target y offset */
-    public Command setToTargetPositionFromTargetY(DoubleSupplier targetYSup, boolean waitUntilAchieved) { //TODO use wait until achieved and clean up
-        return runOnce(() -> setArmSetpoint(lookupTable(targetYSup.getAsDouble())))
-            .andThen(Commands.waitUntil(this::armAtSetpoint))
-            .withName("To LLT");
+    public Command setToTargetPositionFromTargetY(DoubleSupplier targetYSup, boolean waitUntilAchieved) {
+        Command setTargetCommand = runOnce(() -> setArmSetpoint(applyLookupTable(targetYSup.getAsDouble())));
+                
+        setTargetCommand = waitUntilAchieved ? setTargetCommand.andThen(Commands.waitUntil(this::armAtSetpoint)) : setTargetCommand;
+
+        return setTargetCommand.withName("To target y pos");
     }   
 
-    private double lookupTable(double yOffset) {
+    private double applyLookupTable(double yOffset) {
         double targetPos = armPosLookupTableFromTargetY.get(yOffset);
 
         System.out.println("Target pos " + targetPos + " at y " + yOffset);
@@ -191,8 +193,8 @@ public class Shooter extends SubsystemBase {
 
     public void reset() {
         armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
-        flywheelMotor.setClosedLoopTarget(0.0);
-        storageMotor.set(0.0);
+        flywheelMotor.disable();
+        storageMotor.disable();
 
         if(getCurrentCommand() != null) 
             getCurrentCommand().cancel();
