@@ -23,7 +23,7 @@ public class LockToRotationTargetWhileMoving extends Command {
         this.targetRotSup = targetRotSup;
         this.translationSup = translationSup;
 
-        swerveRotController = new PIDController(ClosedLoopConstants.kPRotationTarget, 0, ClosedLoopConstants.kDRotationTarget);
+        swerveRotController = new PIDController(ClosedLoopConstants.kPRotationTarget, 0, 0);
         swerveRotController.enableContinuousInput(-180.0, 180.0);//TODO the units will be messed up
 
         addRequirements(swerve);

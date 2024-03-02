@@ -143,7 +143,7 @@ public final class Constants {
         /* Key - Target Y Offset : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap armPosLookupTableFromTargetY = new InterpolatingDoubleTreeMap();
         static {
-            armPosLookupTableFromTargetY.put(0.0, 3.0);
+            armPosLookupTableFromTargetY.put(-3.65, 127.0);
             armPosLookupTableFromTargetY.put(1.0, 4.0);
         }
 

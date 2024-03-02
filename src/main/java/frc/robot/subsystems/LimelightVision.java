@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.util.Optional;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -120,7 +121,7 @@ public class LimelightVision extends SubsystemBase {
     }
 
     public static final class LimelightPoseEstimate implements Sendable {
-        public PoseEstimate poseEstimate;
+        public PoseEstimate poseEstimate = new PoseEstimate(new Pose2d(), 0, 0, 0, 0, 0, 0);
 
         public LimelightPoseEstimate() {
             SendableRegistry.add(this, "Limelight Pose Estimate");
