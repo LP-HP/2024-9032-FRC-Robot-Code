@@ -56,16 +56,14 @@ public class Intake extends SubsystemBase {
             .withPosition(1, 3).withSize(1, 1);
         intakeTab.add(setToAmpPosition(true))
             .withPosition(2, 3).withSize(1, 1);
-        intakeTab.add(setToStoragePosition(true))
-            .withPosition(3, 3).withSize(1, 1);
         intakeTab.add(shootIntoAmp())
-            .withPosition(4, 3).withSize(1, 1);
+            .withPosition(3, 3).withSize(1, 1);
         intakeTab.add(enableTransferToShooter())
-            .withPosition(5, 3).withSize(1, 1);
+            .withPosition(4, 3).withSize(1, 1);
         intakeTab.add(getNoteFromGround())
-            .withPosition(6, 3).withSize(1, 1);
+            .withPosition(5, 3).withSize(1, 1);
         intakeTab.add(resetState())
-            .withPosition(7, 3).withSize(1, 1);
+            .withPosition(6, 3).withSize(1, 1);
         
         /* Prevent moving to a previous setpoint */
         reset();
@@ -98,10 +96,6 @@ public class Intake extends SubsystemBase {
         return setTargetPosition(armPositionAmp, waitUntilAchieved).withName("To amp");
     }
 
-    public Command setToStoragePosition(boolean waitUntilAchieved) {
-        return setTargetPosition(armPositionStorage, waitUntilAchieved).withName("To storage");
-    }
-
     public Command disableFlywheels() {
         return setFlywheelPower(0.0);
     }
@@ -112,7 +106,7 @@ public class Intake extends SubsystemBase {
             .andThen(Commands.waitSeconds(shotWaitTime))
             .andThen(disableFlywheels())
             .andThen(setNoteState(false))
-            .andThen(setToStoragePosition(false))
+            .andThen(setToPassthroughPosition(false))
             .withName("Shoot into amp");
     }
 
@@ -128,7 +122,7 @@ public class Intake extends SubsystemBase {
             .andThen(Commands.waitUntil(this::beamBreakTriggered))
             .andThen(disableFlywheels())
             .andThen(setNoteState(true))
-            .andThen(setToStoragePosition(false))
+            .andThen(setToPassthroughPosition(false))
             .withName("Get note");
     }
 

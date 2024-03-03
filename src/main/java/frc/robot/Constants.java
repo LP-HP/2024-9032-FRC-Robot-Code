@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.SerialPort.Port;
 import frc.robot.util.SparkMaxConstants;
 import frc.robot.util.SwerveModuleConstants;
 import frc.robot.util.SparkMaxConstants.ControlMode;
@@ -35,11 +35,15 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        public static final double visionPoseTolerance = 1.0;//TODO tune for localization (in meters)
-
         public static final String limelightName = "limelight";//TODO set name to 9032Limeligh
         public static final int targetPipelineID = 0;
         public static final int localizationPipelineID = 1;//TODO make sure this aligns with the limelight config
+        public static final boolean startInLocalization = false;
+
+        /* Distance Constants */
+        public static final double tagHeight = Units.inchesToMeters(60.0);
+        public static final double mountingHeight = Units.inchesToMeters(10.0);
+        public static final double mountingAngle = Units.degreesToRadians(18.0);
     }
 
     /* Using CANIds 13-14 - 2 motors */
@@ -47,7 +51,7 @@ public final class Constants {
         /* Intake Arm */
         public static final double armSetpointTolerance = 5.0;
         public static final SparkMaxPIDConstants intakeArmPID = new SparkMaxPIDConstants(
-            0.02, //TODO this response can be uppped later when the intake is properly mounted
+            0.02, 
             0.0, 
             0.0, 
             0.0,
@@ -72,7 +76,6 @@ public final class Constants {
         public static final double armPositionGround = 26.5;
         public static final double armPositionPassthrough = 225.0;
         public static final double armPositionAmp = 160.0;
-        public static final double armPositionStorage = 225.0;
 
         /* Intake Flywheel */
         public static final SparkMaxConstants intakeFlywheelConstants = new SparkMaxConstants(
@@ -97,7 +100,7 @@ public final class Constants {
     }
 
     /* Using CANIds 15-19 - 5 motors */
-    public static final class ShooterConstants {//TODO tune
+    public static final class ShooterConstants {
         /* Shooter Arm */
         public static final double armSetpointTolerance = 1.0;
         public static final double minSetpoint = 90.0;
@@ -108,7 +111,7 @@ public final class Constants {
             0.01, 
             0.0,
             -0.3,
-            0.5//TODO set max
+            0.5
         );
         public static final SparkMaxConstants shooterArmConstants = new SparkMaxConstants(
             15,
@@ -140,13 +143,13 @@ public final class Constants {
         /* Arm Positions */
         public static final double armPositionPassthrough = 130.0;
         public static final double armPositionStorage = 140.0;
-        /* Key - Target Y Offset : Value - Arm Position */
-        public static final InterpolatingDoubleTreeMap armPosLookupTableFromTargetY = new InterpolatingDoubleTreeMap();
+        /* Key - Distance : Value - Arm Position */
+        public static final InterpolatingDoubleTreeMap distanceToArmPosTable = new InterpolatingDoubleTreeMap();
         static {
-            armPosLookupTableFromTargetY.put(-3.34, 128.0);
-            armPosLookupTableFromTargetY.put(-0.12, 129.0);
-            armPosLookupTableFromTargetY.put(4.58, 132.0);
-            armPosLookupTableFromTargetY.put(15.51, 142.0);
+            distanceToArmPosTable.put(-3.34, 128.0);
+            distanceToArmPosTable.put(-0.12, 129.0);
+            distanceToArmPosTable.put(4.58, 132.0);
+            distanceToArmPosTable.put(15.51, 142.0);
         }
 
         /* Shooter Flywheels */
@@ -155,7 +158,7 @@ public final class Constants {
             0.0003, 
             0.0, 
             0.001, 
-            0.000165,
+            0.000175,
             -1.0,
             1.0
         );
@@ -181,8 +184,8 @@ public final class Constants {
             12,
             60.0
         );
-        public static final boolean invertFlywheelFollower = true;//TODO INVERT OR NO
-        public static final double shotWaitTime = 0.25;
+        public static final boolean invertFlywheelFollower = true;
+        public static final double shotWaitTime = 1.0;//TODO change
 
         /* Storage Motor */
         public static final SparkMaxConstants shooterStorageConstants = new SparkMaxConstants(
@@ -206,7 +209,7 @@ public final class Constants {
     /* Using CANIds 1-12 - 8 motors and 4 cancoders */
     public static final class SwerveConstants {
         public static final boolean invertGyro = true;
-        public static final SPI.Port gyroPort = SPI.Port.kMXP;
+        public static final Port gyroPort = Port.kUSB;
 
         /* Drivetrain Constants */
         public static final double trackWidth = Units.inchesToMeters(24.5); 
@@ -415,9 +418,9 @@ public final class Constants {
         ); 
 
         /* PID Constants for rotation and movement to a vision target */
-        public static final double kPRotationTarget = 0.01;//TODO tune and test
+        public static final double kPRotationTarget = 0.1;//TODO tune and test
         public static final double kPTranslationTarget = 0.01;//TODO tune and test
-        public static final double rotationSetpointTolerance = 0.5;
+        public static final double rotationSetpointTolerance = 1.0;
         public static final double translationSetpointTolerance = 0.5;
     }
 

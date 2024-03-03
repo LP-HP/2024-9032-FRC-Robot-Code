@@ -10,10 +10,10 @@ public class SpeakerScoringSequence extends SequentialCommandGroup {
         addCommands(
             /* Rotate to target while moving the arm to the initial limelight reading */
             new AlignWithVisionTarget(swerve, limelight, true, true)
-                .alongWith(shooter.setToTargetPositionFromTargetY(() -> limelight.getAprilTagTarget().yOffset, false)),
+                .alongWith(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().yOffset, false)),
             /* Move the arm to the current target to ensure that the target has not changed since the initial limelight reading */
-            shooter.setToTargetPositionFromTargetY(() -> limelight.getAprilTagTarget().yOffset, true),
-            shooter.shootSequence(4000.0)//TODO do lookup table if needed
+            shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().yOffset, true),//TODO use distance
+            shooter.shootSequence(4500.0)//TODO do lookup table if needed
         );
     }
 }

@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import java.util.Optional;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -13,21 +14,23 @@ import frc.lib.limelightutil.LimelightHelpers;
 import frc.lib.limelightutil.LimelightHelpers.PoseEstimate;
 import frc.robot.Constants;
 
-import static frc.robot.Constants.VisionConstants.limelightName;
+import static frc.robot.Constants.VisionConstants.*;
 
 public class LimelightVision extends SubsystemBase {
     private LimelightPoseEstimate currentPose = new LimelightPoseEstimate();
     private AprilTagTarget currentTarget = new AprilTagTarget();
     
-    private boolean isLocalizationPipeline;//Whether we are localizing or tracking a target
+    private boolean isLocalizationPipeline = startInLocalization;//Whether we are localizing or tracking a target
 
     private final ShuffleboardTab limelightTab = Shuffleboard.getTab("Limelight");
 
-    public LimelightVision(boolean isLocalizationPipeline) {
-        this.isLocalizationPipeline = isLocalizationPipeline;
-
-        limelightTab.addCamera("Limelight View", limelightName, "camera_server://" + limelightName)//TODO does this work
-            .withPosition(0, 0).withSize(5, 5);
+    public LimelightVision() {
+        try {
+            limelightTab.addCamera("Limelight View", limelightName, "camera_server://" + limelightName)
+                .withPosition(0, 0).withSize(5, 5);
+        } catch (Exception e) {
+            System.err.println("Limelight view already added!");
+        }
 
         /* Add Telemetry */
         limelightTab.add(currentTarget)
@@ -49,23 +52,21 @@ public class LimelightVision extends SubsystemBase {
             currentTarget.area = LimelightHelpers.getTA(limelightName);
             currentTarget.isValid = LimelightHelpers.getTV(limelightName);
             currentTarget.id = LimelightHelpers.getFiducialID(limelightName);
+
+            currentTarget.distance = (tagHeight - mountingHeight) / Math.tan(Units.degreesToRadians(currentTarget.yOffset) + mountingAngle);
         }
     }
 
     public void switchToTargetPipeline() {
-        if(isLocalizationPipeline) {
-            LimelightHelpers.setPipelineIndex(limelightName, Constants.VisionConstants.targetPipelineID);
+        LimelightHelpers.setPipelineIndex(limelightName, Constants.VisionConstants.targetPipelineID);
 
-            isLocalizationPipeline = false;
-        }
+        isLocalizationPipeline = false;
     }
 
     public void switchToLocalizationPipeline() {
-        if(!isLocalizationPipeline) {
-            LimelightHelpers.setPipelineIndex(limelightName, Constants.VisionConstants.localizationPipelineID);
-
-            isLocalizationPipeline = true;
-        }
+        LimelightHelpers.setPipelineIndex(limelightName, Constants.VisionConstants.localizationPipelineID);
+        
+        isLocalizationPipeline = true;
     }
 
     public Optional<PoseEstimate> getPoseEstimate() {
@@ -92,11 +93,12 @@ public class LimelightVision extends SubsystemBase {
     }
 
     public static final class AprilTagTarget implements Sendable {
-        public double xOffset = 0;
-        public double yOffset = 0;
-        public double id;
-        public double area = 0;
+        public double xOffset = 0.0;
+        public double yOffset = 0.0;
+        public double id = 0.0;
+        public double area = 0.0;
         public boolean isValid = false;
+        public double distance = 0.0;
 
         public AprilTagTarget() {
             SendableRegistry.add(this, "April Tag Target");
@@ -117,6 +119,7 @@ public class LimelightVision extends SubsystemBase {
             builder.addDoubleProperty("ID", () -> id, null);
             builder.addDoubleProperty("Area", () -> area, null);
             builder.addBooleanProperty("Is Valid", () -> isValid, null);
+            builder.addDoubleProperty("Distance", () -> distance, null);
         }
     }
 

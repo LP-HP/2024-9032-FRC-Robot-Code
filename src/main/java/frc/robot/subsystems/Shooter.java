@@ -37,6 +37,7 @@ public class Shooter extends SubsystemBase {
         armMotorFollower.config();
 
         flywheelMotor = new SparkMaxWrapper(shooterFlywheelConstants);
+        flywheelMotor.relativeEncoder.setAverageDepth(1);
         flywheelMotor.config();
 
         flywheelMotorFollower = new SparkMaxWrapper(shooterFlywheelFolllowerConstants);
@@ -130,8 +131,8 @@ public class Shooter extends SubsystemBase {
 
     private Command disableFlywheels() {
         return runOnce(() -> { 
-            flywheelMotor.setClosedLoopTarget(0.0);
-            storageMotor.set(0.0);
+            flywheelMotor.disable();
+            storageMotor.disable();
         });
     }
 
@@ -163,16 +164,18 @@ public class Shooter extends SubsystemBase {
     }
 
     /* Moves to the target position from a vision target y offset */
-    public Command setToTargetPositionFromTargetY(DoubleSupplier targetYSup, boolean waitUntilAchieved) { //TODO use wait until achieved and clean up
-        return runOnce(() -> setArmSetpoint(lookupTable(targetYSup.getAsDouble())))
-            .andThen(Commands.waitUntil(this::armAtSetpoint))
-            .withName("To LLT");
+    public Command setToTargetPositionFromDistance(DoubleSupplier distanceSup, boolean waitUntilAchieved) {
+        Command setTargetCommand = runOnce(() -> setArmSetpoint(applyLookupTable(distanceSup.getAsDouble())));
+                
+        setTargetCommand = waitUntilAchieved ? setTargetCommand.andThen(Commands.waitUntil(this::armAtSetpoint)) : setTargetCommand;
+
+        return setTargetCommand.withName("To distance pos");
     }   
 
-    private double lookupTable(double yOffset) {
-        double targetPos = armPosLookupTableFromTargetY.get(yOffset);
+    private double applyLookupTable(double distance) {
+        double targetPos = distanceToArmPosTable.get(distance);
 
-        System.out.println("Target pos " + targetPos + " at y " + yOffset);
+        System.out.println("Target pos " + targetPos + " at distance " + distance);
 
         return targetPos;
     }
@@ -191,8 +194,8 @@ public class Shooter extends SubsystemBase {
 
     public void reset() {
         armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
-        flywheelMotor.setClosedLoopTarget(0.0);
-        storageMotor.set(0.0);
+        flywheelMotor.disable();
+        storageMotor.disable();
 
         if(getCurrentCommand() != null) 
             getCurrentCommand().cancel();
