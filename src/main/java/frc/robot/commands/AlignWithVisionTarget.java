@@ -3,9 +3,10 @@ package frc.robot.commands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.ClosedLoopConstants;
 import frc.robot.subsystems.LimelightVision;
 import frc.robot.subsystems.Swerve;
+
+import static frc.robot.Constants.ClosedLoopConstants.*;
 
 public class AlignWithVisionTarget extends Command {
     private final Swerve swerve;
@@ -23,12 +24,13 @@ public class AlignWithVisionTarget extends Command {
         this.endAtTarget = endAtTarget;
         this.rotateOnly = rotateOnly;
 
-        swerveRotController = new PIDController(ClosedLoopConstants.kPRotationTarget, 0, 0.0);
-        swerveRotController.setTolerance(ClosedLoopConstants.rotationSetpointTolerance);
+        swerveRotController = new PIDController(kPRotationTarget, kIRotationTarget, kDRotationTarget);
+        swerveRotController.setTolerance(rotationSetpointTolerance);
+        swerveRotController.setIntegratorRange(-kIZoneRotationTarget, kIZoneRotationTarget);
         swerveRotController.setSetpoint(0.0);
         
-        swerveTranslationController = new PIDController(ClosedLoopConstants.kPTranslationTarget, 0, 0.0); 
-        swerveTranslationController.setTolerance(ClosedLoopConstants.translationSetpointTolerance);
+        swerveTranslationController = new PIDController(kPTranslationTarget, 0, 0.0); 
+        swerveTranslationController.setTolerance(translationSetpointTolerance);
         swerveTranslationController.setSetpoint(0.0);
 
         addRequirements(swerve, limelight);

@@ -233,7 +233,7 @@ public class Swerve extends SubsystemBase {
         double xyStandardDeviation;
         double headingStandardDeviation;
         /* Multiple targets detected means a lower standard deviation */
-        if (poseEstimate.tagCount >= 2) {
+        if (poseEstimate.tagCount >= 2 && poseDifference < 1.0) {
             xyStandardDeviation = 0.5;
             headingStandardDeviation = 6;
         }
