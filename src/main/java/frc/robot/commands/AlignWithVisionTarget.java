@@ -16,7 +16,7 @@ public class AlignWithVisionTarget extends Command {
 
     private final boolean endAtTarget;
     private final boolean rotateOnly;
-
+    
     public AlignWithVisionTarget(Swerve swerve, LimelightVision limelight, boolean rotateOnly, boolean endAtTarget) {
         this.swerve = swerve;       
         this.limelight = limelight;
@@ -36,16 +36,18 @@ public class AlignWithVisionTarget extends Command {
 
     @Override
     public void execute() {
-        if (rotateOnly) {
-            swerve.driveOpenLoop(//TODO use closed loop
-                new Translation2d(),
-                swerveRotController.calculate(limelight.getAprilTagTarget().xOffset), false);
-        }
+        if(limelight.getAprilTagTarget().isValid) {
+             if (rotateOnly) {
+                swerve.driveOpenLoop(//TODO use closed loop
+                    new Translation2d(),
+                    swerveRotController.calculate(limelight.getAprilTagTarget().xOffset), false);
+            }
 
-        else {
-            swerve.driveClosedLoop(
-                new Translation2d(swerveTranslationController.calculate(limelight.getAprilTagTarget().yOffset), 0.0),//TODO use distance
-                swerveRotController.calculate(limelight.getAprilTagTarget().xOffset));
+            else {
+                swerve.driveClosedLoop(
+                    new Translation2d(swerveTranslationController.calculate(limelight.getAprilTagTarget().yOffset), 0.0),//TODO use distance
+                    swerveRotController.calculate(limelight.getAprilTagTarget().xOffset));
+            }
         }
     }
 
