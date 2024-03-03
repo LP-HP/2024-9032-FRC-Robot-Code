@@ -25,7 +25,8 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
     private double closedLoopSetpoint = 0.0;
     private boolean isConfigured = false;
     private boolean hasAbsoluteEncoder = false;
-    private boolean hasError = false;
+
+    private static boolean hasError = false;
 
     public SparkMaxWrapper(SparkMaxConstants constants) {
         super(constants.id(), MotorType.kBrushless);
@@ -120,8 +121,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
 
         System.out.println("Configured " + constants.name());
 
-        if(!hasError)
-            isConfigured = true;
+        isConfigured = true;
     }      
 
     public void setClosedLoopTarget(double setpoint, double feedforward) {
@@ -215,5 +215,9 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
         }   
 
         builder.addDoubleProperty("Applied Output", this::getAppliedOutput, null);
+    }
+
+    public static boolean hasAnyMotorErrors() {
+        return hasError;
     }
 }

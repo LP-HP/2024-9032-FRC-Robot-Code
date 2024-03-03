@@ -20,15 +20,17 @@ public class LimelightVision extends SubsystemBase {
     private LimelightPoseEstimate currentPose = new LimelightPoseEstimate();
     private AprilTagTarget currentTarget = new AprilTagTarget();
     
-    private boolean isLocalizationPipeline;//Whether we are localizing or tracking a target
+    private boolean isLocalizationPipeline = startInLocalization;//Whether we are localizing or tracking a target
 
     private final ShuffleboardTab limelightTab = Shuffleboard.getTab("Limelight");
 
-    public LimelightVision(boolean isLocalizationPipeline) {
-        this.isLocalizationPipeline = isLocalizationPipeline;
-
-        limelightTab.addCamera("Limelight View", limelightName, "camera_server://" + limelightName)//TODO does this work
-            .withPosition(0, 0).withSize(5, 5);
+    public LimelightVision() {
+        try {
+            limelightTab.addCamera("Limelight View", limelightName, "camera_server://" + limelightName)
+                .withPosition(0, 0).withSize(5, 5);
+        } catch (Exception e) {
+            System.err.println("Limelight view already added!");
+        }
 
         /* Add Telemetry */
         limelightTab.add(currentTarget)

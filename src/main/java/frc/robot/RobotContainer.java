@@ -1,6 +1,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.util.SparkMaxWrapper;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -20,9 +23,6 @@ import frc.robot.subsystems.*;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    /* Auto Chooser */
-    private final SendableChooser<Command> autoChooser = new SendableChooser<>();
-
     /* Controllers */
     private final CommandXboxController driveController = new CommandXboxController(Constants.driveControllerPort);
 
@@ -35,10 +35,14 @@ public class RobotContainer {
     // private final Trigger aprilTagAlignmentTest = driveController.x().debounce(0.025);//TODO remove
 
     /* Subsystems */
-    private final LimelightVision limelight = new LimelightVision(false);
+    private final LimelightVision limelight = new LimelightVision();
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
     private final Shooter shooter = new Shooter();
+
+    /* Shuffleboard */
+    private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
+    SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     public RobotContainer() {
         //Will run the following command when there is no other command set, such as during teleop
@@ -57,12 +61,17 @@ public class RobotContainer {
         //Configure the button bindings
         configureButtonBindings();
 
+        /* Add auto chooser */
         autoChooser.addOption("Swerve Auto Shakedown", new SwerveShakedown(swerve));
         // autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
         // autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
         // autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
         autoChooser.addOption("Rotate To April Tag", new AlignWithVisionTarget(swerve, limelight, true, false));
-        SmartDashboard.putData("Choose an Auto:", autoChooser);//Let us choose autos through the dashboard
+
+        driverTab.add(autoChooser);
+
+        /* Add driver tab telemetry */
+        driverTab.addBoolean("Has Any Motor Errors", SparkMaxWrapper::hasAnyMotorErrors);
     }
 
     /* Only reset variables - don't run any commands here */

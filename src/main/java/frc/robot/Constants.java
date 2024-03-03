@@ -38,6 +38,7 @@ public final class Constants {
         public static final String limelightName = "limelight";//TODO set name to 9032Limeligh
         public static final int targetPipelineID = 0;
         public static final int localizationPipelineID = 1;//TODO make sure this aligns with the limelight config
+        public static final boolean startInLocalization = false;
 
         /* Distance Constants */
         public static final double tagHeight = Units.inchesToMeters(60.0);
@@ -50,7 +51,7 @@ public final class Constants {
         /* Intake Arm */
         public static final double armSetpointTolerance = 5.0;
         public static final SparkMaxPIDConstants intakeArmPID = new SparkMaxPIDConstants(
-            0.02, //TODO this response can be uppped later when the intake is properly mounted
+            0.02, 
             0.0, 
             0.0, 
             0.0,
