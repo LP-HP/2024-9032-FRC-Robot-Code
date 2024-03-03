@@ -107,27 +107,27 @@ public class Swerve extends SubsystemBase {
 
         /* Add Telemetry */
         swerveTab.addDouble("Pose X", () -> getPose().getX())
-            .withPosition(0, 4).withSize(2, 1);
+            .withPosition(0, 4).withSize(1, 1);
         swerveTab.addDouble("Pose Y", () -> getPose().getY())
-            .withPosition(2,4).withSize(2, 1);
+            .withPosition(1,4).withSize(1, 1);
         swerveTab.addDouble("Pose Heading", () -> getPose().getRotation().getDegrees())
-            .withPosition(4, 4).withSize(2, 1);
+            .withPosition(2, 4).withSize(1, 1);
 
         /* Add Constants */
         GenericEntry kS = swerveTab.add("kS", velocityFeedforward.ks)
-            .withPosition(5, 4).withSize(1, 1)
+            .withPosition(3, 4).withSize(1, 1)
             .getEntry();
         GenericEntry kV = swerveTab.add("kV", velocityFeedforward.kv)
-            .withPosition(6, 4).withSize(1, 1)
+            .withPosition(4, 4).withSize(1, 1)
             .getEntry();
         GenericEntry kP = swerveTab.add("kP", velocityPID.kP())
-            .withPosition(7, 4).withSize(1, 1)
+            .withPosition(5, 4).withSize(1, 1)
             .getEntry();
         GenericEntry kD = swerveTab.add("kD", velocityPID.kD())
-            .withPosition(8, 4).withSize(1, 1)
+            .withPosition(6, 4).withSize(1, 1)
             .getEntry();
         swerveTab.add(runOnce(() -> updateConstantsFromDashboard(kS, kV, kP, kD)).withName("Update Constants"))
-            .withPosition(9, 4).withSize(1, 1);
+            .withPosition(7, 4).withSize(1, 1);
     }
 
     private void updateConstantsFromDashboard(GenericEntry kS, GenericEntry kV, GenericEntry kP, GenericEntry kD) {
