@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.util.SparkMaxWrapper;
 import frc.robot.util.SwerveModuleConstants;
+import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -27,7 +28,7 @@ public class SwerveModule {
   
     private final CANcoder angleEncoder;
 
-    private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(driveKS, driveKV, driveKA);
+    private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(driveKS, driveKV, driveKA);
 
     private final ShuffleboardTab swerveModuleTab;
 
@@ -137,6 +138,11 @@ public class SwerveModule {
         cancoderConfig.MagnetSensor.SensorDirection = canCoderInvert;
         
         angleEncoder.getConfigurator().apply(cancoderConfig);
+    }
+
+    public void updateVelocityConstants(SimpleMotorFeedforward feedforward, SparkMaxPIDConstants pid) {
+        this.feedforward = feedforward;
+        driveMotor.updatePIDConstants(pid);
     }
 
     public SwerveModuleState getState() {

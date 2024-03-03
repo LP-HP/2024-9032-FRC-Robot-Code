@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.lib.swerveutil.CANSparkMaxUtil;
 import frc.lib.swerveutil.CANSparkMaxUtil.Usage;
 import frc.robot.Constants;
+import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
 
 public class SparkMaxWrapper extends CANSparkMax implements Sendable {
     private final SparkMaxConstants constants;
@@ -102,11 +103,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
         checkError(setIdleMode(constants.idleMode()));
 
         if(constants.pidConstants() != null) {
-            checkError(controller.setP(constants.pidConstants().kP()));
-            checkError(controller.setI(constants.pidConstants().kI()));
-            checkError(controller.setD(constants.pidConstants().kD()));
-            checkError(controller.setFF(constants.pidConstants().kF()));
-            checkError(controller.setOutputRange(constants.pidConstants().minOutput(), constants.pidConstants().maxOutput()));
+            updatePIDConstants(constants.pidConstants());
         }
 
         checkError(enableVoltageCompensation(constants.nominalVoltage()));
@@ -147,6 +144,14 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
                 System.err.println("Cannot set closed loop target on percent output mode");
                 break;
         }          
+    }
+
+    public void updatePIDConstants(SparkMaxPIDConstants constants) {
+        checkError(controller.setP(constants.kP()));
+        checkError(controller.setI(constants.kI()));
+        checkError(controller.setD(constants.kD()));
+        checkError(controller.setFF(constants.kF()));
+        checkError(controller.setOutputRange(constants.minOutput(), constants.maxOutput()));
     }
 
     public void setClosedLoopTarget(double setpoint) {
