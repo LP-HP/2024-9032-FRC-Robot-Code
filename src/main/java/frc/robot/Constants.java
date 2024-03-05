@@ -154,7 +154,7 @@ public final class Constants {
         }
 
         /* Shooter Flywheels */
-        public static final double flywheelVelocityTolerance = 5.0;
+        public static final double flywheelVelocityTolerance = 0.05;
         public static final int flywheelSupplyCurrentLimit = 60;
         public static final double flywheelkP = 0.0;
         public static final double flywheelkD = 0.0;
