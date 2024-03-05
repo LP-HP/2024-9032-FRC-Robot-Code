@@ -95,7 +95,7 @@ public class Shooter extends SubsystemBase {
             .withPosition(0, 3).withSize(1, 1);
         shooterTab.add(enableStorageMotorToFlywheels())
             .withPosition(1, 3).withSize(1, 1);
-        shooterTab.add(shootSequence(4500.0))
+        shooterTab.add(shootSequence(90.0))
             .withPosition(2, 3).withSize(1, 1);
         shooterTab.add(resetState())
             .withPosition(3, 3).withSize(1, 1);
@@ -167,8 +167,8 @@ public class Shooter extends SubsystemBase {
             .andThen(disableFlywheels());
     }
 
-    public Command shootSequence(double velocity) {
-        return setFlywheelVelocity(velocity, true)
+    public Command shootSequence(double velocityRPS) {
+        return setFlywheelVelocity(velocityRPS, true)
            .andThen(enableStorageMotorToFlywheels())
            .andThen(Commands.waitSeconds(shotWaitTime))
            .andThen(disableFlywheels())
