@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -153,38 +154,19 @@ public final class Constants {
         }
 
         /* Shooter Flywheels */
-        public static final double flywheelVelocityTolerance = 50.0;
-        public static final SparkMaxPIDConstants shooterFlywheelPID = new SparkMaxPIDConstants(
-            0.0003, 
-            0.0, 
-            0.001, 
-            0.000175,
-            -1.0,
-            1.0
-        );
-        public static final SparkMaxConstants shooterFlywheelConstants = new SparkMaxConstants(
-            17,
-            "Shooter Flywheel",
-            ControlMode.velocityLeader,
-            shooterFlywheelPID,
-            60,
-            false,
-            IdleMode.kCoast,
-            12,
-            60.0
-        );
-        public static final SparkMaxConstants shooterFlywheelFolllowerConstants = new SparkMaxConstants(
-            18,
-            "Shooter Flywheel Follower",
-            ControlMode.percentOutput,
-            shooterFlywheelPID,
-            60,
-            false,
-            IdleMode.kCoast,
-            12,
-            60.0
-        );
-        public static final boolean invertFlywheelFollower = true;
+        public static final double flywheelVelocityTolerance = 5.0;
+        public static final int flywheelSupplyCurrentLimit = 60;
+        public static final double flywheelkP = 0.0;
+        public static final double flywheelkD = 0.0;
+        public static final double flywheelkV = 0.0;
+        public static final double flywheelkS = 0.0;
+
+        public static final int leftFlywheelMotorID = 17;
+        public static final InvertedValue leftFlywheelInvert = InvertedValue.Clockwise_Positive;
+
+        public static final int rightFlywheelMotorID = 18;
+        public static final InvertedValue rightFlywheelInvert = InvertedValue.Clockwise_Positive;
+
         public static final double shotWaitTime = 1.0;//TODO change
 
         /* Storage Motor */
