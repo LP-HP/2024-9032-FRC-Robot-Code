@@ -69,10 +69,8 @@ public final class Constants {
             12,
             360.0 / 60.0
         );
-        public static final boolean invertAbsoluteEncoder = false;
-        public static final double absoluteEncoderConversionFactor = 360.0;
-        public static final double absoluteEncoderOffset = 98.1747508;
         /* Arm Positions */
+        public static final double armPositionStarting = 220.0;//TODO tune
         public static final double armPositionGround = 26.5;
         public static final double armPositionPassthrough = 225.0;
         public static final double armPositionAmp = 160.0;

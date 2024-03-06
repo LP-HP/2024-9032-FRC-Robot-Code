@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,17 +22,12 @@ public class Intake extends SubsystemBase {
 
     public Intake() {
         armMotor = new SparkMaxWrapper(intakeArmConstants);
-        armMotor.configAbsoluteEncoder(invertAbsoluteEncoder, absoluteEncoderConversionFactor, absoluteEncoderOffset);
         armMotor.config();
 
         flywheelMotor = new SparkMaxWrapper(intakeFlywheelConstants);
         flywheelMotor.config();
 
-        /* Wait for the encoder to initialize before setting to absolute */
-        Timer.delay(1.0);
-
-        /* Reset the relative encoder to the absolute encoder value */
-        armMotor.relativeEncoder.setPosition(armMotor.getAbsolutePosition());
+        armMotor.relativeEncoder.setPosition(armPositionStarting);
 
         /* Add Telemetry */
         intakeTab.add(armMotor)
@@ -139,7 +133,6 @@ public class Intake extends SubsystemBase {
     }
 
     public void reset() {
-        armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
         flywheelMotor.set(0.0);
 
         if(this.getCurrentCommand() != null) 
