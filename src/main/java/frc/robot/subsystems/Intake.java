@@ -58,9 +58,6 @@ public class Intake extends SubsystemBase {
             .withPosition(5, 3).withSize(1, 1);
         intakeTab.add(resetState())
             .withPosition(6, 3).withSize(1, 1);
-        
-        /* Prevent moving to a previous setpoint */
-        reset();
     }
 
     /* Sets the target and if blocking, waits until the setpoint is achieved */
@@ -134,6 +131,7 @@ public class Intake extends SubsystemBase {
 
     public void reset() {
         flywheelMotor.set(0.0);
+        armMotor.setClosedLoopTarget(armMotor.relativeEncoder.getPosition());
 
         if(this.getCurrentCommand() != null) 
             this.getCurrentCommand().cancel();
