@@ -76,9 +76,13 @@ public class Shooter extends SubsystemBase {
         shooterTab.add(armMotor)
             .withPosition(0, 0).withSize(2, 2);
         shooterTab.add(leftFlywheelMotor)
-            .withPosition(3, 0).withSize(1, 2);
+            .withPosition(3, 0).withSize(1, 1);
+        shooterTab.addDouble("Left Velocity", () -> leftFlywheelMotor.getVelocity().getValueAsDouble())
+            .withPosition(3, 1).withSize(1, 1);
         shooterTab.add(rightFlywheelMotor)
-            .withPosition(4, 0).withSize(1, 2);
+            .withPosition(4, 0).withSize(1, 1);
+        shooterTab.addDouble("Right Velocity", () -> rightFlywheelMotor.getVelocity().getValueAsDouble())
+            .withPosition(4, 1);
         shooterTab.add(storageMotor)
             .withPosition(0, 2).withSize(2, 1);
         shooterTab.addBoolean("Has Note", this::hasNote)
