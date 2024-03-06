@@ -206,6 +206,34 @@ public final class Constants {
         public static final int beamBreakPort = 2;
     }
 
+    /* Using CANIds 20-21 - 2 motors */
+    public static final class ClimberConstants {
+        /* Left Climber */
+        public static final SparkMaxConstants leftClimberConstants = new SparkMaxConstants(
+            20, 
+            "Left Climber", 
+            ControlMode.percentOutput, 
+            null, 
+            60, 
+            false, 
+            IdleMode.kBrake, 
+            12, 
+            1.0
+        );
+        /* Right Climber */
+        public static final SparkMaxConstants rightClimberConstants = new SparkMaxConstants(
+            21, 
+            "Right Climber", 
+            ControlMode.percentOutput, 
+            null, 
+            60, 
+            false, 
+            IdleMode.kBrake, 
+            12, 
+            1.0
+        );
+    }
+
     /* Using CANIds 1-12 - 8 motors and 4 cancoders */
     public static final class SwerveConstants {
         public static final boolean invertGyro = true;
