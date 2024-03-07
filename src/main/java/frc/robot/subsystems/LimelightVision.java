@@ -38,7 +38,14 @@ public class LimelightVision extends SubsystemBase {
         limelightTab.add(currentPose)
             .withPosition(8, 0).withSize(2, 2);
         limelightTab.addBoolean("Localization Pipeline", () -> isLocalizationPipeline)
-            .withPosition(8, 3).withSize(2, 1);;
+            .withPosition(8, 3).withSize(2, 1);
+
+        /* Add Pipeline Buttons */
+        limelightTab.add("To Localization", runOnce(this::switchToLocalizationPipeline))
+            .withPosition(0, 4).withSize(2, 1);
+        limelightTab.add("To Target", runOnce(this::switchToTargetPipeline))
+            .withPosition(2, 4).withSize(2, 1);
+
     }
 
     @Override
