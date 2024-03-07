@@ -79,8 +79,12 @@ public class RobotContainer {
     }
 
     /* Only reset variables - don't run any commands here */
-    public void disabledExit() {
+    public void teleopInit() {
         limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
+    }
+
+    /* Only reset variables - don't run any commands here */
+    public void disabledExit() {
         shooter.reset();
         intake.reset();
     }
