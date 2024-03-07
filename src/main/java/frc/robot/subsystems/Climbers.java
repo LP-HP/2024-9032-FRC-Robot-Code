@@ -10,6 +10,8 @@ import static frc.robot.Constants.ClimberConstants.*;
 
 import java.util.function.BooleanSupplier;
 
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
+
 public class Climbers extends SubsystemBase {
     private final SparkMaxWrapper leftClimber;
     private final SparkMaxWrapper rightClimber;
@@ -18,9 +20,17 @@ public class Climbers extends SubsystemBase {
 
     public Climbers() {
         leftClimber = new SparkMaxWrapper(leftClimberConstants);
+        leftClimber.setSoftLimit(SoftLimitDirection.kForward, forwardSoftLimit);
+        leftClimber.setSoftLimit(SoftLimitDirection.kReverse, reverseSoftLimit);
+        leftClimber.enableSoftLimit(SoftLimitDirection.kForward, true);
+        leftClimber.enableSoftLimit(SoftLimitDirection.kReverse, true);
         leftClimber.config();
 
         rightClimber = new SparkMaxWrapper(rightClimberConstants);
+        rightClimber.setSoftLimit(SoftLimitDirection.kForward, forwardSoftLimit);
+        rightClimber.setSoftLimit(SoftLimitDirection.kReverse, reverseSoftLimit);
+        rightClimber.enableSoftLimit(SoftLimitDirection.kForward, true);
+        rightClimber.enableSoftLimit(SoftLimitDirection.kReverse, true);
         rightClimber.config();
 
         /* Add Telemetry */
