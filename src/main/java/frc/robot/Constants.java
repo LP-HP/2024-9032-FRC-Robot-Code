@@ -104,8 +104,8 @@ public final class Constants {
     public static final class ShooterConstants {
         /* Shooter Arm */
         public static final double armSetpointTolerance = 1.0;
-        public static final double minSetpoint = 90.0;
-        public static final double maxSetpoint = 180.0;
+        public static final double minArmSetpoint = 90.0;
+        public static final double maxArmSetpoint = 180.0;
         public static final SparkMaxPIDConstants shooterArmPID = new SparkMaxPIDConstants(
             0.05, 
             0.0, 
@@ -168,6 +168,8 @@ public final class Constants {
         public static final InvertedValue rightFlywheelInvert = InvertedValue.Clockwise_Positive;
 
         public static final double shotWaitTime = 1.0;//TODO change
+        public static final double minFlywheelSetpoint = 0.0;
+        public static final double maxFlywheelSetpoint = 100.0;
 
         /* Storage Motor */
         public static final SparkMaxConstants shooterStorageConstants = new SparkMaxConstants(

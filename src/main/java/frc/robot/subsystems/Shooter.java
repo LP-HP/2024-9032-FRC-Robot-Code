@@ -107,12 +107,18 @@ public class Shooter extends SubsystemBase {
             .withPosition(4, 3).withSize(1, 1);
         shooterTab.add(setToPassthroughPosition(true))
             .withPosition(5, 3).withSize(1, 1);
-        /* Add widget to modify the setpoint */
+        /* Add widget to modify the arm setpoint */
         GenericEntry armSetpointEntry = shooterTab.add("Arm Override", 0.0)
             .withPosition(6, 3).withSize(1, 1)
             .getEntry();
-        shooterTab.add(runOnce(() -> setArmSetpoint(armSetpointEntry.getDouble(armMotor.getSetpoint()))).withName("Apply Setpoint"))
+        shooterTab.add(runOnce(() -> setArmSetpoint(armSetpointEntry.getDouble(armMotor.getSetpoint()))).withName("Override Arm"))
             .withPosition(7, 3).withSize(1, 1);
+        /* Add widget to modify the flywheel setpoint */
+        GenericEntry velocitySetpointEntry = shooterTab.add("Flywheel Override", 0.0)
+            .withPosition(6, 4).withSize(1, 1)
+            .getEntry();
+        shooterTab.add(runOnce(() -> setVelocitySetpoint(velocitySetpointEntry.getDouble(0.0))).withName("Override Velocity"))
+            .withPosition(7, 4).withSize(1, 1);
 
         /* Prevent moving to a previous setpoint */
         reset();
@@ -124,12 +130,20 @@ public class Shooter extends SubsystemBase {
 
     /* Sets the target and if blocking, waits until the setpoint is achieved */
     private Command setFlywheelVelocity(double setpoint, boolean blocking) {
-        Command setTargetCommand = runOnce(() -> {
-            leftFlywheelMotor.setControl(flywheelController.withVelocity(setpoint));
-            rightFlywheelMotor.setControl(flywheelController.withVelocity(setpoint));
-        });
+        Command setTargetCommand = runOnce(() -> setVelocitySetpoint(setpoint));
 
         return blocking ? setTargetCommand.andThen(Commands.waitUntil(this::flywheelsAtSetpoint)) : setTargetCommand;
+    }
+
+    private void setVelocitySetpoint(double setpoint) {
+        if(setpoint > maxFlywheelSetpoint || setpoint < minFlywheelSetpoint) {
+            System.err.println("Velocity setpoint " + setpoint + " is out of bounds!");
+
+            return;
+        }
+
+        leftFlywheelMotor.setControl(flywheelController.withVelocity(setpoint));
+        rightFlywheelMotor.setControl(flywheelController.withVelocity(setpoint));
     }
 
     /* Sets the target and if blocking, waits until the setpoint is achieved */
@@ -140,8 +154,8 @@ public class Shooter extends SubsystemBase {
     }
 
     private void setArmSetpoint(double setpoint) {
-        if(setpoint > maxSetpoint || setpoint < minSetpoint) {
-            System.err.println("Shooter setpoint " + setpoint + " is out of bounds!");
+        if(setpoint > maxArmSetpoint || setpoint < minArmSetpoint) {
+            System.err.println("Shooter arm setpoint " + setpoint + " is out of bounds!");
 
             return;
         }
