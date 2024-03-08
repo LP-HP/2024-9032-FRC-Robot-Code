@@ -8,9 +8,7 @@ import frc.robot.util.SparkMaxWrapper;
 
 import static frc.robot.Constants.ClimberConstants.*;
 
-import java.util.function.BooleanSupplier;
-
-import com.revrobotics.CANSparkBase.SoftLimitDirection;
+import java.util.function.DoubleSupplier;
 
 public class Climbers extends SubsystemBase {
     private final SparkMaxWrapper leftClimber;
@@ -20,17 +18,9 @@ public class Climbers extends SubsystemBase {
 
     public Climbers() {
         leftClimber = new SparkMaxWrapper(leftClimberConstants);
-        leftClimber.setSoftLimit(SoftLimitDirection.kForward, forwardSoftLimit);
-        leftClimber.setSoftLimit(SoftLimitDirection.kReverse, reverseSoftLimit);
-        leftClimber.enableSoftLimit(SoftLimitDirection.kForward, true);
-        leftClimber.enableSoftLimit(SoftLimitDirection.kReverse, true);
         leftClimber.config();
 
         rightClimber = new SparkMaxWrapper(rightClimberConstants);
-        rightClimber.setSoftLimit(SoftLimitDirection.kForward, forwardSoftLimit);
-        rightClimber.setSoftLimit(SoftLimitDirection.kReverse, reverseSoftLimit);
-        rightClimber.enableSoftLimit(SoftLimitDirection.kForward, true);
-        rightClimber.enableSoftLimit(SoftLimitDirection.kReverse, true);
         rightClimber.config();
 
         /* Add Telemetry */
@@ -40,11 +30,10 @@ public class Climbers extends SubsystemBase {
             .withPosition(3, 0).withSize(2, 1);
     }
 
-    public Command setLeftClimberPower(double power, BooleanSupplier inverted) {
-        return runOnce(() -> leftClimber.set(power * (inverted.getAsBoolean() ? -1 : 1)));
-    }
-
-    public Command setRightClimberPower(double power, BooleanSupplier inverted) {
-        return runOnce(() -> rightClimber.set(power * (inverted.getAsBoolean() ? -1 : 1)));
+    public Command setClimberPower(DoubleSupplier powerSup) {
+        return runOnce(() -> {
+            leftClimber.set(powerSup.getAsDouble());
+            rightClimber.set(powerSup.getAsDouble());
+        });
     }
 }   

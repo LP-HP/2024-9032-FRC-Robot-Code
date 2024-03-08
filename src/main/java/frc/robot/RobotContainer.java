@@ -31,10 +31,6 @@ public class RobotContainer {
     private final Trigger enableIntakeButton = driveController.b().debounce(0.025);
     private final Trigger storeNoteButton = driveController.rightBumper().debounce(0.025);
     private final Trigger ampScoreButton = driveController.leftBumper().debounce(0.025);
-    private final Trigger leftClimberPowerButton = driveController.leftTrigger(0.075);
-    private final Trigger rightClimberPowerButton = driveController.rightTrigger(0.075);
-    private final Trigger climberInvertButton = driveController.x().debounce(0.025);
-
     // private final Trigger aprilTagAlignmentTest = driveController.x().debounce(0.025);//TODO remove
 
     /* Subsystems */
@@ -108,9 +104,9 @@ public class RobotContainer {
          * b -> [must not have a note] set intake to ground position and enable intake - when a note is gained, then move the intake to storage
          * right bumper [must have a note in the intake] -> run store note sequence
          * left bumper [must have a note in the intake] -> move intake to amp position and shoot into amp
-         * right trigger -> move right climber down by trigger amount
-         * left trigger -> move left climber down by trigger amount
-         * x -> make climbers move up instead of down
+         * right trigger -> move climbers up by trigger amount
+         * left trigger -> move climbers down by trigger amount
+         * 
         */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
 
@@ -137,10 +133,12 @@ public class RobotContainer {
             .onlyIf(intake::hasNote)
         );
 
-        leftClimberPowerButton.onTrue(climbers.setLeftClimberPower(driveController.getLeftTriggerAxis(), climberInvertButton::getAsBoolean));
-
-        rightClimberPowerButton.onTrue(climbers.setRightClimberPower(driveController.getRightTriggerAxis(), climberInvertButton::getAsBoolean));
-
+        climbers.setDefaultCommand(
+            climbers.setClimberPower(
+                () -> driveController.getRightTriggerAxis() - driveController.getLeftTriggerAxis()
+            )
+        );
+        
         // aprilTagAlignmentTest.onTrue(//TODO move to other class
         //     new LockToRotationTargetWhileMoving(swerve, 
         //         () -> limelight.getAprilTagTarget().xOffset, 

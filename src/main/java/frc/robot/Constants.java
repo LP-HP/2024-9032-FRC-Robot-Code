@@ -215,7 +215,7 @@ public final class Constants {
             ControlMode.percentOutput, 
             null, 
             60, 
-            false, 
+            true, 
             IdleMode.kBrake, 
             12, 
             1.0
@@ -232,9 +232,6 @@ public final class Constants {
             12, 
             1.0
         );
-
-        public static final float forwardSoftLimit = 100.0f;//TODO check
-        public static final float reverseSoftLimit = 0.0f;//TODO check
     }
 
     /* Using CANIds 1-12 - 8 motors and 4 cancoders */
