@@ -49,21 +49,32 @@ public class Shooter extends SubsystemBase {
         rightFlywheelMotor = new TalonFX(rightFlywheelMotorID);
 
         /* Flywheel configs */
-        TalonFXConfiguration flywheelConfig = new TalonFXConfiguration();
-        flywheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-        flywheelConfig.CurrentLimits.SupplyCurrentLimit = flywheelSupplyCurrentLimit;
-        flywheelConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        flywheelConfig.Slot0.kP = flywheelkP;
-        flywheelConfig.Slot0.kD = flywheelkD;
-        flywheelConfig.Slot0.kV = flywheelkV;
-        flywheelConfig.Slot0.kS = flywheelkS;
+        TalonFXConfiguration leftFlywheelConfig = new TalonFXConfiguration();
+        leftFlywheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        leftFlywheelConfig.CurrentLimits.SupplyCurrentLimit = flywheelSupplyCurrentLimit;
+        leftFlywheelConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        leftFlywheelConfig.Slot0.kP = flywheelkP;
+        leftFlywheelConfig.Slot0.kD = flywheelkD;
+        leftFlywheelConfig.Slot0.kV = flywheelkV;
+        leftFlywheelConfig.Slot0.kS = flywheelkS;
+        leftFlywheelConfig.MotorOutput.Inverted = leftFlywheelInvert;
+
+        TalonFXConfiguration rightFlywheelConfig = new TalonFXConfiguration();
+        rightFlywheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        rightFlywheelConfig.CurrentLimits.SupplyCurrentLimit = flywheelSupplyCurrentLimit;
+        rightFlywheelConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        rightFlywheelConfig.Slot0.kP = flywheelkP;
+        rightFlywheelConfig.Slot0.kD = flywheelkD;
+        rightFlywheelConfig.Slot0.kV = flywheelkV;
+        rightFlywheelConfig.Slot0.kS = flywheelkS;
+        rightFlywheelConfig.MotorOutput.Inverted = rightFlywheelInvert;
 
         /* Apply the configs and invert */
         leftFlywheelMotor.getConfigurator().apply(
-            flywheelConfig.MotorOutput.withInverted(leftFlywheelInvert)
+            leftFlywheelConfig
         );
         rightFlywheelMotor.getConfigurator().apply(
-            flywheelConfig.MotorOutput.withInverted(rightFlywheelInvert)
+            rightFlywheelConfig
         );
 
          /* Wait for the encoder to initialize before setting to absolute */

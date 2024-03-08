@@ -165,7 +165,7 @@ public final class Constants {
         public static final InvertedValue leftFlywheelInvert = InvertedValue.Clockwise_Positive;
 
         public static final int rightFlywheelMotorID = 18;
-        public static final InvertedValue rightFlywheelInvert = InvertedValue.Clockwise_Positive;
+        public static final InvertedValue rightFlywheelInvert = InvertedValue.CounterClockwise_Positive;
 
         public static final double shotWaitTime = 1.0;//TODO change
         public static final double minFlywheelSetpoint = 0.0;
