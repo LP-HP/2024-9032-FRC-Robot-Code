@@ -110,7 +110,7 @@ public class Shooter extends SubsystemBase {
             .withPosition(0, 3).withSize(1, 1);
         shooterTab.add(enableStorageMotorToFlywheels())
             .withPosition(1, 3).withSize(1, 1);
-        shooterTab.add(shootSequence(90.0))
+        shooterTab.add(shootSequence(95.0))
             .withPosition(2, 3).withSize(1, 1);
         shooterTab.add(resetState())
             .withPosition(3, 3).withSize(1, 1);

@@ -156,9 +156,9 @@ public final class Constants {
         /* Shooter Flywheels */
         public static final double flywheelVelocityTolerance = 1.0;
         public static final int flywheelSupplyCurrentLimit = 60;
-        public static final double flywheelkP = 0.52;
+        public static final double flywheelkP = 0.1;
         public static final double flywheelkD = 0.0;
-        public static final double flywheelkV = 0.11;
+        public static final double flywheelkV = 0.12;
         public static final double flywheelkS = 0.0;
 
         public static final int leftFlywheelMotorID = 17;
@@ -183,7 +183,7 @@ public final class Constants {
             12,
             1.0
         );
-        public static final double storageMotorPowerReceiving = 0.15;
+        public static final double storageMotorPowerReceiving = 0.3;
         public static final double storageMotorPowerToFlywheels = 0.75;
 
         /* Sensors */
