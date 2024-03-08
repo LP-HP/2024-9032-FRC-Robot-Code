@@ -215,7 +215,7 @@ public final class Constants {
             ControlMode.percentOutput, 
             null, 
             60, 
-            true, 
+            false, 
             IdleMode.kBrake, 
             12, 
             1.0
@@ -227,7 +227,7 @@ public final class Constants {
             ControlMode.percentOutput, 
             null, 
             60, 
-            false, 
+            true, 
             IdleMode.kBrake, 
             12, 
             1.0
