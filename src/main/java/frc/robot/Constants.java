@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -103,8 +104,8 @@ public final class Constants {
     public static final class ShooterConstants {
         /* Shooter Arm */
         public static final double armSetpointTolerance = 1.0;
-        public static final double minSetpoint = 90.0;
-        public static final double maxSetpoint = 180.0;
+        public static final double minArmSetpoint = 90.0;
+        public static final double maxArmSetpoint = 180.0;
         public static final SparkMaxPIDConstants shooterArmPID = new SparkMaxPIDConstants(
             0.05, 
             0.0, 
@@ -153,39 +154,22 @@ public final class Constants {
         }
 
         /* Shooter Flywheels */
-        public static final double flywheelVelocityTolerance = 50.0;
-        public static final SparkMaxPIDConstants shooterFlywheelPID = new SparkMaxPIDConstants(
-            0.0003, 
-            0.0, 
-            0.001, 
-            0.000175,
-            -1.0,
-            1.0
-        );
-        public static final SparkMaxConstants shooterFlywheelConstants = new SparkMaxConstants(
-            17,
-            "Shooter Flywheel",
-            ControlMode.velocityLeader,
-            shooterFlywheelPID,
-            60,
-            false,
-            IdleMode.kCoast,
-            12,
-            60.0
-        );
-        public static final SparkMaxConstants shooterFlywheelFolllowerConstants = new SparkMaxConstants(
-            18,
-            "Shooter Flywheel Follower",
-            ControlMode.percentOutput,
-            shooterFlywheelPID,
-            60,
-            false,
-            IdleMode.kCoast,
-            12,
-            60.0
-        );
-        public static final boolean invertFlywheelFollower = true;
+        public static final double flywheelVelocityTolerance = 1.0;
+        public static final int flywheelSupplyCurrentLimit = 60;
+        public static final double flywheelkP = 0.1;
+        public static final double flywheelkD = 0.0;
+        public static final double flywheelkV = 0.12;
+        public static final double flywheelkS = 0.0;
+
+        public static final int leftFlywheelMotorID = 17;
+        public static final InvertedValue leftFlywheelInvert = InvertedValue.Clockwise_Positive;
+
+        public static final int rightFlywheelMotorID = 18;
+        public static final InvertedValue rightFlywheelInvert = InvertedValue.CounterClockwise_Positive;
+
         public static final double shotWaitTime = 1.0;//TODO change
+        public static final double minFlywheelSetpoint = 0.0;
+        public static final double maxFlywheelSetpoint = 100.0;
 
         /* Storage Motor */
         public static final SparkMaxConstants shooterStorageConstants = new SparkMaxConstants(
@@ -199,7 +183,7 @@ public final class Constants {
             12,
             1.0
         );
-        public static final double storageMotorPowerReceiving = 0.15;
+        public static final double storageMotorPowerReceiving = 0.3;
         public static final double storageMotorPowerToFlywheels = 0.75;
 
         /* Sensors */
