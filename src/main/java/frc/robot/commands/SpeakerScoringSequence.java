@@ -13,7 +13,7 @@ public class SpeakerScoringSequence extends SequentialCommandGroup {
                 .alongWith(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().yOffset, false)),
             /* Move the arm to the current target to ensure that the target has not changed since the initial limelight reading */
             shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().yOffset, true),//TODO use distance
-            shooter.shootSequence(4500.0)//TODO do lookup table if needed
+            shooter.shootSequence(95.0)//TODO do lookup table if needed
         );
     }
 }

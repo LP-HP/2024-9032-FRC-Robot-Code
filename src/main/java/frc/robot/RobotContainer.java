@@ -38,6 +38,7 @@ public class RobotContainer {
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
     private final Shooter shooter = new Shooter();
+    private final Climbers climbers = new Climbers();
 
     /* Shuffleboard */
     private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
@@ -107,6 +108,8 @@ public class RobotContainer {
          * b -> [must not have a note] set intake to ground position and enable intake - when a note is gained, then move the intake to storage
          * right bumper [must have a note in the intake] -> run store note sequence
          * left bumper [must have a note in the intake] -> move intake to amp position and shoot into amp
+         * right trigger -> move climbers up by trigger amount
+         * left trigger -> move climbers down by trigger amount
          * 
         */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
@@ -134,6 +137,12 @@ public class RobotContainer {
             .onlyIf(intake::hasNote)
         );
 
+        climbers.setDefaultCommand(
+            climbers.setClimberPower(
+                () -> driveController.getRightTriggerAxis() - driveController.getLeftTriggerAxis()
+            )
+        );
+        
         // aprilTagAlignmentTest.onTrue(//TODO move to other class
         //     new LockToRotationTargetWhileMoving(swerve, 
         //         () -> limelight.getAprilTagTarget().xOffset, 

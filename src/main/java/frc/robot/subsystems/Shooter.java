@@ -2,6 +2,11 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
@@ -18,10 +23,11 @@ public class Shooter extends SubsystemBase {
     private final SparkMaxWrapper armMotor;    
     private final SparkMaxWrapper armMotorFollower;    
 
-    private final SparkMaxWrapper flywheelMotor;
-    private final SparkMaxWrapper flywheelMotorFollower;
-
     private final SparkMaxWrapper storageMotor;
+
+    private final TalonFX leftFlywheelMotor;
+    private final TalonFX rightFlywheelMotor;
+    private final VelocityVoltage flywheelController = new VelocityVoltage(0.0);
 
     private final ShuffleboardTab shooterTab = Shuffleboard.getTab("Shooter");
 
@@ -36,16 +42,40 @@ public class Shooter extends SubsystemBase {
         armMotorFollower.follow(armMotor, invertArmFollower);
         armMotorFollower.config();
 
-        flywheelMotor = new SparkMaxWrapper(shooterFlywheelConstants);
-        flywheelMotor.relativeEncoder.setAverageDepth(1);
-        flywheelMotor.config();
-
-        flywheelMotorFollower = new SparkMaxWrapper(shooterFlywheelFolllowerConstants);
-        flywheelMotorFollower.follow(flywheelMotor, invertFlywheelFollower);
-        flywheelMotorFollower.config();
-
         storageMotor = new SparkMaxWrapper(shooterStorageConstants);
         storageMotor.config();
+
+        leftFlywheelMotor = new TalonFX(leftFlywheelMotorID);
+        rightFlywheelMotor = new TalonFX(rightFlywheelMotorID);
+
+        /* Flywheel configs */
+        TalonFXConfiguration leftFlywheelConfig = new TalonFXConfiguration();
+        leftFlywheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        leftFlywheelConfig.CurrentLimits.SupplyCurrentLimit = flywheelSupplyCurrentLimit;
+        leftFlywheelConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        leftFlywheelConfig.Slot0.kP = flywheelkP;
+        leftFlywheelConfig.Slot0.kD = flywheelkD;
+        leftFlywheelConfig.Slot0.kV = flywheelkV;
+        leftFlywheelConfig.Slot0.kS = flywheelkS;
+        leftFlywheelConfig.MotorOutput.Inverted = leftFlywheelInvert;
+
+        TalonFXConfiguration rightFlywheelConfig = new TalonFXConfiguration();
+        rightFlywheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        rightFlywheelConfig.CurrentLimits.SupplyCurrentLimit = flywheelSupplyCurrentLimit;
+        rightFlywheelConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        rightFlywheelConfig.Slot0.kP = flywheelkP;
+        rightFlywheelConfig.Slot0.kD = flywheelkD;
+        rightFlywheelConfig.Slot0.kV = flywheelkV;
+        rightFlywheelConfig.Slot0.kS = flywheelkS;
+        rightFlywheelConfig.MotorOutput.Inverted = rightFlywheelInvert;
+
+        /* Apply the configs and invert */
+        leftFlywheelMotor.getConfigurator().apply(
+            leftFlywheelConfig
+        );
+        rightFlywheelMotor.getConfigurator().apply(
+            rightFlywheelConfig
+        );
 
          /* Wait for the encoder to initialize before setting to absolute */
         Timer.delay(1.0);
@@ -56,8 +86,14 @@ public class Shooter extends SubsystemBase {
         /* Add Telemetry */
         shooterTab.add(armMotor)
             .withPosition(0, 0).withSize(2, 2);
-        shooterTab.add(flywheelMotor)
-            .withPosition(3, 0).withSize(2, 2);
+        shooterTab.add(leftFlywheelMotor)
+            .withPosition(3, 0).withSize(1, 1);
+        shooterTab.addDouble("Left Velocity", () -> leftFlywheelMotor.getVelocity().getValueAsDouble())
+            .withPosition(3, 1).withSize(1, 1);
+        shooterTab.add(rightFlywheelMotor)
+            .withPosition(4, 0).withSize(1, 1);
+        shooterTab.addDouble("Right Velocity", () -> rightFlywheelMotor.getVelocity().getValueAsDouble())
+            .withPosition(4, 1).withSize(1, 1);
         shooterTab.add(storageMotor)
             .withPosition(0, 2).withSize(2, 1);
         shooterTab.addBoolean("Has Note", this::hasNote)
@@ -74,7 +110,7 @@ public class Shooter extends SubsystemBase {
             .withPosition(0, 3).withSize(1, 1);
         shooterTab.add(enableStorageMotorToFlywheels())
             .withPosition(1, 3).withSize(1, 1);
-        shooterTab.add(shootSequence(4500.0))
+        shooterTab.add(shootSequence(95.0))
             .withPosition(2, 3).withSize(1, 1);
         shooterTab.add(resetState())
             .withPosition(3, 3).withSize(1, 1);
@@ -82,12 +118,18 @@ public class Shooter extends SubsystemBase {
             .withPosition(4, 3).withSize(1, 1);
         shooterTab.add(setToPassthroughPosition(true))
             .withPosition(5, 3).withSize(1, 1);
-        /* Add widget to modify the setpoint */
+        /* Add widget to modify the arm setpoint */
         GenericEntry armSetpointEntry = shooterTab.add("Arm Override", 0.0)
             .withPosition(6, 3).withSize(1, 1)
             .getEntry();
-        shooterTab.add(runOnce(() -> setArmSetpoint(armSetpointEntry.getDouble(armMotor.getSetpoint()))).withName("Apply Setpoint"))
+        shooterTab.add(runOnce(() -> setArmSetpoint(armSetpointEntry.getDouble(armMotor.getSetpoint()))).withName("Override Arm"))
             .withPosition(7, 3).withSize(1, 1);
+        /* Add widget to modify the flywheel setpoint */
+        GenericEntry velocitySetpointEntry = shooterTab.add("Flywheel Override", 0.0)
+            .withPosition(6, 4).withSize(1, 1)
+            .getEntry();
+        shooterTab.add(runOnce(() -> setVelocitySetpoint(velocitySetpointEntry.getDouble(0.0))).withName("Override Velocity"))
+            .withPosition(7, 4).withSize(1, 1);
 
         /* Prevent moving to a previous setpoint */
         reset();
@@ -99,9 +141,20 @@ public class Shooter extends SubsystemBase {
 
     /* Sets the target and if blocking, waits until the setpoint is achieved */
     private Command setFlywheelVelocity(double setpoint, boolean blocking) {
-        Command setTargetCommand = runOnce(() -> flywheelMotor.setClosedLoopTarget(setpoint));
+        Command setTargetCommand = runOnce(() -> setVelocitySetpoint(setpoint));
 
         return blocking ? setTargetCommand.andThen(Commands.waitUntil(this::flywheelsAtSetpoint)) : setTargetCommand;
+    }
+
+    private void setVelocitySetpoint(double setpoint) {
+        if(setpoint > maxFlywheelSetpoint || setpoint < minFlywheelSetpoint) {
+            System.err.println("Velocity setpoint " + setpoint + " is out of bounds!");
+
+            return;
+        }
+
+        leftFlywheelMotor.setControl(flywheelController.withVelocity(setpoint));
+        rightFlywheelMotor.setControl(flywheelController.withVelocity(setpoint));
     }
 
     /* Sets the target and if blocking, waits until the setpoint is achieved */
@@ -112,8 +165,8 @@ public class Shooter extends SubsystemBase {
     }
 
     private void setArmSetpoint(double setpoint) {
-        if(setpoint > maxSetpoint || setpoint < minSetpoint) {
-            System.err.println("Shooter setpoint " + setpoint + " is out of bounds!");
+        if(setpoint > maxArmSetpoint || setpoint < minArmSetpoint) {
+            System.err.println("Shooter arm setpoint " + setpoint + " is out of bounds!");
 
             return;
         }
@@ -131,7 +184,8 @@ public class Shooter extends SubsystemBase {
 
     private Command disableFlywheels() {
         return runOnce(() -> { 
-            flywheelMotor.disable();
+            leftFlywheelMotor.disable();
+            rightFlywheelMotor.disable();
             storageMotor.disable();
         });
     }
@@ -142,8 +196,8 @@ public class Shooter extends SubsystemBase {
             .andThen(disableFlywheels());
     }
 
-    public Command shootSequence(double velocity) {
-        return setFlywheelVelocity(velocity, true)
+    public Command shootSequence(double velocityRPS) {
+        return setFlywheelVelocity(velocityRPS, true)
            .andThen(enableStorageMotorToFlywheels())
            .andThen(Commands.waitSeconds(shotWaitTime))
            .andThen(disableFlywheels())
@@ -189,12 +243,14 @@ public class Shooter extends SubsystemBase {
     }
 
     private boolean flywheelsAtSetpoint() {
-        return Math.abs(flywheelMotor.relativeEncoder.getVelocity() - flywheelMotor.getSetpoint()) < flywheelVelocityTolerance;
+        return Math.abs(leftFlywheelMotor.getVelocity().getValueAsDouble() - flywheelController.Velocity) < flywheelVelocityTolerance
+        && Math.abs(rightFlywheelMotor.getVelocity().getValueAsDouble() - flywheelController.Velocity) < flywheelVelocityTolerance;
     }
 
     public void reset() {
         armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
-        flywheelMotor.disable();
+        leftFlywheelMotor.disable();
+        rightFlywheelMotor.disable();
         storageMotor.disable();
 
         if(getCurrentCommand() != null) 
