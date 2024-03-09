@@ -30,8 +30,9 @@ public class MultiNoteAuto extends SequentialCommandGroup {
         //Add at least 1 note
         addCommands(
             /* Reset starting pose to limelight pose and start adding vision measurements */
-            new InstantCommand(() -> swerve.resetOdometry(limelight.getPoseEstimate().get().pose), swerve, limelight),
-            new InstantCommand(() -> swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate), swerve, limelight),
+            new InstantCommand(() -> swerve.resetOdometry(paths.get(0).getPreviewStartingHolonomicPose()), swerve, limelight),
+            // new InstantCommand(() -> swerve.resetOdometry(limelight.getPoseEstimate().get().pose), swerve, limelight),
+            // new InstantCommand(() -> swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate), swerve, limelight), //TODO add back
             /* Drive to the position to shoot the 1rst note, while setting the arm to the shooting position */
             firstNoteShootAlignment
                 .alongWith(shooter.setToAutoPosition(armPosNote1, true)),

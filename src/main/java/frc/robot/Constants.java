@@ -272,7 +272,7 @@ public final class Constants {
 
         /* Drive Motor PID Values */
         public static final SparkMaxPIDConstants drivePIDConstants = new SparkMaxPIDConstants( //TODO: This must be tuned to specific robot - needed for closed loop
-            0.05, 
+            0.75, 
             0.0, 
             0.0, 
             0.0,
@@ -282,7 +282,7 @@ public final class Constants {
 
         /* Drive Motor Characterization Values */
         public static final double driveKS = 0.0; //TODO: This must be tuned to specific robot - needed for auto
-        public static final double driveKV = 0.0;
+        public static final double driveKV = 2.5;
         public static final double driveKA = 0.0;
 
         /* Drive Motor Conversion Factors */
@@ -421,12 +421,12 @@ public final class Constants {
     public static final class ClosedLoopConstants { 
         /* PID Constants for Path Following */
         public static final PIDConstants translationPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            0.0, 
+            0.8, 
             0.0, 
             0.0
         ); 
         public static final PIDConstants headingPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            0.0, 
+            0.85, 
             0.0, 
             0.0
         ); 
@@ -447,9 +447,9 @@ public final class Constants {
         /* Seconds */
         public static final double notePickupTimeout = 2.0;
 
-        public static final double armPosNote1 = 10.0;
-        public static final double shooterVelocityNote1 = 10.0;
-        public static final double armPosNote2 = 10.0;
-        public static final double shooterVelocityNote2 = 10.0;
+        public static final double armPosNote1 = 140.0;
+        public static final double shooterVelocityNote1 = 95.0;
+        public static final double armPosNote2 = 140.0;
+        public static final double shooterVelocityNote2 = 95.0;
     }
 }
