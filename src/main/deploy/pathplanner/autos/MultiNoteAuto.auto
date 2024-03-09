@@ -1,6 +1,12 @@
 {
   "version": 1.0,
-  "startingPose": null,
+  "startingPose": {
+    "position": {
+      "x": 0.57,
+      "y": 7.07
+    },
+    "rotation": 0
+  },
   "command": {
     "type": "sequential",
     "data": {
@@ -12,9 +18,21 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "ShootNote1"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "2nd note alignment"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootNote2"
           }
         },
         {
@@ -24,15 +42,33 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "ShootNote3"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "4th note alignment"
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "ShootNote4"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "5th note alignment"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootNote5"
           }
         }
       ]

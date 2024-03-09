@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -12,10 +13,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.SparkMaxWrapper;
+
+import static frc.robot.Constants.AutoConstants.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -73,13 +75,13 @@ public class RobotContainer {
         autoChooser.addOption("Multinote Test", AutoBuilder.buildAuto("MultiNoteAuto"));
         // autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
         // autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
-        autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
+        // autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
         autoChooser.addOption("Rotate To April Tag", new AlignWithVisionTarget(swerve, limelight, true, false));
 
         driverTab.add(autoChooser);
 
         /* Add driver tab telemetry */
-        driverTab.addBoolean("Has Any Motor Errors", SparkMaxWrapper::hasAnyMotorErrors);
+        driverTab.addBoolean("No Motor Errors", () -> SparkMaxWrapper.noMotorErrors());
     }
 
     /* Only reset variables - don't run any commands here */
@@ -99,9 +101,26 @@ public class RobotContainer {
     }
 
     private void registerPathplannerCommands() {
-        // NamedCommands.registerCommand("IntakeToGround", intake.setToGroundPosition());
-        // NamedCommands.registerCommand("EnableIntake", intake.enableIntake());
-        // NamedCommands.registerCommand("ShooterArmNote1", shooter.setArmTargetPosition(4));//TODO maybe don't register here
+        NamedCommands.registerCommand("StoreNoteFromGround", 
+            intake.getNoteFromGround()
+            .andThen(Commands.waitSeconds(passthroughWait)
+            .andThen(new StoreNoteSequence(intake, shooter))));
+
+        NamedCommands.registerCommand("ShootNote1", 
+            shooter.setToAutoPosition(armPosNote1, true)
+            .andThen(shooter.shootSequence(shooterVelocityNote1)));
+        NamedCommands.registerCommand("ShootNote2", 
+            shooter.setToAutoPosition(armPosNote2, true)
+            .andThen(shooter.shootSequence(shooterVelocityNote2)));
+        NamedCommands.registerCommand("ShootNote3", 
+            shooter.setToAutoPosition(armPosNote3, true)
+            .andThen(shooter.shootSequence(shooterVelocityNote3)));
+        NamedCommands.registerCommand("ShootNote4", 
+            shooter.setToAutoPosition(armPosNote4, true)
+            .andThen(shooter.shootSequence(shooterVelocityNote4)));
+        NamedCommands.registerCommand("ShootNote5", 
+            shooter.setToAutoPosition(armPosNote5, true)
+            .andThen(shooter.shootSequence(shooterVelocityNote5)));
     }
 
     private void configureButtonBindings() {
