@@ -145,6 +145,7 @@ public final class Constants {
         /* Arm Positions */
         public static final double armPositionPassthrough = 130.0;
         public static final double armPositionStorage = 120.0;
+        public static final double armPositionClimbing = 170.0;
         /* Key - Distance : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap distanceToArmPosTable = new InterpolatingDoubleTreeMap();
         static {

@@ -30,6 +30,7 @@ public class RobotContainer {
 
     /* Drive Controller Buttons */
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
+    private final Trigger climberDownButton = driveController.leftTrigger(0.05).debounce(0.025);
 
     /* Mechanism Controller Buttons */
     private final Trigger speakerScoreButton = mechanismController.rightBumper().debounce(0.025);
@@ -111,7 +112,7 @@ public class RobotContainer {
          * left stick x and y - controls strafing
          * right stick x - controls rotation 
          * right trigger -> move climbers up by trigger amount
-         * left trigger -> move climbers down by trigger amount
+         * left trigger -> move climbers down by trigger amount and put the shooter into climber position
          * a -> zero gyro
          * 
          * Current mechanism controls:
@@ -132,6 +133,8 @@ public class RobotContainer {
                 () -> driveController.getRightTriggerAxis() - driveController.getLeftTriggerAxis()
             )
         );
+
+        climberDownButton.onTrue(shooter.setToClimbingPosition(false));
 
         /* Mechanism Controls */
         speakerScoreButton.onTrue(
