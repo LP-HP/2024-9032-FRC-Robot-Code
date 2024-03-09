@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.57,
-      "y": 7.07
+      "x": 1.43,
+      "y": 5.58
     },
     "rotation": 0
   },
@@ -11,12 +11,6 @@
     "type": "sequential",
     "data": {
       "commands": [
-        {
-          "type": "path",
-          "data": {
-            "pathName": "1rst shoot alignment"
-          }
-        },
         {
           "type": "named",
           "data": {

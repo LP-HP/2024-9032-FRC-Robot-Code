@@ -3,15 +3,15 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.6162826627647557,
-        "y": 6.1979018544931685
+        "x": 1.43,
+        "y": 5.58
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.9485799777170318,
-        "y": 6.4403958409124105
+        "x": 1.5352473899819596,
+        "y": 5.837271397733678
       },
-      "isLocked": false,
+      "isLocked": true,
       "linkedName": "Path 1 end"
     },
     {
@@ -55,7 +55,7 @@
   "eventMarkers": [
     {
       "name": "Get Note",
-      "waypointRelativePos": 0.4,
+      "waypointRelativePos": 0.3,
       "command": {
         "type": "parallel",
         "data": {
