@@ -8,8 +8,6 @@ import frc.robot.subsystems.Swerve;
 
 import static frc.robot.Constants.ClosedLoopConstants.*;
 
-import java.util.function.DoubleSupplier;
-
 public class AlignWithVisionTarget extends Command {
     private final Swerve swerve;
     private final LimelightVision limelight;
@@ -19,9 +17,6 @@ public class AlignWithVisionTarget extends Command {
 
     private final boolean endAtTarget;
     private final boolean rotateOnly;
-
-    private DoubleSupplier transSup;
-    private DoubleSupplier strafeSup;
 
     public AlignWithVisionTarget(Swerve swerve, LimelightVision limelight, boolean rotateOnly, boolean endAtTarget) {
         this.swerve = swerve;       
@@ -41,38 +36,12 @@ public class AlignWithVisionTarget extends Command {
         addRequirements(swerve, limelight);
     }
 
-    public AlignWithVisionTarget(Swerve swerve, DoubleSupplier transSup, DoubleSupplier strafeSup, LimelightVision limelight, boolean rotateOnly, boolean endAtTarget) {
-        this.swerve = swerve;       
-        this.limelight = limelight;
-        this.endAtTarget = endAtTarget;
-        this.rotateOnly = rotateOnly;
-        this.strafeSup = strafeSup;
-        this.transSup = transSup;
-
-        swerveRotController = new PIDController(kPRotationTarget, kIRotationTarget, kDRotationTarget);
-        swerveRotController.setTolerance(rotationSetpointTolerance);
-        swerveRotController.setIntegratorRange(-kIZoneRotationTarget, kIZoneRotationTarget);
-        swerveRotController.setSetpoint(0.0);
-        
-        swerveTranslationController = new PIDController(kPTranslationTarget, 0, 0.0); 
-        swerveTranslationController.setTolerance(translationSetpointTolerance);
-        swerveTranslationController.setSetpoint(0.0);
-
-        addRequirements(swerve, limelight);
-    }
-
     @Override
     public void execute() {
         if(limelight.getAprilTagTarget().isValid) {
-            if (rotateOnly && (transSup == null || strafeSup == null)) {
+            if (rotateOnly) {
                 swerve.driveOpenLoop(//TODO use closed loop
                     new Translation2d(),
-                    swerveRotController.calculate(limelight.getAprilTagTarget().xOffset), false);
-            }
-
-            else if (rotateOnly) {
-                swerve.driveOpenLoop(//TODO use closed loop
-                    new Translation2d(transSup.getAsDouble(), strafeSup.getAsDouble()),
                     swerveRotController.calculate(limelight.getAprilTagTarget().xOffset), false);
             }
 
@@ -81,6 +50,11 @@ public class AlignWithVisionTarget extends Command {
                     new Translation2d(swerveTranslationController.calculate(limelight.getAprilTagTarget().yOffset), 0.0),//TODO use distance
                     swerveRotController.calculate(limelight.getAprilTagTarget().xOffset));
             }
+        }
+
+        else {
+            swerveRotController.reset();
+            swerve.driveOpenLoop(new Translation2d(), 0.0, false);
         }
     }
 
@@ -96,5 +70,6 @@ public class AlignWithVisionTarget extends Command {
     @Override
     public void end(boolean interrupted) {
         swerve.driveOpenLoop(new Translation2d(), 0.0, false);
+        swerveRotController.reset();
     }
 }

@@ -74,7 +74,6 @@ public class RobotContainer {
         autoChooser.addOption("Rotate To April Tag", new AlignWithVisionTarget(swerve, limelight, true, false));
 
         driverTab.add(autoChooser);
-        driverTab.add(new SpeakerScoringSequence(swerve, limelight, shooter));
 
         /* Add driver tab telemetry */
         driverTab.addBoolean("Has Any Motor Errors", SparkMaxWrapper::hasAnyMotorErrors);
@@ -114,18 +113,28 @@ public class RobotContainer {
          * 
          * Current mechanism controls:
          * right bumper [must have a valid speaker target and a note] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
+         * right trigger [must have a valid speaker target] -> aim for speaker
          * b -> [must not have a note] set intake to ground position and enable intake - when a note is gained, then move the intake to storage
          * a [must have a note in the intake] -> run store note sequence
          * left bumper [must have a note in the intake] -> move intake to amp position and shoot into amp
          * back [hold 1 second ] -> reset states
          * 
         */
+
+        /* Driver Controls */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
 
+        climbers.setDefaultCommand(
+            climbers.setClimberPower(
+                () -> driveController.getRightTriggerAxis() - driveController.getLeftTriggerAxis()
+            )
+        );
+
+        /* Mechanism Controls */
         speakerScoreButton.onTrue(
-            new SpeakerScoringSequence(swerve, limelight, shooter)
+            new SpeakerScoringSequence(limelight, shooter)
              /* Only run if there is a valid target and it's a speaker tag and we have a note */
-            .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.hasNote())
+            .onlyIf(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && shooter.hasNote())
         );
 
         enableIntakeButton.onTrue(
@@ -145,18 +154,16 @@ public class RobotContainer {
             .onlyIf(intake::hasNote)
         );
 
-        climbers.setDefaultCommand(
-            climbers.setClimberPower(
-                () -> driveController.getRightTriggerAxis() - driveController.getLeftTriggerAxis()
-            )
-        );
-
         resetButton.onTrue(
             intake.resetState()
             .andThen(shooter.resetState())
         );
 
-        aimButton.whileTrue(new AlignWithVisionTarget(swerve, () -> -driveController.getLeftY(), () -> -driveController.getLeftX(), limelight, true, false));
+        aimButton.whileTrue(
+            new LockToVisionTargetWhileMoving(swerve, limelight, 
+                () -> -driveController.getLeftY(), 
+                () -> -driveController.getLeftX())
+        );
         
         // aprilTagAlignmentTest.onTrue(//TODO move to other class
         //     new LockToRotationTargetWhileMoving(swerve, 

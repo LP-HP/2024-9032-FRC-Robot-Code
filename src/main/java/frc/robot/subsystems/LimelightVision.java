@@ -111,12 +111,12 @@ public class LimelightVision extends SubsystemBase {
             SendableRegistry.add(this, "April Tag Target");
         }
 
-        public boolean isSpeakerTag() {
-            return id == 4 || id == 7;
+        public boolean isValidSpeakerTag() {
+            return isValid && (id == 4 || id == 7);
         }
 
-        public boolean isAmpTag() {
-            return id == 6 || id == 5;
+        public boolean isValidAmpTag() {
+            return isValid && (id == 6 || id == 5);
         }
 
         @Override
