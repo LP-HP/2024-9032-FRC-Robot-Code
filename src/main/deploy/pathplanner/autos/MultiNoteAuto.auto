@@ -16,6 +16,24 @@
           "data": {
             "pathName": "2nd note alignment"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "3rd note alignment"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4th note alignment"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5th note alignment"
+          }
         }
       ]
     }

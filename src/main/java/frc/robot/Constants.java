@@ -23,6 +23,7 @@ public final class Constants {
     public static final int driveControllerPort = 0;
     public static final int mechanismControllerPort = 1;
     public static final boolean burnFlash = false;
+    public static final boolean configMotors = false;
 
     public static final class TeleopConstants {
         public static final double stickDeadband = 0.02;
@@ -299,7 +300,7 @@ public final class Constants {
         /* Front Left Module - Module 0 */
         public static final class Mod0 { 
             public static final SparkMaxConstants driveMotorConstants = new SparkMaxConstants(
-                1,
+                41,
                 "Drive Front Left",
                 ControlMode.velocityControlWithPositionData,
                 drivePIDConstants,

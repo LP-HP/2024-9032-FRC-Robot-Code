@@ -32,7 +32,8 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
     public SparkMaxWrapper(SparkMaxConstants constants) {
         super(constants.id(), MotorType.kBrushless);
 
-        restoreFactoryDefaults();
+        if(Constants.configMotors)
+            restoreFactoryDefaults();
 
         this.constants = constants;
         controller = getPIDController();
@@ -49,9 +50,12 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
         }
 
         absoluteEncoder = getAbsoluteEncoder(Type.kDutyCycle);
-        checkError(absoluteEncoder.setInverted(invert));
-        checkError(absoluteEncoder.setPositionConversionFactor(positionConversionFactor));
-        checkError(absoluteEncoder.setZeroOffset(offset));
+
+        if(Constants.configMotors) {
+            checkError(absoluteEncoder.setInverted(invert));
+            checkError(absoluteEncoder.setPositionConversionFactor(positionConversionFactor));
+            checkError(absoluteEncoder.setZeroOffset(offset));
+        }
 
         hasAbsoluteEncoder = true;
     }
@@ -63,9 +67,11 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
             return;
         }
 
-        checkError(controller.setPositionPIDWrappingEnabled(true));
-        checkError(controller.setPositionPIDWrappingMaxInput(max));
-        checkError(controller.setPositionPIDWrappingMinInput(min));
+        if(Constants.configMotors) {
+            checkError(controller.setPositionPIDWrappingEnabled(true));
+            checkError(controller.setPositionPIDWrappingMaxInput(max));
+            checkError(controller.setPositionPIDWrappingMinInput(min));
+        }
     }
 
     public void config() {
@@ -96,6 +102,12 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
                 break;
         }
 
+        if(!Constants.configMotors) {
+            isConfigured = true;
+
+            return;
+        }
+
         setInverted(constants.inverted());
 
         checkError(setSmartCurrentLimit(constants.currentLimit()));
@@ -115,6 +127,9 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
 
             System.out.println("Burned the flash of " + constants.name());
         }
+
+        if(hasError) 
+            return;
 
         System.out.println("Configured " + constants.name());
 
@@ -152,6 +167,8 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
         checkError(controller.setD(constants.kD()));
         checkError(controller.setFF(constants.kF()));
         checkError(controller.setOutputRange(constants.minOutput(), constants.maxOutput()));
+
+        System.out.println("Updated PID constants of " + this.constants.name());
     }
 
     public void setClosedLoopTarget(double setpoint) {

@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -36,7 +38,6 @@ public class RobotContainer {
     private final Trigger ampScoreButton = mechanismController.leftBumper().debounce(0.025);
     private final Trigger aimButton = mechanismController.rightTrigger(0.2);
     private final Trigger resetButton = mechanismController.back().debounce(1.0);
-    // private final Trigger aprilTagAlignmentTest = driveController.x().debounce(0.025);//TODO remove
 
     /* Subsystems */
     private final LimelightVision limelight = new LimelightVision();
@@ -67,7 +68,7 @@ public class RobotContainer {
         configureButtonBindings();
 
         /* Add auto chooser */
-        autoChooser.addOption("Swerve Auto Shakedown", new SwerveShakedown(swerve));
+        autoChooser.addOption("Swerve Auto Shakedown", AutoBuilder.buildAuto("SwerveShakedown"));
         // autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
         // autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
         // autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
@@ -118,7 +119,6 @@ public class RobotContainer {
          * a [must have a note in the intake] -> run store note sequence
          * left bumper [must have a note in the intake] -> move intake to amp position and shoot into amp
          * back [hold 1 second ] -> reset states
-         * 
         */
 
         /* Driver Controls */
@@ -149,7 +149,7 @@ public class RobotContainer {
             new StoreNoteSequence(intake, shooter)
             .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
         );
-
+ 
         ampScoreButton.onTrue(
             intake.shootIntoAmp()
             .onlyIf(intake::hasNote)
