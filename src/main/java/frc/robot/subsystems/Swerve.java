@@ -16,6 +16,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -25,6 +26,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -37,6 +39,9 @@ import frc.robot.Constants.SwerveConstants.Mod0;
 import frc.robot.Constants.SwerveConstants.Mod1;
 import frc.robot.Constants.SwerveConstants.Mod2;
 import frc.robot.Constants.SwerveConstants.Mod3;
+import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
+
+import static frc.robot.Constants.SwerveConstants.*;
 
 public class Swerve extends SubsystemBase {
     private final SwerveDrivePoseEstimator swerveOdometry;
@@ -47,6 +52,9 @@ public class Swerve extends SubsystemBase {
     private final ShuffleboardTab swerveTab = Shuffleboard.getTab("Swerve");
 
     private Supplier<Optional<PoseEstimate>> visionSup = Optional::empty;
+
+    private SimpleMotorFeedforward velocityFeedforward = new SimpleMotorFeedforward(driveKS, driveKV, driveKA);
+    private SparkMaxPIDConstants velocityPID = drivePIDConstants;
 
     public Swerve() {
         gyro = new AHRS(gyroPort);//Automatically calibrates
@@ -85,7 +93,7 @@ public class Swerve extends SubsystemBase {
 
         /* Show field view */
         swerveTab.add("Field", field)
-            .withPosition(0, 0).withSize(10, 4);
+            .withPosition(0, 0).withSize(8, 3);
 
         /* Send pathplanner target pose to field view */
         PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
@@ -99,11 +107,36 @@ public class Swerve extends SubsystemBase {
 
         /* Add Telemetry */
         swerveTab.addDouble("Pose X", () -> getPose().getX())
-            .withPosition(0, 5).withSize(2, 1);
+            .withPosition(0, 4).withSize(1, 1);
         swerveTab.addDouble("Pose Y", () -> getPose().getY())
-            .withPosition(2,5).withSize(2, 1);
+            .withPosition(1,4).withSize(1, 1);
         swerveTab.addDouble("Pose Heading", () -> getPose().getRotation().getDegrees())
-            .withPosition(4, 5).withSize(2, 1);
+            .withPosition(2, 4).withSize(1, 1);
+
+        /* Add Constants */
+        GenericEntry kS = swerveTab.add("kS", velocityFeedforward.ks)
+            .withPosition(3, 4).withSize(1, 1)
+            .getEntry();
+        GenericEntry kV = swerveTab.add("kV", velocityFeedforward.kv)
+            .withPosition(4, 4).withSize(1, 1)
+            .getEntry();
+        GenericEntry kP = swerveTab.add("kP", velocityPID.kP())
+            .withPosition(5, 4).withSize(1, 1)
+            .getEntry();
+        GenericEntry kD = swerveTab.add("kD", velocityPID.kD())
+            .withPosition(6, 4).withSize(1, 1)
+            .getEntry();
+        swerveTab.add(runOnce(() -> updateConstantsFromDashboard(kS, kV, kP, kD)).withName("Update Constants"))
+            .withPosition(7, 4).withSize(1, 1);
+    }
+
+    private void updateConstantsFromDashboard(GenericEntry kS, GenericEntry kV, GenericEntry kP, GenericEntry kD) {
+        velocityFeedforward = new SimpleMotorFeedforward(kS.getDouble(0), kV.getDouble(0));
+        velocityPID = new SparkMaxPIDConstants(kP.getDouble(0), 0.0, kD.getDouble(0), 0.0, -1.0, 1.0);
+
+        for(SwerveModule mod : swerveMods) {
+            mod.updateVelocityConstants(velocityFeedforward, velocityPID);
+        }
     }
 
     public void driveClosedLoopFromSpeeds(ChassisSpeeds speeds) {
@@ -200,7 +233,7 @@ public class Swerve extends SubsystemBase {
         double xyStandardDeviation;
         double headingStandardDeviation;
         /* Multiple targets detected means a lower standard deviation */
-        if (poseEstimate.tagCount >= 2) {
+        if (poseEstimate.tagCount >= 2 && poseDifference < 1.0) {
             xyStandardDeviation = 0.5;
             headingStandardDeviation = 6;
         }
