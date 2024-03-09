@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.SparkMaxWrapper;
 
@@ -114,7 +115,7 @@ public class Shooter extends SubsystemBase {
             .withPosition(1, 3).withSize(1, 1);
         shooterTab.add(shootSequence(95.0))
             .withPosition(2, 3).withSize(1, 1);
-        shooterTab.add(resetState())
+        shooterTab.add(resetCommand())
             .withPosition(3, 3).withSize(1, 1);
         shooterTab.add(setToStoragePosition(true))
             .withPosition(4, 3).withSize(1, 1);
@@ -200,11 +201,31 @@ public class Shooter extends SubsystemBase {
 
     public Command shootSequence(double velocityRPS) {
         return setFlywheelVelocity(velocityRPS, true)
-           .andThen(enableStorageMotorToFlywheels())
+           .andThen(feedRingSequence())
+           .withName("Shoot");
+    }
+
+    public Command shootSequenceWithDistanceLockOn(double velocityRPS, DoubleSupplier distanceSup) {
+        return setVelocityWhileMovingArm(velocityRPS, distanceSup)
+           .andThen(feedRingSequence())
+           .withName("Shoot locked on");
+    }
+
+    private Command feedRingSequence() {
+        return enableStorageMotorToFlywheels()
            .andThen(Commands.waitSeconds(shotWaitTime))
            .andThen(disableFlywheels())
-           .andThen(setToStoragePosition(false))
-           .withName("Shoot");
+           .andThen(setToStoragePosition(false));
+    }
+
+    private Command setVelocityWhileMovingArm(double setpoint, DoubleSupplier distanceSup) {
+        return new FunctionalCommand(
+            () -> setVelocitySetpoint(setpoint), 
+            () -> setArmSetpoint(applyLookupTable(distanceSup.getAsDouble())), 
+            unused -> {}, 
+            this::flywheelsAtSetpoint, 
+            this
+        );
     }
 
     public Command setToStoragePosition(boolean waitUntilAchieved) {
@@ -259,7 +280,7 @@ public class Shooter extends SubsystemBase {
             getCurrentCommand().cancel();
     }
 
-    public Command resetState() {
+    public Command resetCommand() {
         return runOnce(this::reset).withName("Reset");
     }
 }

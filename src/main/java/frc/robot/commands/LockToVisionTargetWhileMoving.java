@@ -21,17 +21,19 @@ public class LockToVisionTargetWhileMoving extends Command {
 
     private DoubleSupplier translationSup;
     private DoubleSupplier strafeSup;
+    private DoubleSupplier rotationSup;
 
     private final SlewRateLimiter accelerationLimiterTranslation = new SlewRateLimiter(accelerationLimit);
     private final SlewRateLimiter accelerationLimiterStrafe = new SlewRateLimiter(accelerationLimit);
 
     private final PIDController swerveRotController;
 
-    public LockToVisionTargetWhileMoving(Swerve swerve, LimelightVision limelight, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+    public LockToVisionTargetWhileMoving(Swerve swerve, LimelightVision limelight, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {
         this.swerve = swerve;
         this.limelight = limelight;
         this.translationSup = translationSup;
         this.strafeSup = strafeSup;
+        this.rotationSup = rotationSup;
 
         swerveRotController = new PIDController(kPRotationTarget, kIRotationTarget, kDRotationTarget);
         swerveRotController.setIntegratorRange(-kIZoneRotationTarget, kIZoneRotationTarget);
@@ -45,11 +47,12 @@ public class LockToVisionTargetWhileMoving extends Command {
         /* Use joystick deadband to prevent small drifts */
         double translationVal = MathUtil.applyDeadband(translationSup.getAsDouble(), stickDeadband);
         double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), stickDeadband);
-        double rotationVal = 0.0;
+        double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), stickDeadband);
 
         /* Curve inputs to allow for more control closer to the lower range of the joystick */
         translationVal = applyInputCurve(translationVal);
         strafeVal = applyInputCurve(strafeVal);
+        rotationVal = applyInputCurve(rotationVal);
 
         /* Multiply by conversion factor to get the joystick value in m/s and apply acceleration limits */
         translationVal *= joystickToSpeedConversionFactor;
@@ -57,6 +60,8 @@ public class LockToVisionTargetWhileMoving extends Command {
 
         strafeVal *= joystickToSpeedConversionFactor;
         strafeVal = accelerationLimiterStrafe.calculate(strafeVal);
+
+        rotationVal *= joystickToAngularVelocityConversionFactor;
 
         /* Override rotation to tag x-offset */
         AprilTagTarget aprilTag = limelight.getAprilTagTarget();

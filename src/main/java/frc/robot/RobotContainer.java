@@ -35,8 +35,9 @@ public class RobotContainer {
     private final Trigger speakerScoreButton = mechanismController.rightBumper().debounce(0.025);
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
     private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
-    private final Trigger ampScoreButton = mechanismController.leftBumper().debounce(0.025);
-    private final Trigger aimButton = mechanismController.rightTrigger(0.2);
+    private final Trigger ampScoreButton = mechanismController.y().debounce(0.025);
+    private final Trigger storageButton = mechanismController.x().debounce(0.025);
+    private final Trigger aimButton = mechanismController.leftBumper().debounce(0.025);
     private final Trigger resetButton = mechanismController.back().debounce(1.0);
 
     /* Subsystems */
@@ -69,6 +70,7 @@ public class RobotContainer {
 
         /* Add auto chooser */
         autoChooser.addOption("Swerve Auto Shakedown", AutoBuilder.buildAuto("SwerveShakedown"));
+        autoChooser.addOption("Multinote Test", AutoBuilder.buildAuto("MultiNoteAuto"));
         // autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
         // autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
         autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
@@ -114,11 +116,12 @@ public class RobotContainer {
          * 
          * Current mechanism controls:
          * right bumper [must have a valid speaker target and a note] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
-         * right trigger [must have a valid speaker target] -> aim shooter and swerve for speaker
+         * left bumper [must have a valid speaker target] -> aim swerve for april tag
          * b -> [must not have a note] set intake to ground position and enable intake - when a note is gained, then move the intake to storage
          * a [must have a note in the intake] -> run store note sequence
-         * left bumper [must have a note in the intake] -> move intake to amp position and shoot into amp
-         * back [hold 1 second ] -> reset states
+         * y [must have a note in the intake] -> move intake to amp position and shoot into amp
+         * x -> set intake and shooter to the default positions
+         * back [hold 1 second] -> reset states
         */
 
         /* Driver Controls */
@@ -132,8 +135,7 @@ public class RobotContainer {
 
         /* Mechanism Controls */
         speakerScoreButton.onTrue(
-            shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().yOffset, true)//TODO use distance
-            .andThen(shooter.shootSequence(95.0))//TODO do lookup table if needed
+            shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().yOffset)//TODO use distance and do lookup table if needed
              /* Only run if there is a valid target and it's a speaker tag and we have a note */
             .onlyIf(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && shooter.hasNote())
         );
@@ -156,17 +158,22 @@ public class RobotContainer {
         );
 
         resetButton.onTrue(
-            intake.resetState()
-            .andThen(shooter.resetState())
+            intake.resetCommand()
+            .andThen(shooter.resetCommand())
         );
 
         aimButton.whileTrue(
             new LockToVisionTargetWhileMoving(swerve, limelight, 
                 () -> -driveController.getLeftY(), 
-                () -> -driveController.getLeftX())
-            .alongWith(
-                shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().yOffset, false)
-                .repeatedly())//TODO use distance
+                () -> -driveController.getLeftX(),
+                driveController::getRightX)
+        );
+
+        storageButton.onTrue(
+            intake.setToPassthroughPosition(false)
+            .andThen(intake.disableFlywheels())
+            .andThen(shooter.setToStoragePosition(false))
+            .onlyIf(() -> !intake.hasNote())
         );
     }
 
