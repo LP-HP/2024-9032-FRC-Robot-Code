@@ -27,9 +27,9 @@ public final class Constants {
         public static final double stickDeadband = 0.02;
         public static final boolean isFieldCentric = true;
         /* Meters per Second */
-        public static final double joystickToSpeedConversionFactor = 1;
+        public static final double joystickToSpeedConversionFactor = 4.0;
         /* Radians per Second */
-        public static final double joystickToAngularVelocityConversionFactor = Math.PI;
+        public static final double joystickToAngularVelocityConversionFactor = 4 * Math.PI;
         /* Meters per Second Squared */
         public static final double accelerationLimit = 16.0;//TODO tune
         public static final double decelerationLimit = -16.0;//TODO tune
@@ -42,8 +42,8 @@ public final class Constants {
         public static final boolean startInLocalization = false;
 
         /* Distance Constants */
-        public static final double tagHeight = Units.inchesToMeters(60.0);
-        public static final double mountingHeight = Units.inchesToMeters(10.0);
+        public static final double tagHeight = Units.inchesToMeters(57.25);
+        public static final double mountingHeight = Units.inchesToMeters(12.75);
         public static final double mountingAngle = Units.degreesToRadians(18.0);
     }
 
