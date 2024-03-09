@@ -113,7 +113,7 @@ public class RobotContainer {
          * 
          * Current mechanism controls:
          * right bumper [must have a valid speaker target and a note] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
-         * right trigger [must have a valid speaker target] -> aim for speaker
+         * right trigger [must have a valid speaker target] -> aim shooter and swerve for speaker
          * b -> [must not have a note] set intake to ground position and enable intake - when a note is gained, then move the intake to storage
          * a [must have a note in the intake] -> run store note sequence
          * left bumper [must have a note in the intake] -> move intake to amp position and shoot into amp
@@ -132,7 +132,8 @@ public class RobotContainer {
 
         /* Mechanism Controls */
         speakerScoreButton.onTrue(
-            new SpeakerScoringSequence(limelight, shooter)
+            shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().yOffset, true)//TODO use distance
+            .andThen(shooter.shootSequence(95.0))//TODO do lookup table if needed
              /* Only run if there is a valid target and it's a speaker tag and we have a note */
             .onlyIf(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && shooter.hasNote())
         );
@@ -163,6 +164,9 @@ public class RobotContainer {
             new LockToVisionTargetWhileMoving(swerve, limelight, 
                 () -> -driveController.getLeftY(), 
                 () -> -driveController.getLeftX())
+            .alongWith(
+                shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().yOffset, false)
+                .repeatedly())//TODO use distance
         );
     }
 
