@@ -148,7 +148,7 @@ public class Intake extends SubsystemBase {
         hasNoteState = false;
     }
 
-    private Command resetState() {
+    public Command resetState() {
         return runOnce(this::reset).withName("Reset");
     }
 }

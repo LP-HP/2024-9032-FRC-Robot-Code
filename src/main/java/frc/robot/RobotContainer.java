@@ -24,13 +24,17 @@ import frc.robot.util.SparkMaxWrapper;
 public class RobotContainer {
     /* Controllers */
     private final CommandXboxController driveController = new CommandXboxController(Constants.driveControllerPort);
+    private final CommandXboxController mechanismController = new CommandXboxController(Constants.mechanismControllerPort);
 
-    /* Driver Buttons */
+    /* Drive Controller Buttons */
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
-    private final Trigger speakerScoreButton = driveController.y().debounce(0.025);
-    private final Trigger enableIntakeButton = driveController.b().debounce(0.025);
-    private final Trigger storeNoteButton = driveController.rightBumper().debounce(0.025);
-    private final Trigger ampScoreButton = driveController.leftBumper().debounce(0.025);
+
+    /* Mechanism Controller Buttons */
+    private final Trigger speakerScoreButton = mechanismController.rightBumper().debounce(0.025);
+    private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
+    private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
+    private final Trigger ampScoreButton = mechanismController.leftBumper().debounce(0.025);
+    private final Trigger resetButton = mechanismController.back().debounce(1.0);
     // private final Trigger aprilTagAlignmentTest = driveController.x().debounce(0.025);//TODO remove
 
     /* Subsystems */
@@ -98,18 +102,20 @@ public class RobotContainer {
 
     private void configureButtonBindings() {
         /* 
-         * Current controls: 
+         * Current driver controls: 
          * 
          * left stick x and y - controls strafing
          * right stick x - controls rotation 
-         * 
-         * a -> zero gyro
-         * y [must have a valid speaker target and a note] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
-         * b -> [must not have a note] set intake to ground position and enable intake - when a note is gained, then move the intake to storage
-         * right bumper [must have a note in the intake] -> run store note sequence
-         * left bumper [must have a note in the intake] -> move intake to amp position and shoot into amp
          * right trigger -> move climbers up by trigger amount
          * left trigger -> move climbers down by trigger amount
+         * a -> zero gyro
+         * 
+         * Current mechanism controls:
+         * right bumper [must have a valid speaker target and a note] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
+         * b -> [must not have a note] set intake to ground position and enable intake - when a note is gained, then move the intake to storage
+         * a [must have a note in the intake] -> run store note sequence
+         * left bumper [must have a note in the intake] -> move intake to amp position and shoot into amp
+         * back [hold 1 second ] -> reset states
          * 
         */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
@@ -141,6 +147,11 @@ public class RobotContainer {
             climbers.setClimberPower(
                 () -> driveController.getRightTriggerAxis() - driveController.getLeftTriggerAxis()
             )
+        );
+
+        resetButton.onTrue(
+            intake.resetState()
+            .andThen(shooter.resetState())
         );
         
         // aprilTagAlignmentTest.onTrue(//TODO move to other class

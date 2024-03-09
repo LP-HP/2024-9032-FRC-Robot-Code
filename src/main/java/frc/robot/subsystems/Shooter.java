@@ -257,7 +257,7 @@ public class Shooter extends SubsystemBase {
             getCurrentCommand().cancel();
     }
 
-    private Command resetState() {
+    public Command resetState() {
         return runOnce(this::reset).withName("Reset");
     }
 }

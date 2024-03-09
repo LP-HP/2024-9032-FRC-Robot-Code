@@ -21,6 +21,7 @@ import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
  */
 public final class Constants {
     public static final int driveControllerPort = 0;
+    public static final int mechanismControllerPort = 1;
     public static final boolean burnFlash = false;
 
     public static final class TeleopConstants {
@@ -31,8 +32,7 @@ public final class Constants {
         /* Radians per Second */
         public static final double joystickToAngularVelocityConversionFactor = 4 * Math.PI;
         /* Meters per Second Squared */
-        public static final double accelerationLimit = 16.0;//TODO tune
-        public static final double decelerationLimit = -16.0;//TODO tune
+        public static final double accelerationLimit = 32.0;
     }
 
     public static final class VisionConstants {
@@ -143,7 +143,7 @@ public final class Constants {
 
         /* Arm Positions */
         public static final double armPositionPassthrough = 130.0;
-        public static final double armPositionStorage = 140.0;
+        public static final double armPositionStorage = 120.0;
         /* Key - Distance : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap distanceToArmPosTable = new InterpolatingDoubleTreeMap();
         static {
@@ -183,7 +183,7 @@ public final class Constants {
             12,
             1.0
         );
-        public static final double storageMotorPowerReceiving = 0.3;
+        public static final double storageMotorPowerReceiving = 0.25;
         public static final double storageMotorPowerToFlywheels = 0.75;
 
         /* Sensors */
