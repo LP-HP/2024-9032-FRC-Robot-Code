@@ -52,6 +52,7 @@ public class Shooter extends SubsystemBase {
         TalonFXConfiguration leftFlywheelConfig = new TalonFXConfiguration();
         leftFlywheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         leftFlywheelConfig.CurrentLimits.SupplyCurrentLimit = flywheelSupplyCurrentLimit;
+        leftFlywheelConfig.CurrentLimits.SupplyTimeThreshold = flywheelSupplyTimeThreshold;
         leftFlywheelConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         leftFlywheelConfig.Slot0.kP = flywheelkP;
         leftFlywheelConfig.Slot0.kD = flywheelkD;
@@ -62,6 +63,7 @@ public class Shooter extends SubsystemBase {
         TalonFXConfiguration rightFlywheelConfig = new TalonFXConfiguration();
         rightFlywheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         rightFlywheelConfig.CurrentLimits.SupplyCurrentLimit = flywheelSupplyCurrentLimit;
+        rightFlywheelConfig.CurrentLimits.SupplyTimeThreshold = flywheelSupplyTimeThreshold;
         rightFlywheelConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         rightFlywheelConfig.Slot0.kP = flywheelkP;
         rightFlywheelConfig.Slot0.kD = flywheelkD;

@@ -34,6 +34,7 @@ public class RobotContainer {
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
     private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
     private final Trigger ampScoreButton = mechanismController.leftBumper().debounce(0.025);
+    private final Trigger aimButton = mechanismController.rightTrigger(0.1);
     private final Trigger resetButton = mechanismController.back().debounce(1.0);
     // private final Trigger aprilTagAlignmentTest = driveController.x().debounce(0.025);//TODO remove
 
@@ -73,6 +74,7 @@ public class RobotContainer {
         autoChooser.addOption("Rotate To April Tag", new AlignWithVisionTarget(swerve, limelight, true, false));
 
         driverTab.add(autoChooser);
+        driverTab.add(new SpeakerScoringSequence(swerve, limelight, shooter));
 
         /* Add driver tab telemetry */
         driverTab.addBoolean("Has Any Motor Errors", SparkMaxWrapper::hasAnyMotorErrors);
@@ -153,6 +155,8 @@ public class RobotContainer {
             intake.resetState()
             .andThen(shooter.resetState())
         );
+
+        aimButton.whileTrue(new AlignWithVisionTarget(swerve, () -> -driveController.getLeftY(), () -> -driveController.getLeftX(), limelight, true, false));
         
         // aprilTagAlignmentTest.onTrue(//TODO move to other class
         //     new LockToRotationTargetWhileMoving(swerve, 

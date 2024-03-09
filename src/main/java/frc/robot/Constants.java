@@ -156,9 +156,10 @@ public final class Constants {
         /* Shooter Flywheels */
         public static final double flywheelVelocityTolerance = 1.0;
         public static final int flywheelSupplyCurrentLimit = 60;
+        public static final double flywheelSupplyTimeThreshold = 0.2;
         public static final double flywheelkP = 0.1;
         public static final double flywheelkD = 0.0;
-        public static final double flywheelkV = 0.12;
+        public static final double flywheelkV = 0.117;
         public static final double flywheelkS = 0.0;
 
         public static final int leftFlywheelMotorID = 17;
@@ -431,7 +432,7 @@ public final class Constants {
 
         /* PID Constants for rotation and movement to a vision target */
         public static final double kPRotationTarget = 0.09;
-        public static final double kIRotationTarget = 0.00001;
+        public static final double kIRotationTarget = 0.000011;
         public static final double kDRotationTarget = 0.005;
         public static final double kIZoneRotationTarget = 1.0;
 
