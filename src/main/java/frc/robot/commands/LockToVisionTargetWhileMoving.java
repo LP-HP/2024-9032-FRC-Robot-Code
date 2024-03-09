@@ -58,7 +58,7 @@ public class LockToVisionTargetWhileMoving extends Command {
         strafeVal *= joystickToSpeedConversionFactor;
         strafeVal = accelerationLimiterStrafe.calculate(strafeVal);
 
-        /* Override Rotation  */
+        /* Override rotation to tag x-offset */
         AprilTagTarget aprilTag = limelight.getAprilTagTarget();
         if(aprilTag.isValid) 
             rotationVal = swerveRotController.calculate(aprilTag.xOffset);

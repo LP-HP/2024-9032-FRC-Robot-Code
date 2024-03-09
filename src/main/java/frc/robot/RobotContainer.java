@@ -34,7 +34,7 @@ public class RobotContainer {
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
     private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
     private final Trigger ampScoreButton = mechanismController.leftBumper().debounce(0.025);
-    private final Trigger aimButton = mechanismController.rightTrigger(0.1);
+    private final Trigger aimButton = mechanismController.rightTrigger(0.2);
     private final Trigger resetButton = mechanismController.back().debounce(1.0);
     // private final Trigger aprilTagAlignmentTest = driveController.x().debounce(0.025);//TODO remove
 
@@ -164,14 +164,6 @@ public class RobotContainer {
                 () -> -driveController.getLeftY(), 
                 () -> -driveController.getLeftX())
         );
-        
-        // aprilTagAlignmentTest.onTrue(//TODO move to other class
-        //     new LockToRotationTargetWhileMoving(swerve, 
-        //         () -> limelight.getAprilTagTarget().xOffset, 
-        //         () -> 
-        //             new Translation2d(driveController.getLeftX(), -driveController.getLeftY())
-        //             .times(Constants.TeleopConstants.joystickToSpeedConversionFactor))
-        // );
     }
 
     private Command setAndDisableRumble() {
