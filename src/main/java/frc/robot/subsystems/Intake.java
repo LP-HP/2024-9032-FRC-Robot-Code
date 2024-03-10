@@ -56,7 +56,7 @@ public class Intake extends SubsystemBase {
             .withPosition(4, 3).withSize(1, 1);
         intakeTab.add(getNoteFromGround())
             .withPosition(5, 3).withSize(1, 1);
-        intakeTab.add(resetState())
+        intakeTab.add(resetCommand())
             .withPosition(6, 3).withSize(1, 1);
     }
 
@@ -139,7 +139,7 @@ public class Intake extends SubsystemBase {
         hasNoteState = false;
     }
 
-    private Command resetState() {
+    public Command resetCommand() {
         return runOnce(this::reset).withName("Reset");
     }
 }

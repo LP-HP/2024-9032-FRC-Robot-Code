@@ -38,7 +38,14 @@ public class LimelightVision extends SubsystemBase {
         limelightTab.add(currentPose)
             .withPosition(8, 0).withSize(2, 2);
         limelightTab.addBoolean("Localization Pipeline", () -> isLocalizationPipeline)
-            .withPosition(8, 3).withSize(2, 1);;
+            .withPosition(8, 3).withSize(2, 1);
+
+        /* Add Pipeline Buttons */
+        limelightTab.add("To Localization", runOnce(this::switchToLocalizationPipeline))
+            .withPosition(0, 4).withSize(2, 1);
+        limelightTab.add("To Target", runOnce(this::switchToTargetPipeline))
+            .withPosition(2, 4).withSize(2, 1);
+
     }
 
     @Override
@@ -104,12 +111,12 @@ public class LimelightVision extends SubsystemBase {
             SendableRegistry.add(this, "April Tag Target");
         }
 
-        public boolean isSpeakerTag() {
-            return id == 4 || id == 7;
+        public boolean isValidSpeakerTag() {
+            return isValid && (id == 4 || id == 7);
         }
 
-        public boolean isAmpTag() {
-            return id == 6 || id == 5;
+        public boolean isValidAmpTag() {
+            return isValid && (id == 6 || id == 5);
         }
 
         @Override

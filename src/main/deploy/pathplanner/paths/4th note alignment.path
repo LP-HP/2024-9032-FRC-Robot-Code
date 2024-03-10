@@ -3,54 +3,48 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.6162826627647557,
-        "y": 6.1979018544931685
+        "x": 1.7866673263037751,
+        "y": 5.089373789198885
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.9485799777170318,
-        "y": 6.4403958409124105
+        "x": 1.8354161173880559,
+        "y": 4.650634669440361
       },
       "isLocked": false,
-      "linkedName": "Path 1 end"
+      "linkedName": "3rd note end"
     },
     {
       "anchor": {
-        "x": 2.5167325548326307,
-        "y": 6.630585568863446
+        "x": 2.040161039942034,
+        "y": 4.211895549681836
       },
       "prevControl": {
-        "x": 2.403875998972379,
-        "y": 6.7742211854128564
+        "x": 1.6306711948340775,
+        "y": 4.3386424065009646
       },
       "nextControl": {
-        "x": 2.6453682536994703,
-        "y": 6.466867406669288
+        "x": 2.347375502504204,
+        "y": 4.116805358888785
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.9904956049228335,
-        "y": 6.034183692299009
+        "x": 2.9273890376759386,
+        "y": 5.089373789198885
       },
       "prevControl": {
-        "x": 2.264322147662911,
-        "y": 6.501949869996606
+        "x": 1.884164908472336,
+        "y": 5.157622096716878
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "2nd note end"
+      "linkedName": "4th note end"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1,
-      "rotationDegrees": 45.0,
-      "rotateFast": true
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -61,11 +55,14 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 29.93151184050796,
+    "rotation": -14.03624346792636,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "MultiNoteAuto",
-  "previewStartingState": null,
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
   "useDefaultConstraints": true
 }

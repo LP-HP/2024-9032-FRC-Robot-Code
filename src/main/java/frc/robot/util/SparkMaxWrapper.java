@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.lib.swerveutil.CANSparkMaxUtil;
 import frc.lib.swerveutil.CANSparkMaxUtil.Usage;
 import frc.robot.Constants;
+import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
 
 public class SparkMaxWrapper extends CANSparkMax implements Sendable {
     private final SparkMaxConstants constants;
@@ -31,7 +32,8 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
     public SparkMaxWrapper(SparkMaxConstants constants) {
         super(constants.id(), MotorType.kBrushless);
 
-        restoreFactoryDefaults();
+        if(Constants.configMotors)
+            restoreFactoryDefaults();
 
         this.constants = constants;
         controller = getPIDController();
@@ -48,9 +50,12 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
         }
 
         absoluteEncoder = getAbsoluteEncoder(Type.kDutyCycle);
-        checkError(absoluteEncoder.setInverted(invert));
-        checkError(absoluteEncoder.setPositionConversionFactor(positionConversionFactor));
-        checkError(absoluteEncoder.setZeroOffset(offset));
+
+        if(Constants.configMotors) {
+            checkError(absoluteEncoder.setInverted(invert));
+            checkError(absoluteEncoder.setPositionConversionFactor(positionConversionFactor));
+            checkError(absoluteEncoder.setZeroOffset(offset));
+        }
 
         hasAbsoluteEncoder = true;
     }
@@ -62,9 +67,11 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
             return;
         }
 
-        checkError(controller.setPositionPIDWrappingEnabled(true));
-        checkError(controller.setPositionPIDWrappingMaxInput(max));
-        checkError(controller.setPositionPIDWrappingMinInput(min));
+        if(Constants.configMotors) {
+            checkError(controller.setPositionPIDWrappingEnabled(true));
+            checkError(controller.setPositionPIDWrappingMaxInput(max));
+            checkError(controller.setPositionPIDWrappingMinInput(min));
+        }
     }
 
     public void config() {
@@ -79,11 +86,11 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
                 break;
             case velocity:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kVelocityOnly);
-                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));//TODO units??
+                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));//TODO units?? - /60 seems to work
                 break;
             case velocityLeader:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kVelocityOnly, true);
-                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));//TODO units??
+                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));
                 break;
             case percentOutput:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kMinimal);
@@ -91,8 +98,14 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
             case velocityControlWithPositionData:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kAll);
                 checkError(relativeEncoder.setPositionConversionFactor(constants.positionConversionFactor()));
-                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));//TODO units??
+                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));
                 break;
+        }
+
+        if(!Constants.configMotors) {
+            isConfigured = true;
+
+            return;
         }
 
         setInverted(constants.inverted());
@@ -102,11 +115,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
         checkError(setIdleMode(constants.idleMode()));
 
         if(constants.pidConstants() != null) {
-            checkError(controller.setP(constants.pidConstants().kP()));
-            checkError(controller.setI(constants.pidConstants().kI()));
-            checkError(controller.setD(constants.pidConstants().kD()));
-            checkError(controller.setFF(constants.pidConstants().kF()));
-            checkError(controller.setOutputRange(constants.pidConstants().minOutput(), constants.pidConstants().maxOutput()));
+            updatePIDConstants(constants.pidConstants());
         }
 
         checkError(enableVoltageCompensation(constants.nominalVoltage()));
@@ -118,6 +127,9 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
 
             System.out.println("Burned the flash of " + constants.name());
         }
+
+        if(hasError) 
+            return;
 
         System.out.println("Configured " + constants.name());
 
@@ -147,6 +159,16 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
                 System.err.println("Cannot set closed loop target on percent output mode");
                 break;
         }          
+    }
+
+    public void updatePIDConstants(SparkMaxPIDConstants constants) {
+        checkError(controller.setP(constants.kP()));
+        checkError(controller.setI(constants.kI()));
+        checkError(controller.setD(constants.kD()));
+        checkError(controller.setFF(constants.kF()));
+        checkError(controller.setOutputRange(constants.minOutput(), constants.maxOutput()));
+
+        System.out.println("Updated PID constants of " + this.constants.name());
     }
 
     public void setClosedLoopTarget(double setpoint) {

@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -24,20 +26,26 @@ import frc.robot.util.SparkMaxWrapper;
 public class RobotContainer {
     /* Controllers */
     private final CommandXboxController driveController = new CommandXboxController(Constants.driveControllerPort);
+    private final CommandXboxController mechanismController = new CommandXboxController(Constants.mechanismControllerPort);
 
-    /* Driver Buttons */
+    /* Drive Controller Buttons */
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
-    private final Trigger speakerScoreButton = driveController.y().debounce(0.025);
-    private final Trigger enableIntakeButton = driveController.b().debounce(0.025);
-    private final Trigger storeNoteButton = driveController.rightBumper().debounce(0.025);
-    private final Trigger ampScoreButton = driveController.leftBumper().debounce(0.025);
-    // private final Trigger aprilTagAlignmentTest = driveController.x().debounce(0.025);//TODO remove
+
+    /* Mechanism Controller Buttons */
+    private final Trigger speakerScoreButton = mechanismController.rightBumper().debounce(0.025);
+    private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
+    private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
+    private final Trigger ampScoreButton = mechanismController.y().debounce(0.025);
+    private final Trigger storageButton = mechanismController.x().debounce(0.025);
+    private final Trigger aimButton = mechanismController.leftBumper().debounce(0.025);
+    private final Trigger resetButton = mechanismController.back().debounce(1.0);
 
     /* Subsystems */
     private final LimelightVision limelight = new LimelightVision();
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
     private final Shooter shooter = new Shooter();
+    private final Climbers climbers = new Climbers();
 
     /* Shuffleboard */
     private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
@@ -61,10 +69,11 @@ public class RobotContainer {
         configureButtonBindings();
 
         /* Add auto chooser */
-        autoChooser.addOption("Swerve Auto Shakedown", new SwerveShakedown(swerve));
+        autoChooser.addOption("Swerve Auto Shakedown", AutoBuilder.buildAuto("SwerveShakedown"));
+        autoChooser.addOption("Multinote Test", AutoBuilder.buildAuto("MultiNoteAuto"));
         // autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
         // autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
-        // autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
+        autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
         autoChooser.addOption("Rotate To April Tag", new AlignWithVisionTarget(swerve, limelight, true, false));
 
         driverTab.add(autoChooser);
@@ -75,12 +84,16 @@ public class RobotContainer {
 
     /* Only reset variables - don't run any commands here */
     public void autonomousInit() {
-        // limelight.switchToLocalizationPipeline();//Ensures that the limelight is never stuck in the wrong pipeline //TODO fix
+        limelight.switchToLocalizationPipeline();//Ensures that the limelight is never stuck in the wrong pipeline 
+    }
+
+    /* Only reset variables - don't run any commands here */
+    public void teleopInit() {
+        limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
     }
 
     /* Only reset variables - don't run any commands here */
     public void disabledExit() {
-        limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
         shooter.reset();
         intake.reset();
     }
@@ -93,24 +106,38 @@ public class RobotContainer {
 
     private void configureButtonBindings() {
         /* 
-         * Current controls: 
+         * Current driver controls: 
          * 
          * left stick x and y - controls strafing
          * right stick x - controls rotation 
-         * 
+         * right trigger -> move climbers up by trigger amount
+         * left trigger -> move climbers down by trigger amount
          * a -> zero gyro
-         * y [must have a valid speaker target and a note] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
-         * b -> [must not have a note] set intake to ground position and enable intake - when a note is gained, then move the intake to storage
-         * right bumper [must have a note in the intake] -> run store note sequence
-         * left bumper [must have a note in the intake] -> move intake to amp position and shoot into amp
          * 
+         * Current mechanism controls:
+         * right bumper [must have a valid speaker target and a note] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
+         * left bumper [must have a valid speaker target] -> aim swerve for april tag
+         * b -> [must not have a note] set intake to ground position and enable intake - when a note is gained, then move the intake to storage
+         * a [must have a note in the intake] -> run store note sequence
+         * y [must have a note in the intake] -> move intake to amp position and shoot into amp
+         * x -> set intake and shooter to the default positions
+         * back [hold 1 second] -> reset states
         */
+
+        /* Driver Controls */
         zeroGyroButton.onTrue(new InstantCommand(swerve::zeroGyro, swerve));
 
+        climbers.setDefaultCommand(
+            climbers.setClimberPower(
+                () -> driveController.getRightTriggerAxis() - driveController.getLeftTriggerAxis()
+            )
+        );
+
+        /* Mechanism Controls */
         speakerScoreButton.onTrue(
-            new SpeakerScoringSequence(swerve, limelight, shooter)
+            shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance)//TODO do lookup table if needed
              /* Only run if there is a valid target and it's a speaker tag and we have a note */
-            .onlyIf(() -> limelight.getAprilTagTarget().isValid && limelight.getAprilTagTarget().isSpeakerTag() && shooter.hasNote())
+            .onlyIf(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && shooter.hasNote())
         );
 
         enableIntakeButton.onTrue(
@@ -124,19 +151,41 @@ public class RobotContainer {
             new StoreNoteSequence(intake, shooter)
             .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
         );
-
+ 
         ampScoreButton.onTrue(
             intake.shootIntoAmp()
             .onlyIf(intake::hasNote)
         );
 
-        // aprilTagAlignmentTest.onTrue(//TODO move to other class
-        //     new LockToRotationTargetWhileMoving(swerve, 
-        //         () -> limelight.getAprilTagTarget().xOffset, 
-        //         () -> 
-        //             new Translation2d(driveController.getLeftX(), -driveController.getLeftY())
-        //             .times(Constants.TeleopConstants.joystickToSpeedConversionFactor))
-        // );
+        resetButton.onTrue(
+            intake.resetCommand()
+            .andThen(shooter.resetCommand())
+        );
+
+        /* When the shooter is not running, run the shooter auto aim */
+        aimButton.and(() -> shooter.getCurrentCommand() == null).whileTrue(
+            new LockToVisionTargetWhileMoving(swerve, limelight, 
+                () -> -driveController.getLeftY(), 
+                () -> -driveController.getLeftX(),
+                driveController::getRightX)
+            .alongWith(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
+                .repeatedly())
+        );
+
+        /* When the shooter is running, don't use the shooter auto aim */
+        aimButton.and(() -> shooter.getCurrentCommand() != null).whileTrue(
+            new LockToVisionTargetWhileMoving(swerve, limelight, 
+                () -> -driveController.getLeftY(), 
+                () -> -driveController.getLeftX(),
+                driveController::getRightX)
+        );
+
+        storageButton.onTrue(
+            intake.setToPassthroughPosition(false)
+            .andThen(intake.disableFlywheels())
+            .andThen(shooter.setToStoragePosition(false))
+            .onlyIf(() -> !intake.hasNote())
+        );
     }
 
     private Command setAndDisableRumble() {
