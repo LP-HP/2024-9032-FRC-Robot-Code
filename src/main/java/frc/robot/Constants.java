@@ -148,10 +148,12 @@ public final class Constants {
         /* Key - Distance : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap distanceToArmPosTable = new InterpolatingDoubleTreeMap();
         static {
-            distanceToArmPosTable.put(-3.34, 128.0);
-            distanceToArmPosTable.put(-0.12, 129.0);
-            distanceToArmPosTable.put(4.58, 132.0);
-            distanceToArmPosTable.put(15.51, 142.0);
+            distanceToArmPosTable.put(1.6, 142.5);
+            distanceToArmPosTable.put(2.1, 135.0);
+            distanceToArmPosTable.put(2.62, 132.5);
+            distanceToArmPosTable.put(3.086, 131.0);
+            distanceToArmPosTable.put(3.63, 127.0);
+            distanceToArmPosTable.put(4.152, 126.0);
         }
 
         /* Shooter Flywheels */
@@ -432,9 +434,9 @@ public final class Constants {
         ); 
 
         /* PID Constants for rotation and movement to a vision target */
-        public static final double kPRotationTarget = 0.09;
-        public static final double kIRotationTarget = 0.000011;
-        public static final double kDRotationTarget = 0.005;
+        public static final double kPRotationTarget = 0.14;
+        public static final double kIRotationTarget = 0.0;
+        public static final double kDRotationTarget = 0.01;
         public static final double kIZoneRotationTarget = 1.0;
 
         public static final double kPTranslationTarget = 0.01;//TODO tune and test
