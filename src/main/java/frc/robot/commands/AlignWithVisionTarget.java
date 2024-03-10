@@ -47,7 +47,7 @@ public class AlignWithVisionTarget extends Command {
 
             else {
                 swerve.driveClosedLoop(
-                    new Translation2d(swerveTranslationController.calculate(limelight.getAprilTagTarget().yOffset), 0.0),//TODO use distance
+                    new Translation2d(swerveTranslationController.calculate(limelight.getAprilTagTarget().distance), 0.0),
                     swerveRotController.calculate(limelight.getAprilTagTarget().xOffset));
             }
         }

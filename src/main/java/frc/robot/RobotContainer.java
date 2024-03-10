@@ -135,7 +135,7 @@ public class RobotContainer {
 
         /* Mechanism Controls */
         speakerScoreButton.onTrue(
-            shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().yOffset)//TODO use distance and do lookup table if needed
+            shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance)//TODO do lookup table if needed
              /* Only run if there is a valid target and it's a speaker tag and we have a note */
             .onlyIf(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && shooter.hasNote())
         );

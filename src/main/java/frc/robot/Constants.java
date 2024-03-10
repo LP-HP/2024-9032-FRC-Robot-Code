@@ -261,7 +261,7 @@ public final class Constants {
         public static final int driveContinuousCurrentLimit = 60;
 
         /* Angle Motor PID Values */
-        public static final SparkMaxPIDConstants anglePIDConstants = new SparkMaxPIDConstants(//TODO Tune - needed for teleop
+        public static final SparkMaxPIDConstants anglePIDConstants = new SparkMaxPIDConstants(
             0.06, 
             0.0, 
             0.0, 
