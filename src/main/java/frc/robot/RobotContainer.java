@@ -162,7 +162,18 @@ public class RobotContainer {
             .andThen(shooter.resetCommand())
         );
 
-        aimButton.whileTrue(
+        /* When the shooter is not running, run the shooter auto aim */
+        aimButton.and(() -> shooter.getCurrentCommand() == null).whileTrue(
+            new LockToVisionTargetWhileMoving(swerve, limelight, 
+                () -> -driveController.getLeftY(), 
+                () -> -driveController.getLeftX(),
+                driveController::getRightX)
+            .alongWith(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
+                .repeatedly())
+        );
+
+        /* When the shooter is running, don't use the shooter auto aim */
+        aimButton.and(() -> shooter.getCurrentCommand() != null).whileTrue(
             new LockToVisionTargetWhileMoving(swerve, limelight, 
                 () -> -driveController.getLeftY(), 
                 () -> -driveController.getLeftX(),
