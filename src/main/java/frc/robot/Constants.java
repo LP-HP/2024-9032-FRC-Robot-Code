@@ -435,9 +435,7 @@ public final class Constants {
 
         /* PID Constants for rotation and movement to a vision target */
         public static final double kPRotationTarget = 0.14;
-        public static final double kIRotationTarget = 0.0;
         public static final double kDRotationTarget = 0.01;
-        public static final double kIZoneRotationTarget = 1.0;
 
         public static final double kPTranslationTarget = 0.01;//TODO tune and test
         
