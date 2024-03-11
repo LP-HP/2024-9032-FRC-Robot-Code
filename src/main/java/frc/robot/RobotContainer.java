@@ -147,7 +147,7 @@ public class RobotContainer {
             .onlyIf(() -> !intake.hasNote() && !shooter.hasNote() && !shooter.isShooting())
         );
 
-        storeNoteButton.onTrue(
+        storeNoteButton.and(aimButton.negate()).onTrue(
             new StoreNoteSequence(intake, shooter)
             .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
         );
