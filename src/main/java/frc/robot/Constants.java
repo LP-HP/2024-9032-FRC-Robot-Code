@@ -37,7 +37,7 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        public static final String limelightName = "limelight";//TODO set name to 9032Limeligh
+        public static final String limelightName = "limelight";//TODO set name to real camera name
         public static final int targetPipelineID = 0;
         public static final int localizationPipelineID = 1;//TODO make sure this aligns with the limelight config
         public static final boolean startInLocalization = false;
@@ -46,6 +46,14 @@ public final class Constants {
         public static final double tagHeight = Units.inchesToMeters(57.25);
         public static final double mountingHeight = Units.inchesToMeters(12.75);
         public static final double mountingAngle = Units.degreesToRadians(18.0);
+    }
+
+    public static final class IntakeCameraConstants {
+        public static final String cameraName = "photonvision";//TODO set name 
+        /* Distance Constants */
+        public static final double targetHeight = Units.inchesToMeters(1);
+        public static final double cameraHeight = Units.inchesToMeters(6); //TODO change, this is a guess
+        public static final double mountingAngle = Units.degreesToRadians(90); //TODO find actual pitch of camera
     }
 
     /* Using CANIds 13-14 - 2 motors */
