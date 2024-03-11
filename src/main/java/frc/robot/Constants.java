@@ -446,7 +446,7 @@ public final class Constants {
         public static final double notePickupTimeout = 2.0;
         public static final double passthroughWait = 0.5;
 
-        public static final double armPosNote1 = 140.0;
+        public static final double armPosNote1 = 147.0;
         public static final double shooterVelocityNote1 = 95.0;
         public static final double armPosNote2 = 140.0;
         public static final double shooterVelocityNote2 = 95.0;
