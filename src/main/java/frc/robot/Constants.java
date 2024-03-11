@@ -31,7 +31,7 @@ public final class Constants {
         /* Meters per Second */
         public static final double joystickToSpeedConversionFactor = 4.0;
         /* Radians per Second */
-        public static final double joystickToAngularVelocityConversionFactor = 4 * Math.PI;
+        public static final double joystickToAngularVelocityConversionFactor = 3 * Math.PI;
         /* Meters per Second Squared */
         public static final double accelerationLimit = 32.0;
     }
@@ -71,12 +71,10 @@ public final class Constants {
             12,
             360.0 / 60.0
         );
-        public static final boolean invertAbsoluteEncoder = false;
-        public static final double absoluteEncoderConversionFactor = 360.0;
-        public static final double absoluteEncoderOffset = 98.1747508;
         /* Arm Positions */
+        public static final double armPositionStarting = 229.0;
         public static final double armPositionGround = 26.5;
-        public static final double armPositionPassthrough = 225.0;
+        public static final double armPositionPassthrough = 227.0;
         public static final double armPositionAmp = 160.0;
 
         /* Intake Flywheel */

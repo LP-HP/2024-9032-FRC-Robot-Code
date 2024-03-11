@@ -134,7 +134,7 @@ public class RobotContainer {
         );
 
         /* Mechanism Controls */
-        speakerScoreButton.onTrue(
+        speakerScoreButton.and(aimButton).onTrue(
             shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance)//TODO do lookup table if needed
              /* Only run if there is a valid target and it's a speaker tag and we have a note */
             .onlyIf(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && shooter.hasNote())
@@ -144,10 +144,10 @@ public class RobotContainer {
             shooter.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround())
             .andThen(setAndDisableRumble())
-            .onlyIf(() -> !intake.hasNote() && !shooter.hasNote())
+            .onlyIf(() -> !intake.hasNote() && !shooter.hasNote() && !shooter.isShooting())
         );
 
-        storeNoteButton.onTrue(
+        storeNoteButton.and(aimButton.negate()).onTrue(
             new StoreNoteSequence(intake, shooter)
             .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
         );
@@ -162,22 +162,18 @@ public class RobotContainer {
             .andThen(shooter.resetCommand())
         );
 
-        /* When the shooter is not running, run the shooter auto aim */
-        aimButton.and(() -> shooter.getCurrentCommand() == null).whileTrue(
+        aimButton.whileTrue(
             new LockToVisionTargetWhileMoving(swerve, limelight, 
                 () -> -driveController.getLeftY(), 
                 () -> -driveController.getLeftX(),
                 driveController::getRightX)
-            .alongWith(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
-                .repeatedly())
+            .onlyIf(shooter::hasNote)
         );
 
-        /* When the shooter is running, don't use the shooter auto aim */
-        aimButton.and(() -> shooter.getCurrentCommand() != null).whileTrue(
-            new LockToVisionTargetWhileMoving(swerve, limelight, 
-                () -> -driveController.getLeftY(), 
-                () -> -driveController.getLeftX(),
-                driveController::getRightX)
+        aimButton.and(() -> shooter.getCurrentCommand() == null).whileTrue(
+            shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
+                .repeatedly()
+            .onlyIf(shooter::hasNote)
         );
 
         storageButton.onTrue(
