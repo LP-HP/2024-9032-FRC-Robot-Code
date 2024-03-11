@@ -121,7 +121,7 @@ public class Intake extends SubsystemBase {
         return hasNoteState;
     }
 
-    private boolean armAtSetpoint() {
+    public boolean armAtSetpoint() {
         return Math.abs(armMotor.relativeEncoder.getPosition() - armMotor.getSetpoint()) < armSetpointTolerance;
     }
 
