@@ -42,7 +42,7 @@ public class RobotContainer {
 
     /* Subsystems */
     private final LimelightVision limelight = new LimelightVision();
-    private final Photonvision photonvision = new Photonvision();
+    // private final Photonvision photonvision = new Photonvision();
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
     private final Shooter shooter = new Shooter();
@@ -143,7 +143,7 @@ public class RobotContainer {
         enableIntakeButton.onTrue(
             shooter.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround())
-                .deadlineWith(new AlignWithVisionTarget(swerve, photonvision, false, false))
+                // .deadlineWith(new AlignWithVisionTarget(swerve, photonvision, false, false))
             .andThen(setAndDisableRumble())
             .onlyIf(() -> !intake.hasNote() && !shooter.hasNote() && !shooter.isShooting())
         );

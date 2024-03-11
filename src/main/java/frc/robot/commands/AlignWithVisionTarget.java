@@ -46,7 +46,7 @@ public class AlignWithVisionTarget extends Command {
 
             else {
                 swerve.driveOpenLoop(
-                    new Translation2d(swerveTranslationController.calculate(photonvision.getLatestDistance()), 0.0),
+                    new Translation2d(swerveTranslationController.calculate(-Math.abs(photonvision.getLatestDistance())), 0.0),//TODO fix distance readings
                     swerveRotController.calculate(photonvision.getLatestXOffset()), false);
             }
         }

@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
-import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -36,19 +36,19 @@ public class Photonvision extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (camera.getLatestResult().hasTargets()) {
+        PhotonPipelineResult result = camera.getLatestResult();
+
+        if (result.hasTargets()) {
             hasTargets = true;
 
-            PhotonTrackedTarget result = camera.getLatestResult().getBestTarget();
-
-            xOffset = result.getYaw();
+            xOffset = result.getBestTarget().getYaw();
 
             /* Calculate distance */
             distance = PhotonUtils.calculateDistanceToTargetMeters(
                     cameraHeight,
                     targetHeight,
                     mountingAngle,
-                    Units.degreesToRadians(result.getPitch())
+                    Units.degreesToRadians(result.getBestTarget().getPitch())
             );
         }
 

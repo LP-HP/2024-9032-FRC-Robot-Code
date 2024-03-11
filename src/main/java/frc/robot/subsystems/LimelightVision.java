@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.limelightutil.LimelightHelpers;
 import frc.lib.limelightutil.LimelightHelpers.PoseEstimate;
-import frc.robot.Constants;
 
 import static frc.robot.Constants.LimelightConstants.*;
 
