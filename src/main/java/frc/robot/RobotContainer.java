@@ -135,7 +135,7 @@ public class RobotContainer {
 
         /* Mechanism Controls */
         speakerScoreButton.onTrue(
-            shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().yOffset)//TODO use distance and do lookup table if needed
+            shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance)//TODO do lookup table if needed
              /* Only run if there is a valid target and it's a speaker tag and we have a note */
             .onlyIf(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && shooter.hasNote())
         );
@@ -162,7 +162,18 @@ public class RobotContainer {
             .andThen(shooter.resetCommand())
         );
 
-        aimButton.whileTrue(
+        /* When the shooter is not running, run the shooter auto aim */
+        aimButton.and(() -> shooter.getCurrentCommand() == null).whileTrue(
+            new LockToVisionTargetWhileMoving(swerve, limelight, 
+                () -> -driveController.getLeftY(), 
+                () -> -driveController.getLeftX(),
+                driveController::getRightX)
+            .alongWith(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
+                .repeatedly())
+        );
+
+        /* When the shooter is running, don't use the shooter auto aim */
+        aimButton.and(() -> shooter.getCurrentCommand() != null).whileTrue(
             new LockToVisionTargetWhileMoving(swerve, limelight, 
                 () -> -driveController.getLeftY(), 
                 () -> -driveController.getLeftX(),

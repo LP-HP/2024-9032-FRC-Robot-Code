@@ -86,11 +86,11 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
                 break;
             case velocity:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kVelocityOnly);
-                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));//TODO units??
+                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));//TODO units?? - /60 seems to work
                 break;
             case velocityLeader:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kVelocityOnly, true);
-                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));//TODO units??
+                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));
                 break;
             case percentOutput:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kMinimal);
@@ -98,7 +98,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
             case velocityControlWithPositionData:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kAll);
                 checkError(relativeEncoder.setPositionConversionFactor(constants.positionConversionFactor()));
-                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));//TODO units??
+                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));
                 break;
         }
 
