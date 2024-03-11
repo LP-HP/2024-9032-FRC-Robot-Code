@@ -171,7 +171,7 @@ public class RobotContainer {
             .onlyIf(shooter::hasNote)
         );
 
-        aimButton.and(() -> shooter.getCurrentCommand() == null).whileTrue(
+        aimButton.whileTrue(
             shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
                 .repeatedly()
             .onlyIf(shooter::hasNote)

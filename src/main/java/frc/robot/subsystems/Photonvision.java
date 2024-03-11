@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static frc.robot.Constants.IntakeCameraConstants.*;
+import static frc.robot.Constants.PhotonvisionConstants.*;
 
 public class Photonvision extends SubsystemBase {
     private final ShuffleboardTab photonvisionTab = Shuffleboard.getTab("Photonvision");
