@@ -72,7 +72,7 @@ public final class Constants {
             360.0 / 60.0
         );
         /* Arm Positions */
-        public static final double armPositionStarting = 229.0;//TODO tune
+        public static final double armPositionStarting = 229.0;
         public static final double armPositionGround = 26.5;
         public static final double armPositionPassthrough = 227.0;
         public static final double armPositionAmp = 160.0;

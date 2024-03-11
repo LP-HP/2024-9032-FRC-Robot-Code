@@ -149,7 +149,7 @@ public class RobotContainer {
 
         storeNoteButton.onTrue(
             new StoreNoteSequence(intake, shooter)
-            .onlyIf(() -> intake.hasNote() && !shooter.hasNote() && !shooter.isShooting() && intake.armAtSetpoint() && shooter.armAtSetpoint())
+            .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
         );
  
         ampScoreButton.onTrue(
