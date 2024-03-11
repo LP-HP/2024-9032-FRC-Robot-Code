@@ -34,6 +34,8 @@ public class Shooter extends SubsystemBase {
 
     private final DigitalInput beamBreak = new DigitalInput(beamBreakPort);
 
+    private boolean isShooting = false;
+
     public Shooter() { 
         armMotor = new SparkMaxWrapper(shooterArmConstants);
         armMotor.configAbsoluteEncoder(invertAbsoluteEncoder, absoluteEncoderConversionFactor, absoluteEncoderOffset);
@@ -156,6 +158,8 @@ public class Shooter extends SubsystemBase {
             return;
         }
 
+        isShooting = true;
+
         leftFlywheelMotor.setControl(flywheelController.withVelocity(setpoint));
         rightFlywheelMotor.setControl(flywheelController.withVelocity(setpoint));
     }
@@ -190,6 +194,7 @@ public class Shooter extends SubsystemBase {
             leftFlywheelMotor.disable();
             rightFlywheelMotor.disable();
             storageMotor.disable();
+            isShooting = false;
         });
     }
 
@@ -216,6 +221,10 @@ public class Shooter extends SubsystemBase {
            .andThen(Commands.waitSeconds(shotWaitTime))
            .andThen(disableFlywheels())
            .andThen(setToStoragePosition(false));
+    }
+
+    public boolean isShooting() {
+        return isShooting;
     }
 
     private Command setVelocityWhileMovingArm(double setpoint, DoubleSupplier distanceSup) {
@@ -260,8 +269,8 @@ public class Shooter extends SubsystemBase {
     public boolean hasNote() {
         return !beamBreak.get();
     }
-
-    private boolean armAtSetpoint() {
+ 
+    public boolean armAtSetpoint() {
         return Math.abs(armMotor.relativeEncoder.getPosition() - armMotor.getSetpoint()) < armSetpointTolerance;
     }
 
@@ -275,6 +284,7 @@ public class Shooter extends SubsystemBase {
         leftFlywheelMotor.disable();
         rightFlywheelMotor.disable();
         storageMotor.disable();
+        isShooting = false;
 
         if(getCurrentCommand() != null) 
             getCurrentCommand().cancel();

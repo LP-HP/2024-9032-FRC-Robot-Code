@@ -134,8 +134,8 @@ public class RobotContainer {
         );
 
         /* Mechanism Controls */
-        speakerScoreButton.onTrue(
-            shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().yOffset)//TODO use distance and do lookup table if needed
+        speakerScoreButton.and(aimButton).onTrue(
+            shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance)//TODO do lookup table if needed
              /* Only run if there is a valid target and it's a speaker tag and we have a note */
             .onlyIf(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && shooter.hasNote())
         );
@@ -144,10 +144,10 @@ public class RobotContainer {
             shooter.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround())
             .andThen(setAndDisableRumble())
-            .onlyIf(() -> !intake.hasNote() && !shooter.hasNote())
+            .onlyIf(() -> !intake.hasNote() && !shooter.hasNote() && !shooter.isShooting())
         );
 
-        storeNoteButton.onTrue(
+        storeNoteButton.and(aimButton.negate()).onTrue(
             new StoreNoteSequence(intake, shooter)
             .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
         );
@@ -167,6 +167,13 @@ public class RobotContainer {
                 () -> -driveController.getLeftY(), 
                 () -> -driveController.getLeftX(),
                 driveController::getRightX)
+            .onlyIf(shooter::hasNote)
+        );
+
+        aimButton.and(() -> shooter.getCurrentCommand() == null).whileTrue(
+            shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
+                .repeatedly()
+            .onlyIf(shooter::hasNote)
         );
 
         storageButton.onTrue(
