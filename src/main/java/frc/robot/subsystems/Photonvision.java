@@ -12,12 +12,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.IntakeCameraConstants.*;
 
 public class Photonvision extends SubsystemBase {
-    private final ShuffleboardTab photonvisionTab = Shuffleboard.getTab("PhotonVision");
+    private final ShuffleboardTab photonvisionTab = Shuffleboard.getTab("Photonvision");
 
     private final PhotonCamera camera = new PhotonCamera(cameraName);
 
     private double distance;
     private double xOffset;
+    private boolean hasTargets = false;
 
     public Photonvision () {
         try {
@@ -36,6 +37,8 @@ public class Photonvision extends SubsystemBase {
     @Override
     public void periodic() {
         if (camera.getLatestResult().hasTargets()) {
+            hasTargets = true;
+
             PhotonTrackedTarget result = camera.getLatestResult().getBestTarget();
 
             xOffset = result.getYaw();
@@ -48,6 +51,20 @@ public class Photonvision extends SubsystemBase {
                     Units.degreesToRadians(result.getPitch())
             );
         }
+
+        else 
+            hasTargets = false;
     }
-     
+    
+    public double getLatestDistance() {
+        return distance;
+    }
+
+    public double getLatestXOffset() {
+        return xOffset;
+    }
+
+    public boolean hasTargets() {
+        return hasTargets;
+    }
 }

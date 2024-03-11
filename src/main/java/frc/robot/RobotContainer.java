@@ -42,6 +42,7 @@ public class RobotContainer {
 
     /* Subsystems */
     private final LimelightVision limelight = new LimelightVision();
+    private final Photonvision photonvision = new Photonvision();
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
     private final Shooter shooter = new Shooter();
@@ -74,7 +75,6 @@ public class RobotContainer {
         // autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
         // autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
         autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
-        autoChooser.addOption("Rotate To April Tag", new AlignWithVisionTarget(swerve, limelight, true, false));
 
         driverTab.add(autoChooser);
 
@@ -143,6 +143,7 @@ public class RobotContainer {
         enableIntakeButton.onTrue(
             shooter.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround())
+                .deadlineWith(new AlignWithVisionTarget(swerve, photonvision, false, false))
             .andThen(setAndDisableRumble())
             .onlyIf(() -> !intake.hasNote() && !shooter.hasNote() && !shooter.isShooting())
         );

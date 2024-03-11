@@ -31,7 +31,7 @@ public final class Constants {
         /* Meters per Second */
         public static final double joystickToSpeedConversionFactor = 4.0;
         /* Radians per Second */
-        public static final double joystickToAngularVelocityConversionFactor = 3 * Math.PI;
+        public static final double joystickToAngularVelocityConversionFactor = 2 * Math.PI;
         /* Meters per Second Squared */
         public static final double accelerationLimit = 32.0;
     }
