@@ -12,9 +12,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.limelightutil.LimelightHelpers;
 import frc.lib.limelightutil.LimelightHelpers.PoseEstimate;
-import frc.robot.Constants;
 
-import static frc.robot.Constants.VisionConstants.*;
+import static frc.robot.Constants.LimelightConstants.*;
 
 public class LimelightVision extends SubsystemBase {
     private LimelightPoseEstimate currentPose = new LimelightPoseEstimate();
@@ -65,13 +64,13 @@ public class LimelightVision extends SubsystemBase {
     }
 
     public void switchToTargetPipeline() {
-        LimelightHelpers.setPipelineIndex(limelightName, Constants.VisionConstants.targetPipelineID);
+        LimelightHelpers.setPipelineIndex(limelightName, targetPipelineID);
 
         isLocalizationPipeline = false;
     }
 
     public void switchToLocalizationPipeline() {
-        LimelightHelpers.setPipelineIndex(limelightName, Constants.VisionConstants.localizationPipelineID);
+        LimelightHelpers.setPipelineIndex(limelightName, localizationPipelineID);
         
         isLocalizationPipeline = true;
     }

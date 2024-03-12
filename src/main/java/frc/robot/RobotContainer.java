@@ -39,11 +39,13 @@ public class RobotContainer {
     private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
     private final Trigger ampScoreButton = mechanismController.y().debounce(0.025);
     private final Trigger storageButton = mechanismController.x().debounce(0.025);
-    private final Trigger aimButton = mechanismController.leftBumper().debounce(0.025);
+    private final Trigger speakerAimButton = mechanismController.leftBumper().debounce(0.025);
+    private final Trigger getNoteButton = mechanismController.rightTrigger(0.25).debounce(0.025);
     private final Trigger resetButton = mechanismController.back().debounce(1.0);
 
     /* Subsystems */
     private final LimelightVision limelight = new LimelightVision();
+    private final Photonvision photonvision = new Photonvision();
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
     private final Shooter shooter = new Shooter();
@@ -75,8 +77,7 @@ public class RobotContainer {
         autoChooser.addOption("Multinote Test", AutoBuilder.buildAuto("MultiNoteAuto"));
         // autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
         // autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
-        // autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
-        autoChooser.addOption("Rotate To April Tag", new AlignWithVisionTarget(swerve, limelight, true, false));
+        autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
 
         driverTab.add(autoChooser);
 
@@ -153,7 +154,7 @@ public class RobotContainer {
         );
 
         /* Mechanism Controls */
-        speakerScoreButton.and(aimButton).onTrue(
+        speakerScoreButton.and(speakerAimButton).onTrue(
             shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance)//TODO do lookup table if needed
              /* Only run if there is a valid target and it's a speaker tag and we have a note */
             .onlyIf(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && shooter.hasNote())
@@ -166,7 +167,11 @@ public class RobotContainer {
             .onlyIf(() -> !intake.hasNote() && !shooter.hasNote() && !shooter.isShooting())
         );
 
-        storeNoteButton.and(aimButton.negate()).onTrue(
+        getNoteButton.and(() -> !intake.hasNote() && photonvision.hasTargets()).whileTrue(
+            new AlignWithVisionTarget(swerve, photonvision, false, false)
+        );   
+
+        storeNoteButton.and(speakerAimButton.negate()).onTrue(
             new StoreNoteSequence(intake, shooter)
             .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
         );
@@ -181,7 +186,7 @@ public class RobotContainer {
             .andThen(shooter.resetCommand())
         );
 
-        aimButton.whileTrue(
+        speakerAimButton.whileTrue(
             new LockToVisionTargetWhileMoving(swerve, limelight, 
                 () -> -driveController.getLeftY(), 
                 () -> -driveController.getLeftX(),
@@ -189,7 +194,7 @@ public class RobotContainer {
             .onlyIf(shooter::hasNote)
         );
 
-        aimButton.and(() -> shooter.getCurrentCommand() == null).whileTrue(
+        speakerAimButton.whileTrue(
             shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
                 .repeatedly()
             .onlyIf(shooter::hasNote)
