@@ -31,21 +31,30 @@ public final class Constants {
         /* Meters per Second */
         public static final double joystickToSpeedConversionFactor = 4.0;
         /* Radians per Second */
-        public static final double joystickToAngularVelocityConversionFactor = 3 * Math.PI;
+        public static final double joystickToAngularVelocityConversionFactor = 2 * Math.PI;
         /* Meters per Second Squared */
         public static final double accelerationLimit = 32.0;
     }
 
-    public static final class VisionConstants {
-        public static final String limelightName = "limelight";//TODO set name to 9032Limeligh
+    public static final class LimelightConstants {
+        public static final String limelightName = "limelight";//TODO set name to real camera name
         public static final int targetPipelineID = 0;
-        public static final int localizationPipelineID = 1;//TODO make sure this aligns with the limelight config
+        public static final int localizationPipelineID = 1;
         public static final boolean startInLocalization = false;
 
         /* Distance Constants */
         public static final double tagHeight = Units.inchesToMeters(57.25);
         public static final double mountingHeight = Units.inchesToMeters(12.75);
         public static final double mountingAngle = Units.degreesToRadians(18.0);
+    }
+
+    public static final class PhotonvisionConstants {
+        public static final String cameraName = "IntakeCamera";
+
+        /* Distance Constants */
+        public static final double targetHeight = Units.inchesToMeters(1);
+        public static final double cameraHeight = Units.inchesToMeters(10.25);
+        public static final double mountingAngle = Units.degreesToRadians(-10); 
     }
 
     /* Using CANIds 13-14 - 2 motors */
@@ -435,7 +444,7 @@ public final class Constants {
         public static final double kPRotationTarget = 0.14;
         public static final double kDRotationTarget = 0.01;
 
-        public static final double kPTranslationTarget = 0.01;//TODO tune and test
+        public static final double kPTranslationTarget = 1.7;//TODO tune and test
         
         public static final double rotationSetpointTolerance = 1.0;
         public static final double translationSetpointTolerance = 0.5;
