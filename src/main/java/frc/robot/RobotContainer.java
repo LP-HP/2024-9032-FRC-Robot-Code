@@ -75,9 +75,6 @@ public class RobotContainer {
         /* Add auto chooser */
         autoChooser.addOption("Swerve Auto Shakedown", AutoBuilder.buildAuto("SwerveShakedown"));
         autoChooser.addOption("Multinote Test", AutoBuilder.buildAuto("MultiNoteAuto"));
-        // autoChooser.addOption("1 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 1));
-        // autoChooser.addOption("2 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 2));
-        autoChooser.addOption("3 Note Test Auto Vision", new MultiNoteAuto(swerve, limelight, shooter, intake, 3));
 
         driverTab.add(autoChooser);
 
