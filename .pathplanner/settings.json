@@ -7,7 +7,7 @@
     "SwerveShakedown"
   ],
   "autoFolders": [],
-  "defaultMaxVel": 2.0,
+  "defaultMaxVel": 1.0,
   "defaultMaxAccel": 16.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,

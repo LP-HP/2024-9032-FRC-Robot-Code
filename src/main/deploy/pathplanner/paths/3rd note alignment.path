@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 2.361903061098285,
-        "y": 5.567111941824834
+        "x": 2.586147500085975,
+        "y": 5.362367019270856
       },
       "prevControl": {
-        "x": 2.174974576069497,
-        "y": 5.788027424131583
+        "x": 2.537398709001694,
+        "y": 5.732857831511389
       },
       "nextControl": {
-        "x": 2.5763977418691195,
-        "y": 5.313618228186575
+        "x": 2.634896291170256,
+        "y": 4.991876207030324
       },
       "isLocked": false,
       "linkedName": null
@@ -49,7 +49,7 @@
   "eventMarkers": [
     {
       "name": "Get Note",
-      "waypointRelativePos": 0.4,
+      "waypointRelativePos": 0.25,
       "command": {
         "type": "parallel",
         "data": {
@@ -59,7 +59,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 2.0,
+    "maxVelocity": 1.0,
     "maxAcceleration": 16.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0

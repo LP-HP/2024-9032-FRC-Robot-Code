@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.43,
-        "y": 5.58
+        "x": 2.205906929628587,
+        "y": 5.5086133925236975
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5352473899819596,
-        "y": 5.837271397733678
+        "x": 2.010911765291465,
+        "y": 5.918103237631654
       },
-      "isLocked": true,
+      "isLocked": false,
       "linkedName": "Path 1 end"
     },
     {
       "anchor": {
-        "x": 2.5167325548326307,
-        "y": 6.630585568863446
+        "x": 2.810391939073666,
+        "y": 6.912578575750977
       },
       "prevControl": {
-        "x": 2.403875998972379,
-        "y": 6.7742211854128564
+        "x": 2.6738953240376806,
+        "y": 7.078324465437531
       },
       "nextControl": {
-        "x": 2.6453682536994703,
-        "y": 6.466867406669288
+        "x": 2.942751592910278,
+        "y": 6.7518561389493765
       },
       "isLocked": false,
       "linkedName": null
@@ -36,8 +36,8 @@
         "y": 6.034183692299009
       },
       "prevControl": {
-        "x": 2.264322147662911,
-        "y": 6.501949869996606
+        "x": 2.488649917917414,
+        "y": 6.3470925991733225
       },
       "nextControl": null,
       "isLocked": false,
@@ -55,7 +55,7 @@
   "eventMarkers": [
     {
       "name": "Get Note",
-      "waypointRelativePos": 0.3,
+      "waypointRelativePos": 0.2,
       "command": {
         "type": "parallel",
         "data": {
@@ -72,7 +72,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 2.0,
+    "maxVelocity": 1.0,
     "maxAcceleration": 16.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0

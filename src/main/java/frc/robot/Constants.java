@@ -430,12 +430,12 @@ public final class Constants {
     public static final class ClosedLoopConstants { 
         /* PID Constants for Path Following */
         public static final PIDConstants translationPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            0.8, 
+            0.9, 
             0.0, 
             0.0
         ); 
         public static final PIDConstants headingPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            0.85, 
+            0.95, 
             0.0, 
             0.0
         ); 
@@ -455,7 +455,7 @@ public final class Constants {
         public static final double notePickupTimeout = 2.0;
         public static final double passthroughWait = 0.5;
 
-        public static final double armPosNote1 = 147.0;
+        public static final double armPosNote1 = 145.0;
         public static final double shooterVelocityNote1 = 95.0;
         public static final double armPosNote2 = 140.0;
         public static final double shooterVelocityNote2 = 95.0;

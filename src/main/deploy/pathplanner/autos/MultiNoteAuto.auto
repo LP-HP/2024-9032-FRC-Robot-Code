@@ -12,6 +12,12 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "1rst shoot alignment"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "ShootNote1"
