@@ -445,6 +445,8 @@ public final class Constants {
         public static final double kDRotationTarget = 0.01;
 
         public static final double kPTranslationTarget = 1.7;//TODO tune and test
+
+        public static final double kPRotationTargetNote = 0.12;
         
         public static final double rotationSetpointTolerance = 1.0;
         public static final double translationSetpointTolerance = 0.5;
@@ -452,18 +454,8 @@ public final class Constants {
 
     public static final class AutoConstants { //TODO tune
         /* Seconds */
-        public static final double notePickupTimeout = 2.0;
-        public static final double passthroughWait = 0.5;
-
-        public static final double armPosNote1 = 145.0;
-        public static final double shooterVelocityNote1 = 95.0;
-        public static final double armPosNote2 = 140.0;
-        public static final double shooterVelocityNote2 = 95.0;
-        public static final double armPosNote3 = 140.0;
-        public static final double shooterVelocityNote3 = 95.0;
-        public static final double armPosNote4 = 140.0;
-        public static final double shooterVelocityNote4 = 95.0;
-        public static final double armPosNote5 = 140.0;
-        public static final double shooterVelocityNote5 = 95.0;
+        public static final double notePickupTimeout = 5.0;
+        public static final double passthroughWait = 1.0;
+        public static final double shootVelocity = 95.0;
     }
 }

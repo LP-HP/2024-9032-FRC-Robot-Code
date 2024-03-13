@@ -52,15 +52,17 @@ public class LimelightVision extends SubsystemBase {
         if(isLocalizationPipeline) 
             currentPose.poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
 
-        else {
-            currentTarget.xOffset = LimelightHelpers.getTX(limelightName);
-            currentTarget.yOffset = LimelightHelpers.getTY(limelightName);
-            currentTarget.area = LimelightHelpers.getTA(limelightName);
-            currentTarget.isValid = LimelightHelpers.getTV(limelightName);
-            currentTarget.id = LimelightHelpers.getFiducialID(limelightName);
+        currentTarget.xOffset = LimelightHelpers.getTX(limelightName);
+        currentTarget.yOffset = LimelightHelpers.getTY(limelightName);
+        currentTarget.area = LimelightHelpers.getTA(limelightName);
+        currentTarget.isValid = LimelightHelpers.getTV(limelightName);
+        currentTarget.id = LimelightHelpers.getFiducialID(limelightName);
 
-            currentTarget.distance = (tagHeight - mountingHeight) / Math.tan(Units.degreesToRadians(currentTarget.yOffset) + mountingAngle);
-        }
+        currentTarget.distance = getDistanceFromYOffset(currentTarget.yOffset);
+    }
+
+    private double getDistanceFromYOffset(double yOffset) {
+        return (tagHeight - mountingHeight) / Math.tan(Units.degreesToRadians(yOffset) + mountingAngle);
     }
 
     public void switchToTargetPipeline() {
@@ -91,11 +93,7 @@ public class LimelightVision extends SubsystemBase {
     }
 
     public AprilTagTarget getAprilTagTarget() {
-        if(!isLocalizationPipeline)
-            return currentTarget;
-
-        else
-            throw new IllegalStateException();
+        return currentTarget;
     }
 
     public static final class AprilTagTarget implements Sendable {

@@ -1,60 +1,60 @@
-package frc.robot.autos;
+// package frc.robot.autos;
 
-import java.util.List;
+// import java.util.List;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
+// import com.pathplanner.lib.auto.AutoBuilder;
+// import com.pathplanner.lib.commands.PathPlannerAuto;
+// import com.pathplanner.lib.path.PathPlannerPath;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.StoreNoteSequence;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.LimelightVision;
-import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Swerve;
+// import edu.wpi.first.wpilibj2.command.Command;
+// import edu.wpi.first.wpilibj2.command.InstantCommand;
+// import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+// import frc.robot.commands.StoreNoteSequence;
+// import frc.robot.subsystems.Intake;
+// import frc.robot.subsystems.LimelightVision;
+// import frc.robot.subsystems.Shooter;
+// import frc.robot.subsystems.Swerve;
 
-import static frc.robot.Constants.AutoConstants.*;
+// import static frc.robot.Constants.AutoConstants.*;
 
-public class MultiNoteAuto extends SequentialCommandGroup {
-    /* An auto to test scoring notes with vision */
-    public MultiNoteAuto(Swerve swerve, LimelightVision limelight, Shooter shooter, Intake intake, int noteAmt) {
-        List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile("MultiNoteAuto");
+// public class MultiNoteAuto extends SequentialCommandGroup {
+//     /* An auto to test scoring notes with vision */
+//     public MultiNoteAuto(Swerve swerve, LimelightVision limelight, Shooter shooter, Intake intake, int noteAmt) {
+//         List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile("MultiNoteAuto");
 
-        Command firstNoteShootAlignment = AutoBuilder.followPath(paths.get(0));
-        Command secondNoteAlignment = AutoBuilder.followPath(paths.get(1));
+//         Command firstNoteShootAlignment = AutoBuilder.followPath(paths.get(0));
+//         Command secondNoteAlignment = AutoBuilder.followPath(paths.get(1));
         
-        Command storeNoteFromGround = intake.getNoteFromGround().andThen(new StoreNoteSequence(intake, shooter));
+//         Command storeNoteFromGround = intake.getNoteFromGround().andThen(new StoreNoteSequence(intake, shooter));
 
-        //Add at least 1 note
-        addCommands(
-            /* Reset starting pose to limelight pose and start adding vision measurements */
-            new InstantCommand(() -> swerve.resetOdometry(paths.get(0).getPreviewStartingHolonomicPose()), swerve, limelight),
-            // new InstantCommand(() -> swerve.resetOdometry(limelight.getPoseEstimate().get().pose), swerve, limelight),
-            // new InstantCommand(() -> swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate), swerve, limelight), //TODO add back
-            /* Drive to the position to shoot the 1rst note, while setting the arm to the shooting position */
-            firstNoteShootAlignment
-                .alongWith(shooter.setToAutoPosition(armPosNote1, true)),
-            /* Enable shooter, wait, and disable */
-            shooter.shootSequence(shooterVelocityNote1)
-        );
+//         //Add at least 1 note
+//         addCommands(
+//             /* Reset starting pose to limelight pose and start adding vision measurements */
+//             new InstantCommand(() -> swerve.resetOdometry(paths.get(0).getPreviewStartingHolonomicPose()), swerve, limelight),
+//             // new InstantCommand(() -> swerve.resetOdometry(limelight.getPoseEstimate().get().pose), swerve, limelight),
+//             // new InstantCommand(() -> swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate), swerve, limelight), //TODO add back
+//             /* Drive to the position to shoot the 1rst note, while setting the arm to the shooting position */
+//             firstNoteShootAlignment
+//                 .alongWith(shooter.setToAutoPosition(armPosNote1, true)),
+//             /* Enable shooter, wait, and disable */
+//             shooter.shootSequence(shooterVelocityNote1)
+//         );
 
-        //Add a 2nd note
-        if(noteAmt > 1) {
-            addCommands(
-                /* Drive to the position to intake and shoot the 2nd note, while running the full sequence for storing a note */
-                secondNoteAlignment
-                    .alongWith(storeNoteFromGround
-                        /* When the note is stored, set the arm to the correct position */
-                        .andThen(shooter.setToAutoPosition(armPosNote2, true))
-                        /* If we take too long, timeout to prevent blocking*/
-                        .withTimeout(notePickupTimeout)),
-                /* Enable shooter, wait, disable, and store */
-                shooter.shootSequence(shooterVelocityNote2)
-            );
-        }
+//         //Add a 2nd note
+//         if(noteAmt > 1) {
+//             addCommands(
+//                 /* Drive to the position to intake and shoot the 2nd note, while running the full sequence for storing a note */
+//                 secondNoteAlignment
+//                     .alongWith(storeNoteFromGround
+//                         /* When the note is stored, set the arm to the correct position */
+//                         .andThen(shooter.setToAutoPosition(armPosNote2, true))
+//                         /* If we take too long, timeout to prevent blocking*/
+//                         .withTimeout(notePickupTimeout)),
+//                 /* Enable shooter, wait, disable, and store */
+//                 shooter.shootSequence(shooterVelocityNote2)
+//             );
+//         }
 
-        //TODO To be continued...
-    }
-}
+//         //TODO To be continued...
+//     }
+// }

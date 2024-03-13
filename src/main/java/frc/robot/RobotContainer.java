@@ -2,7 +2,9 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -19,6 +21,8 @@ import frc.robot.util.SparkMaxWrapper;
 
 import static frc.robot.Constants.AutoConstants.*;
 
+import java.util.Optional;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -26,6 +30,8 @@ import static frc.robot.Constants.AutoConstants.*;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+    private boolean shouldOverridePathplannerRotation = false;
+
     /* Controllers */
     private final CommandXboxController driveController = new CommandXboxController(Constants.driveControllerPort);
     private final CommandXboxController mechanismController = new CommandXboxController(Constants.mechanismControllerPort);
@@ -74,9 +80,17 @@ public class RobotContainer {
 
         /* Add auto chooser */
         autoChooser.addOption("Swerve Auto Shakedown", AutoBuilder.buildAuto("SwerveShakedown"));
-        autoChooser.addOption("Multinote Test", AutoBuilder.buildAuto("MultiNoteAuto"));
+        autoChooser.addOption("Aiming Auto", 
+            swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate)
+            .andThen(AutoBuilder.buildAuto("Aiming Auto"))
+        );
 
         driverTab.add(autoChooser);
+        driverTab.add(
+            swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate)
+            .andThen(swerve.resetOdometryCommand(() -> limelight.getPoseEstimate().get().pose))
+            .withName("Add pose sup")
+        );
 
         /* Add driver tab telemetry */
         driverTab.addBoolean("No Motor Errors", () -> SparkMaxWrapper.noMotorErrors());
@@ -99,26 +113,32 @@ public class RobotContainer {
     }
 
     private void registerPathplannerCommands() {
-        NamedCommands.registerCommand("StoreNoteFromGround", 
-            intake.getNoteFromGround()
-            .andThen(Commands.waitSeconds(passthroughWait)
-            .andThen(new StoreNoteSequence(intake, shooter))));
+        NamedCommands.registerCommand("ShootAA", 
+            shooter.shootSequenceWithDistanceLockOn(shootVelocity, () -> limelight.getAprilTagTarget().distance)
+            .andThen(new InstantCommand(() -> shouldOverridePathplannerRotation = false))
+        );
 
-        NamedCommands.registerCommand("ShootNote1", 
-            shooter.setToAutoPosition(armPosNote1, true)
-            .andThen(shooter.shootSequence(shooterVelocityNote1)));
-        NamedCommands.registerCommand("ShootNote2", 
-            shooter.setToAutoPosition(armPosNote2, true)
-            .andThen(shooter.shootSequence(shooterVelocityNote2)));
-        NamedCommands.registerCommand("ShootNote3", 
-            shooter.setToAutoPosition(armPosNote3, true)
-            .andThen(shooter.shootSequence(shooterVelocityNote3)));
-        NamedCommands.registerCommand("ShootNote4", 
-            shooter.setToAutoPosition(armPosNote4, true)
-            .andThen(shooter.shootSequence(shooterVelocityNote4)));
-        NamedCommands.registerCommand("ShootNote5", 
-            shooter.setToAutoPosition(armPosNote5, true)
-            .andThen(shooter.shootSequence(shooterVelocityNote5)));
+        NamedCommands.registerCommand("IntakeAA", 
+            intake.getNoteFromGround()
+                .deadlineWith(new AlignWithVisionTarget(swerve, photonvision, false, false))
+            .andThen(Commands.waitSeconds(passthroughWait))
+            .andThen(new StoreNoteSequence(intake, shooter))
+            .withTimeout(notePickupTimeout)
+        );
+
+        // NamedCommands.registerCommand("Align", 
+        //     new InstantCommand(() -> shouldOverridePathplannerRotation = true)
+        //     .andThen(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
+        //         .repeatedly())
+        // );
+
+        // PPHolonomicDriveController.setRotationTargetOverride(this::pathplannerRotationOverride);
+    }
+
+    private Optional<Rotation2d> pathplannerRotationOverride() {
+        return shouldOverridePathplannerRotation && limelight.getAprilTagTarget().isValid ? 
+            Optional.of(Rotation2d.fromDegrees(limelight.getAprilTagTarget().xOffset).plus(swerve.getPose().getRotation())) : 
+            Optional.empty();
     }
 
     private void configureButtonBindings() {

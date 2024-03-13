@@ -4,6 +4,7 @@
   "holonomicMode": true,
   "pathFolders": [
     "MultiNoteAuto",
+    "Aiming Auto",
     "SwerveShakedown"
   ],
   "autoFolders": [],
