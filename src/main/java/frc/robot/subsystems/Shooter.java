@@ -279,6 +279,14 @@ public class Shooter extends SubsystemBase {
         && Math.abs(rightFlywheelMotor.getVelocity().getValueAsDouble() - flywheelController.Velocity) < flywheelVelocityTolerance;
     }
 
+    public void resetEncoders(){
+        armMotor.relativeEncoder.setPosition(armMotor.getAbsolutePosition());
+    }
+
+    public Command resetShooterEncoders() {
+        return runOnce(this::resetEncoders).withName("resetEncoders");
+    }
+
     public void reset() {
         armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
         leftFlywheelMotor.disable();

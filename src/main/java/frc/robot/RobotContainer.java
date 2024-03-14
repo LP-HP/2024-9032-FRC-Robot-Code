@@ -148,9 +148,9 @@ public class RobotContainer {
             .onlyIf(() -> !intake.hasNote() && !shooter.hasNote() && !shooter.isShooting())
         );
 
-        getNoteButton.and(() -> !intake.hasNote() && photonvision.hasTargets()).whileTrue(
+        getNoteButton.onTrue(shooter.resetShooterEncoders()).and(() -> !intake.hasNote() && photonvision.hasTargets()).whileTrue(
             new AlignWithVisionTarget(swerve, photonvision, false, false)
-        );   
+        );
 
         storeNoteButton.and(speakerAimButton.negate()).onTrue(
             new StoreNoteSequence(intake, shooter)

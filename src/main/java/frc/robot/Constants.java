@@ -53,7 +53,7 @@ public final class Constants {
 
         /* Distance Constants */
         public static final double targetHeight = Units.inchesToMeters(1);
-        public static final double cameraHeight = Units.inchesToMeters(10.25);
+        public static final double cameraHeight = Units.inchesToMeters(10.5);
         public static final double mountingAngle = Units.degreesToRadians(-10); 
     }
 

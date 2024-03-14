@@ -1,7 +1,34 @@
 {
   "NTProvider": {
     "types": {
-      "/FMSInfo": "FMSInfo"
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Driver/SendableChooser[0]": "String Chooser",
+      "/Shuffleboard/Intake/Get note": "Command",
+      "/Shuffleboard/Intake/Intake": "Subsystem",
+      "/Shuffleboard/Intake/Reset": "Command",
+      "/Shuffleboard/Intake/Shoot into amp": "Command",
+      "/Shuffleboard/Intake/To amp": "Command",
+      "/Shuffleboard/Intake/To ground": "Command",
+      "/Shuffleboard/Intake/To passthrough": "Command",
+      "/Shuffleboard/Intake/Transfer": "Command",
+      "/Shuffleboard/Limelight/To Localization": "Command",
+      "/Shuffleboard/Limelight/To Target": "Command",
+      "/Shuffleboard/Shooter/Override Arm": "Command",
+      "/Shuffleboard/Shooter/Override Velocity": "Command",
+      "/Shuffleboard/Shooter/Reset": "Command",
+      "/Shuffleboard/Shooter/Shoot": "Command",
+      "/Shuffleboard/Shooter/Shooter": "Subsystem",
+      "/Shuffleboard/Shooter/Storage flywheels": "Command",
+      "/Shuffleboard/Shooter/Storage receive": "Command",
+      "/Shuffleboard/Shooter/Talon FX (v6) [17]": "Motor Controller",
+      "/Shuffleboard/Shooter/Talon FX (v6) [18]": "Motor Controller",
+      "/Shuffleboard/Shooter/To passthrough": "Command",
+      "/Shuffleboard/Shooter/To storage": "Command",
+      "/Shuffleboard/Swerve/Field": "Field2d",
+      "/Shuffleboard/Swerve/Update Constants": "Command"
     }
+  },
+  "NetworkTables Info": {
+    "visible": true
   }
 }
