@@ -281,6 +281,7 @@ public class Shooter extends SubsystemBase {
 
     public void resetEncoders(){
         armMotor.relativeEncoder.setPosition(armMotor.getAbsolutePosition());
+        System.out.println("Shooter encoders reset!");
     }
 
     public Command resetShooterEncoders() {
