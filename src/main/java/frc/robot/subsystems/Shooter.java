@@ -9,7 +9,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -39,6 +38,7 @@ public class Shooter extends SubsystemBase {
     public Shooter() { 
         armMotor = new SparkMaxWrapper(shooterArmConstants);
         armMotor.configAbsoluteEncoder(invertAbsoluteEncoder, absoluteEncoderConversionFactor, absoluteEncoderOffset);
+        armMotor.setAbsoluteEncoderAsFeedback();
         armMotor.config();
 
         armMotorFollower = new SparkMaxWrapper(shooterArmFolllowerConstants);
@@ -81,12 +81,6 @@ public class Shooter extends SubsystemBase {
         rightFlywheelMotor.getConfigurator().apply(
             rightFlywheelConfig
         );
-
-         /* Wait for the encoder to initialize before setting to absolute */
-        Timer.delay(1.0);
-
-         /* Reset the relative encoder to the absolute encoder value */
-        armMotor.relativeEncoder.setPosition(armMotor.getAbsolutePosition());
 
         /* Add Telemetry */
         shooterTab.add(armMotor)
