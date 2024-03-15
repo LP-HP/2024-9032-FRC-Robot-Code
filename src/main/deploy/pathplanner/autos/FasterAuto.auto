@@ -44,6 +44,12 @@
         {
           "type": "named",
           "data": {
+            "name": "Passthrough"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "ShootAA"
           }
         },

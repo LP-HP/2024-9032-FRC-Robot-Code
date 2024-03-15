@@ -11,7 +11,7 @@
         "x": 1.9719127324240409,
         "y": 5.908353479414798
       },
-      "isLocked": false,
+      "isLocked": true,
       "linkedName": "shoot1fe"
     },
     {
@@ -27,7 +27,7 @@
         "x": 2.3229040282308606,
         "y": 7.107573740088099
       },
-      "isLocked": false,
+      "isLocked": true,
       "linkedName": null
     },
     {
@@ -43,7 +43,7 @@
         "x": 3.327246291560419,
         "y": 6.941804417002867
       },
-      "isLocked": false,
+      "isLocked": true,
       "linkedName": null
     },
     {
@@ -56,13 +56,48 @@
         "y": 5.713358315077675
       },
       "nextControl": null,
-      "isLocked": false,
+      "isLocked": true,
       "linkedName": "shoot2fe"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.2,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 2.6,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Passthrough"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 2.0,
     "maxAcceleration": 16.0,

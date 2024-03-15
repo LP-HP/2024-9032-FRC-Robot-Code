@@ -72,10 +72,18 @@ public class RobotContainer {
         configureButtonBindings();
 
         /* Add auto chooser */
+        autoChooser.setDefaultOption("FasterAuto", 
+            swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate)
+            .andThen(AutoBuilder.buildAuto("FasterAuto"))
+        );
         autoChooser.addOption("Swerve Auto Shakedown", AutoBuilder.buildAuto("SwerveShakedown"));
         autoChooser.addOption("Aiming Auto", 
             swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate)
             .andThen(AutoBuilder.buildAuto("Aiming Auto"))
+        );
+        autoChooser.addOption("FasterAuto", 
+            swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate)
+            .andThen(AutoBuilder.buildAuto("FasterAuto"))
         );
 
         driverTab.add(autoChooser);
@@ -110,13 +118,18 @@ public class RobotContainer {
             shooter.shootSequenceWithDistanceLockOn(shootVelocity, () -> limelight.getAprilTagTarget().distance)
         );
 
-        NamedCommands.registerCommand("IntakeAA", 
+        NamedCommands.registerCommand("Intake", 
             intake.getNoteFromGround()
-                .deadlineWith(new AlignWithVisionTarget(swerve, photonvision, false, false))
-            .andThen(Commands.waitSeconds(passthroughWait))
-            .andThen(new StoreNoteSequence(intake, shooter))
             .withTimeout(notePickupTimeout)
         );
+
+        NamedCommands.registerCommand("Passthrough",
+            new StoreNoteSequence(intake, shooter)
+        );
+
+        NamedCommands.registerCommand("ToStorage",
+            shooter.setToStoragePosition(false)
+        ); 
     }
 
     private void configureButtonBindings() {

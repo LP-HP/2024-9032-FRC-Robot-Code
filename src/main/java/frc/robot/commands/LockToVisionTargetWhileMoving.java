@@ -35,7 +35,7 @@ public class LockToVisionTargetWhileMoving extends Command {
         this.strafeSup = strafeSup;
         this.rotationSup = rotationSup;
 
-        swerveRotController = new PIDController(kPRotationTarget, 0.0, kDRotationTarget);
+        swerveRotController = new PIDController(kPRotationTargetWhileMoving, 0.0, kDRotationTargetWhileMoving);
         swerveRotController.setSetpoint(0.0);
 
         addRequirements(swerve, limelight);

@@ -37,7 +37,7 @@ public final class Constants {
     }
 
     public static final class LimelightConstants {
-        public static final String limelightName = "limelight";//TODO set name to real camera name
+        public static final String limelightName = "limelight";
         public static final int targetPipelineID = 0;
         public static final int localizationPipelineID = 1;
         public static final boolean startInLocalization = false;
@@ -445,14 +445,17 @@ public final class Constants {
             0.0
         ); 
 
-        /* PID Constants for rotation and movement to a vision target */
-        public static final double kPRotationTarget = 0.14;
-        public static final double kDRotationTarget = 0.01;
+        /* PID Constants for rotation and movement to a vision target while moving */
+        public static final double kPRotationTargetWhileMoving = 0.14;
+        public static final double kDRotationTargetWhileMoving = 0.01;
 
-        public static final double kPTranslationTarget = 1.7;//TODO tune and test
-
-        public static final double kPRotationTargetNote = 0.12;
+        /* For alignment without moving */
+        public static final double kPTranslationTarget = 1.7;        
         
+        public static final double kPRotationTarget = 0.12;
+        public static final double kDRotationTarget = 0.01;
+        
+        /* Setpoint tolerances */
         public static final double rotationSetpointTolerance = 1.0;
         public static final double translationSetpointTolerance = 0.5;
     }
@@ -460,7 +463,7 @@ public final class Constants {
     public static final class AutoConstants { //TODO tune
         /* Seconds */
         public static final double notePickupTimeout = 5.0;
-        public static final double passthroughWait = 1.0;
+        public static final double passthroughWait = 0.5;
         public static final double shootVelocity = 95.0;
     }
 }
