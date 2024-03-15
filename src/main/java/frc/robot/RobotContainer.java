@@ -72,19 +72,10 @@ public class RobotContainer {
         configureButtonBindings();
 
         /* Add auto chooser */
-        autoChooser.setDefaultOption("FasterAuto", 
-            swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate)
-            .andThen(AutoBuilder.buildAuto("FasterAuto"))
-        );
+        autoChooser.setDefaultOption("Default", swerve.getVisionLocalizationAuto("FasterAuto", limelight::getPoseEstimate));
         autoChooser.addOption("Swerve Auto Shakedown", AutoBuilder.buildAuto("SwerveShakedown"));
-        autoChooser.addOption("Aiming Auto", 
-            swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate)
-            .andThen(AutoBuilder.buildAuto("Aiming Auto"))
-        );
-        autoChooser.addOption("FasterAuto", 
-            swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate)
-            .andThen(AutoBuilder.buildAuto("FasterAuto"))
-        );
+        autoChooser.addOption("Aiming Auto", swerve.getVisionLocalizationAuto("Aiming Auto", limelight::getPoseEstimate));
+        autoChooser.addOption("FasterAuto", swerve.getVisionLocalizationAuto("FasterAuto", limelight::getPoseEstimate));
 
         driverTab.add(autoChooser);
         driverTab.add(
