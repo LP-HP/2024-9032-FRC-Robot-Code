@@ -265,7 +265,7 @@ public class Shooter extends SubsystemBase {
     }
  
     public boolean armAtSetpoint() {
-        return Math.abs(armMotor.relativeEncoder.getPosition() - armMotor.getSetpoint()) < armSetpointTolerance;
+        return Math.abs(armMotor.getAbsolutePosition() - armMotor.getSetpoint()) < armSetpointTolerance;
     }
 
     private boolean flywheelsAtSetpoint() {
