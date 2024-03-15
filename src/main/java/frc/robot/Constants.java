@@ -183,7 +183,7 @@ public final class Constants {
         public static final int rightFlywheelMotorID = 18;
         public static final InvertedValue rightFlywheelInvert = InvertedValue.CounterClockwise_Positive;
 
-        public static final double shotWaitTime = 1.0;//TODO change
+        public static final double shotWaitTime = 0.5;//TODO change
         public static final double minFlywheelSetpoint = 0.0;
         public static final double maxFlywheelSetpoint = 100.0;
 
@@ -296,7 +296,7 @@ public final class Constants {
 
         /* Drive Motor Characterization Values */
         public static final double driveKS = 0.0; //TODO: This must be tuned to specific robot - needed for auto
-        public static final double driveKV = 2.5;
+        public static final double driveKV = 3.0;
         public static final double driveKA = 0.0;
 
         /* Drive Motor Conversion Factors */
