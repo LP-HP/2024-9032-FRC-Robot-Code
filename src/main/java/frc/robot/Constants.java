@@ -112,11 +112,11 @@ public final class Constants {
     public static final class ShooterConstants {
         /* Shooter Arm */
         public static final double armSetpointTolerance = 1.0;
-        public static final double minArmSetpoint = 90.0;
+        public static final double minArmSetpoint = 95.0;
         public static final double maxArmSetpoint = 180.0;
         public static final SparkMaxPIDConstants shooterArmPID = new SparkMaxPIDConstants(
-            0.05, 
-            0.0, 
+            0.04, 
+            0.00001, 
             0.01, 
             0.0,
             -0.3,
@@ -150,17 +150,22 @@ public final class Constants {
         public static final double absoluteEncoderOffset = 267.23;
 
         /* Arm Positions */
-        public static final double armPositionPassthrough = 130.0;
+        public static final double armPositionPassthrough = 133.0;
         public static final double armPositionStorage = 120.0;
         /* Key - Distance : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap distanceToArmPosTable = new InterpolatingDoubleTreeMap();
         static {
-            distanceToArmPosTable.put(1.6, 142.5);
-            distanceToArmPosTable.put(2.1, 135.0);
-            distanceToArmPosTable.put(2.62, 132.5);
-            distanceToArmPosTable.put(3.086, 131.0);
-            distanceToArmPosTable.put(3.63, 127.0);
-            distanceToArmPosTable.put(4.152, 126.0);
+            distanceToArmPosTable.put(1.335, 148.0);
+            distanceToArmPosTable.put(1.637, 146.0);
+            distanceToArmPosTable.put(1.833, 143.0);
+            distanceToArmPosTable.put(2.318, 138.5);
+            distanceToArmPosTable.put(2.91, 134.0);
+            distanceToArmPosTable.put(3.144, 132.0);
+            distanceToArmPosTable.put(3.32, 131.0);
+            distanceToArmPosTable.put(3.96, 130.0);
+            distanceToArmPosTable.put(4.36, 128.0);
+            distanceToArmPosTable.put(5.02, 127.8);
+            distanceToArmPosTable.put(5.41, 127.75);
         }
 
         /* Shooter Flywheels */

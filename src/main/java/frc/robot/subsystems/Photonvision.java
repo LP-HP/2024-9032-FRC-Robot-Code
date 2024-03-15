@@ -22,7 +22,7 @@ public class Photonvision extends SubsystemBase {
 
     public Photonvision () {
         try {
-            photonvisionTab.addCamera("PhotonVision View", cameraName, "camera_server://" + cameraName)
+            photonvisionTab.addCamera("PhotonVision View", cameraName, "http://photonvision.local:1182/")
                 .withPosition(0, 0).withSize(5, 5);
         } catch (Exception e) {
             System.err.println("PhotonVision view already added!");

@@ -214,6 +214,17 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
         return closedLoopSetpoint;
     }
 
+    public void setAbsoluteEncoderAsFeedback() {
+        if(!hasAbsoluteEncoder) {
+            System.err.println("Must config absolute encoder before setting as feedback!");
+
+            return;
+        }
+
+        if(Constants.configMotors)
+            checkError(controller.setFeedbackDevice(absoluteEncoder));
+    }
+
     @Override
     public void initSendable(SendableBuilder builder) {
         switch (constants.mode()) {
