@@ -46,6 +46,9 @@ public final class Constants {
         public static final double tagHeight = Units.inchesToMeters(57.25);
         public static final double mountingHeight = Units.inchesToMeters(12.75);
         public static final double mountingAngle = Units.degreesToRadians(18.0);
+
+        /* Cutoff for target validity */
+        public static final double distanceCutoff = 5.0;
     }
 
     public static final class PhotonvisionConstants {

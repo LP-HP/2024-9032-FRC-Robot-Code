@@ -51,24 +51,26 @@ public class RobotContainer {
     private final Climbers climbers = new Climbers();
 
     /* Shuffleboard */
+    private final ShuffleboardTab debugTab = Shuffleboard.getTab("Debug");
     private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
     SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     public RobotContainer() {
-        //Will run the following command when there is no other command set, such as during teleop
+        /* Will run the following command when there is no other command set, such as during teleop */
         swerve.setDefaultCommand(
             new TeleopSwerve(
                 swerve, 
-                () -> -driveController.getLeftY(),//The axes are inverted by default on the xbox controller, so uninvert them
+                /* The axes are inverted by default on the xbox controller, so uninvert them */
+                () -> -driveController.getLeftY(),
                 () -> -driveController.getLeftX(),
                 driveController::getRightX
             )
         );
 
-        //Tell pathplanner which commands to associate with named commands in the gui
+        /* Tell pathplanner which commands to associate with named commands in the gui */
         registerPathplannerCommands();
 
-        //Configure the button bindings
+        /* Configure the button bindings */
         configureButtonBindings();
 
         /* Add auto chooser */
@@ -77,15 +79,29 @@ public class RobotContainer {
         autoChooser.addOption("Aiming Auto", swerve.getVisionLocalizationAuto("Aiming Auto", limelight::getPoseEstimate));
         autoChooser.addOption("FasterAuto", swerve.getVisionLocalizationAuto("FasterAuto", limelight::getPoseEstimate));
 
-        driverTab.add(autoChooser);
-        driverTab.add(
+        /* Add debug tab telemetry */
+        debugTab.add(
             swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate)
             .andThen(swerve.resetOdometryCommand(() -> limelight.getPoseEstimate().get().pose))
             .withName("Add pose sup")
         );
 
         /* Add driver tab telemetry */
-        driverTab.addBoolean("No Motor Errors", () -> SparkMaxWrapper.noMotorErrors());
+        driverTab.addBoolean("No Motor Errors", () -> SparkMaxWrapper.noMotorErrors())
+        .   withPosition(0, 0).withSize(1, 1);
+        driverTab.add(autoChooser)
+            .withPosition(1, 0).withSize(1, 1);
+        driverTab.addBoolean("Valid Tag", () -> limelight.getAprilTagTarget().isValid)
+            .withPosition(2, 0).withSize(1, 1);
+        driverTab.addBoolean("Arms at Setpoint", () -> intake.armAtSetpoint() && shooter.armAtSetpoint())
+            .withPosition(3, 0).withSize(1, 1);
+        driverTab.addBoolean("Intake Has Note", () -> intake.hasNote())
+            .withPosition(4, 0).withSize(1, 1);
+        driverTab.addBoolean("Shooter Has Note", () -> shooter.hasNote())
+            .withPosition(5, 0).withSize(1, 1);
+        limelight.addCameraToTab(driverTab, 0, 1, 4);
+        photonvision.addCameraToTab(driverTab, 5, 1, 4);
+        Shuffleboard.selectTab(driverTab.getTitle());
     }
 
     /* Only reset variables - don't run any commands here */
@@ -154,7 +170,7 @@ public class RobotContainer {
 
         /* Mechanism Controls */
         speakerScoreButton.and(speakerAimButton).onTrue(
-            shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance)//TODO do lookup table if needed
+            shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance)//TODO do velocity lookup table if needed
              /* Only run if there is a valid target and it's a speaker tag and we have a note */
             .onlyIf(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && shooter.hasNote())
         );

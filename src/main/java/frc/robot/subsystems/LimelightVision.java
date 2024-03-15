@@ -24,13 +24,6 @@ public class LimelightVision extends SubsystemBase {
     private final ShuffleboardTab limelightTab = Shuffleboard.getTab("Limelight");
 
     public LimelightVision() {
-        try {
-            limelightTab.addCamera("Limelight View", limelightName, "camera_server://" + limelightName)
-                .withPosition(0, 0).withSize(5, 5);
-        } catch (Exception e) {
-            System.err.println("Limelight view already added!");
-        }
-
         /* Add Telemetry */
         limelightTab.add(currentTarget)
             .withPosition(6, 0).withSize(2, 2);
@@ -47,18 +40,35 @@ public class LimelightVision extends SubsystemBase {
 
     }
 
+    public void addCameraToTab(ShuffleboardTab tab, int col, int row, int size) {
+        try {
+            tab.addCamera("Limelight View", limelightName, "camera_server://" + limelightName)
+                .withPosition(col, row).withSize(size, size);
+        } catch (Exception e) {
+            System.err.println("Limelight view already added!");
+        }
+    }
+
     @Override
     public void periodic() {
         if(isLocalizationPipeline) 
             currentPose.poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
 
-        currentTarget.xOffset = LimelightHelpers.getTX(limelightName);
-        currentTarget.yOffset = LimelightHelpers.getTY(limelightName);
-        currentTarget.area = LimelightHelpers.getTA(limelightName);
-        currentTarget.isValid = LimelightHelpers.getTV(limelightName);
-        currentTarget.id = LimelightHelpers.getFiducialID(limelightName);
+        boolean isValid = LimelightHelpers.getTV(limelightName);
 
-        currentTarget.distance = getDistanceFromYOffset(currentTarget.yOffset);
+        if(isValid) {
+            currentTarget.xOffset = LimelightHelpers.getTX(limelightName);
+            currentTarget.yOffset = LimelightHelpers.getTY(limelightName);
+            currentTarget.area = LimelightHelpers.getTA(limelightName);
+            currentTarget.id = LimelightHelpers.getFiducialID(limelightName);
+
+            currentTarget.distance = getDistanceFromYOffset(currentTarget.yOffset);
+
+            currentTarget.isValid = currentTarget.distance < distanceCutoff;
+        }
+
+        else  
+            currentTarget.isValid = false;
     }
 
     private double getDistanceFromYOffset(double yOffset) {
