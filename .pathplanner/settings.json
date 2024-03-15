@@ -3,8 +3,8 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "Aiming Auto",
-    "FasterAuto",
+    "Start Middle",
+    "Start Right",
     "SwerveShakedown"
   ],
   "autoFolders": [],

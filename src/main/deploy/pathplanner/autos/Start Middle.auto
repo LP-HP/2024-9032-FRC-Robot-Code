@@ -14,7 +14,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "shoot1f"
+            "pathName": "shoot1m"
           }
         },
         {
@@ -26,7 +26,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "shoot2f"
+            "pathName": "shoot2m"
           }
         },
         {
@@ -38,7 +38,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "shoot3f"
+            "pathName": "shoot3m"
           }
         },
         {
@@ -56,7 +56,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "shoot4f"
+            "pathName": "shoot4m"
           }
         },
         {
@@ -68,7 +68,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "shoot5f"
+            "pathName": "shoot5m"
           }
         },
         {

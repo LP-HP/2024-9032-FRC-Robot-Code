@@ -3,77 +3,61 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.6933948404713917,
-        "y": 5.557362183607978
+        "x": 2.0206615235083216,
+        "y": 5.547612425391122
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.921864375795261,
-        "y": 5.401366052138281
+        "x": 1.9719127324240409,
+        "y": 5.908353479414798
       },
       "isLocked": true,
-      "linkedName": "shoot4fe"
+      "linkedName": "shoot1fe"
     },
     {
       "anchor": {
-        "x": 4.623846967408901,
-        "y": 4.5531370872718
+        "x": 2.235156204279156,
+        "y": 6.756582444281278
       },
       "prevControl": {
-        "x": 4.370353253770642,
-        "y": 5.050374756331461
+        "x": 2.1610927627272574,
+        "y": 6.460328678073681
       },
       "nextControl": {
-        "x": 5.074242651862306,
-        "y": 3.6696686293055043
-      },
-      "isLocked": true,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 8.270256540513081,
-        "y": 4.1338974839469875
-      },
-      "prevControl": {
-        "x": 6.27155610605758,
-        "y": 4.299643373633542
-      },
-      "nextControl": {
-        "x": 8.691877848984564,
-        "y": 4.0989337656834985
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 4.6043474509751885,
-        "y": 4.562886845488656
-      },
-      "prevControl": {
-        "x": 5.257581251504548,
-        "y": 3.743907155272744
-      },
-      "nextControl": {
-        "x": 4.2485507082935525,
-        "y": 5.008960373626826
+        "x": 2.3229040282308606,
+        "y": 7.107573740088099
       },
       "isLocked": true,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.683645082254536,
-        "y": 5.5768617000416905
+        "x": 2.937138795892795,
+        "y": 7.0198259161363925
       },
       "prevControl": {
-        "x": 3.5903725964221542,
-        "y": 5.47936411787313
+        "x": 2.742143631555673,
+        "y": 7.058824949003817
+      },
+      "nextControl": {
+        "x": 3.327246291560419,
+        "y": 6.941804417002867
+      },
+      "isLocked": true,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.059660556375746,
+        "y": 5.52811290895741
+      },
+      "prevControl": {
+        "x": 2.196157171411731,
+        "y": 5.713358315077675
       },
       "nextControl": null,
       "isLocked": true,
-      "linkedName": null
+      "linkedName": "shoot2fe"
     }
   ],
   "rotationTargets": [],
@@ -81,24 +65,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.15,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "ToStorage"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "New Event Marker",
-      "waypointRelativePos": 1.65,
+      "waypointRelativePos": 0.2,
       "command": {
         "type": "parallel",
         "data": {
@@ -115,7 +82,7 @@
     },
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 2.5,
+      "waypointRelativePos": 2.6,
       "command": {
         "type": "parallel",
         "data": {
@@ -143,7 +110,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "FasterAuto",
+  "folder": "Start Middle",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0
