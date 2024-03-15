@@ -29,7 +29,19 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "New Constraints Zone",
+      "minWaypointRelativePos": 0.8,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 16.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    }
+  ],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 2.0,
@@ -39,8 +51,8 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 178.63607246839712,
-    "rotateFast": false
+    "rotation": 0.5578842517664667,
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "Aiming Auto",

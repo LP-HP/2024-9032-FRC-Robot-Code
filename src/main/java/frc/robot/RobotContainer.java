@@ -2,9 +2,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -21,8 +18,6 @@ import frc.robot.util.SparkMaxWrapper;
 
 import static frc.robot.Constants.AutoConstants.*;
 
-import java.util.Optional;
-
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -30,8 +25,6 @@ import java.util.Optional;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    private boolean shouldOverridePathplannerRotation = false;
-
     /* Controllers */
     private final CommandXboxController driveController = new CommandXboxController(Constants.driveControllerPort);
     private final CommandXboxController mechanismController = new CommandXboxController(Constants.mechanismControllerPort);
@@ -115,7 +108,6 @@ public class RobotContainer {
     private void registerPathplannerCommands() {
         NamedCommands.registerCommand("ShootAA", 
             shooter.shootSequenceWithDistanceLockOn(shootVelocity, () -> limelight.getAprilTagTarget().distance)
-            .andThen(new InstantCommand(() -> shouldOverridePathplannerRotation = false))
         );
 
         NamedCommands.registerCommand("IntakeAA", 
@@ -125,20 +117,6 @@ public class RobotContainer {
             .andThen(new StoreNoteSequence(intake, shooter))
             .withTimeout(notePickupTimeout)
         );
-
-        // NamedCommands.registerCommand("Align", 
-        //     new InstantCommand(() -> shouldOverridePathplannerRotation = true)
-        //     .andThen(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
-        //         .repeatedly())
-        // );
-
-        // PPHolonomicDriveController.setRotationTargetOverride(this::pathplannerRotationOverride);
-    }
-
-    private Optional<Rotation2d> pathplannerRotationOverride() {
-        return shouldOverridePathplannerRotation && limelight.getAprilTagTarget().isValid ? 
-            Optional.of(Rotation2d.fromDegrees(limelight.getAprilTagTarget().xOffset).plus(swerve.getPose().getRotation())) : 
-            Optional.empty();
     }
 
     private void configureButtonBindings() {
