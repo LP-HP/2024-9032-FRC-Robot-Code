@@ -78,8 +78,8 @@ public class RobotContainer {
         autoChooser.setDefaultOption("Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
         autoChooser.addOption("Swerve Shakedown", AutoBuilder.buildAuto("Swerve Shakedown"));
         autoChooser.addOption("Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
-        autoChooser.addOption("Right", swerve.getVisionLocalizationAuto("Start Right", limelight::getPoseEstimate));
-        autoChooser.addOption("Left", swerve.getVisionLocalizationAuto("Start Left", limelight::getPoseEstimate));
+        autoChooser.addOption("Wide", swerve.getVisionLocalizationAuto("Start Right", limelight::getPoseEstimate));
+        autoChooser.addOption("Skinny", swerve.getVisionLocalizationAuto("Start Left", limelight::getPoseEstimate));
         autoChooser.addOption("Aiming", swerve.getVisionLocalizationAuto("Auto Aiming", limelight::getPoseEstimate));
 
         /* Add debug tab telemetry */
@@ -193,7 +193,9 @@ public class RobotContainer {
 
         getNoteButton.and(() -> !intake.hasNote() && photonvision.hasTargets()).whileTrue(
             new AlignWithVisionTarget(swerve, photonvision, false, false)
-        );   
+        );
+        
+        getNoteButton.onFalse(intake.setToPassthroughPosition(false));   
 
         storeNoteButton.and(speakerAimButton.negate()).onTrue(
             new StoreNoteSequence(intake, shooter)

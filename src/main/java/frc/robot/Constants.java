@@ -29,7 +29,7 @@ public final class Constants {
         public static final double stickDeadband = 0.02;
         public static final boolean isFieldCentric = true;
         /* Meters per Second */
-        public static final double joystickToSpeedConversionFactor = 4.0;
+        public static final double joystickToSpeedConversionFactor = 4.15;
         /* Radians per Second */
         public static final double joystickToAngularVelocityConversionFactor = 2 * Math.PI;
         /* Meters per Second Squared */
@@ -159,8 +159,8 @@ public final class Constants {
         /* Key - Distance : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap distanceToArmPosTable = new InterpolatingDoubleTreeMap();
         static {
-            distanceToArmPosTable.put(1.335, 148.0);
-            distanceToArmPosTable.put(1.637, 146.0);
+            distanceToArmPosTable.put(1.335, 147.0);
+            distanceToArmPosTable.put(1.637, 145.0);
             distanceToArmPosTable.put(1.833, 143.0);
             distanceToArmPosTable.put(2.318, 138.5);
             distanceToArmPosTable.put(2.91, 134.0);
