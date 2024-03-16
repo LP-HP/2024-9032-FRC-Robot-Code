@@ -8,40 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4594006432668465,
-        "y": 5.186871371367446
+        "x": 2.5763977418691195,
+        "y": 4.855379591994339
       },
       "isLocked": false,
       "linkedName": "shoot3fe"
     },
     {
       "anchor": {
-        "x": 2.274155237146581,
-        "y": 4.660384427657217
-      },
-      "prevControl": {
-        "x": 2.304149675470837,
-        "y": 4.930334372575519
-      },
-      "nextControl": {
-        "x": 2.2351562042791566,
-        "y": 4.309393131850397
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.8786402465916576,
+        "x": 2.517899192567983,
         "y": 4.153397000380699
       },
       "prevControl": {
-        "x": 2.2741552371465796,
-        "y": 4.153397000380699
+        "x": 1.4649253051475237,
+        "y": 4.4361399886695265
       },
       "nextControl": {
-        "x": 2.9669280622490097,
-        "y": 4.153397000380699
+        "x": 2.673765064965656,
+        "y": 4.111544127236879
       },
       "isLocked": false,
       "linkedName": null
@@ -52,20 +36,26 @@
         "y": 5.557362183607978
       },
       "prevControl": {
-        "x": 2.771392906206241,
-        "y": 5.216120646018014
+        "x": 2.742143631555673,
+        "y": 5.372116777487712
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "shoot4fe"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.9,
+      "rotationDegrees": -13.504674547593657,
+      "rotateFast": true
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.5,
+      "waypointRelativePos": 0.25,
       "command": {
         "type": "parallel",
         "data": {
@@ -82,7 +72,7 @@
     },
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 2.45,
+      "waypointRelativePos": 1.4500000000000002,
       "command": {
         "type": "parallel",
         "data": {
