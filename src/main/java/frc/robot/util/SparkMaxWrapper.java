@@ -26,8 +26,9 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
     private double closedLoopSetpoint = 0.0;
     private boolean isConfigured = false;
     private boolean hasAbsoluteEncoder = false;
+    private boolean hasError = false;
 
-    private static boolean hasError = false;
+    private static boolean hasAnyMotorErrors = false;
 
     public SparkMaxWrapper(SparkMaxConstants constants) {
         super(constants.id(), MotorType.kBrushless);
@@ -86,11 +87,11 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
                 break;
             case velocity:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kVelocityOnly);
-                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));//TODO units??
+                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));//TODO units?? - /60 seems to work
                 break;
             case velocityLeader:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kVelocityOnly, true);
-                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));//TODO units??
+                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));
                 break;
             case percentOutput:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kMinimal);
@@ -98,7 +99,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
             case velocityControlWithPositionData:
                 CANSparkMaxUtil.setCANSparkMaxBusUsage(this, Usage.kAll);
                 checkError(relativeEncoder.setPositionConversionFactor(constants.positionConversionFactor()));
-                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));//TODO units??
+                checkError(relativeEncoder.setVelocityConversionFactor(constants.positionConversionFactor() / 60.0));
                 break;
         }
 
@@ -205,11 +206,23 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
             System.err.println(constants.name() + " has error " + error);
 
             hasError = true;
+            hasAnyMotorErrors = true;
         }
     }
 
     public double getSetpoint() {
         return closedLoopSetpoint;
+    }
+
+    public void setAbsoluteEncoderAsFeedback() {
+        if(!hasAbsoluteEncoder) {
+            System.err.println("Must config absolute encoder before setting as feedback!");
+
+            return;
+        }
+
+        if(Constants.configMotors)
+            checkError(controller.setFeedbackDevice(absoluteEncoder));
     }
 
     @Override
@@ -239,7 +252,7 @@ public class SparkMaxWrapper extends CANSparkMax implements Sendable {
         builder.addDoubleProperty("Applied Output", this::getAppliedOutput, null);
     }
 
-    public static boolean hasAnyMotorErrors() {
-        return hasError;
+    public static boolean noMotorErrors() {
+        return !hasAnyMotorErrors;
     }
 }

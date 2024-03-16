@@ -31,21 +31,33 @@ public final class Constants {
         /* Meters per Second */
         public static final double joystickToSpeedConversionFactor = 4.0;
         /* Radians per Second */
-        public static final double joystickToAngularVelocityConversionFactor = 4 * Math.PI;
+        public static final double joystickToAngularVelocityConversionFactor = 2 * Math.PI;
         /* Meters per Second Squared */
         public static final double accelerationLimit = 32.0;
     }
 
-    public static final class VisionConstants {
-        public static final String limelightName = "limelight";//TODO set name to 9032Limeligh
+    public static final class LimelightConstants {
+        public static final String limelightName = "limelight";
         public static final int targetPipelineID = 0;
-        public static final int localizationPipelineID = 1;//TODO make sure this aligns with the limelight config
+        public static final int localizationPipelineID = 1;
         public static final boolean startInLocalization = false;
 
         /* Distance Constants */
         public static final double tagHeight = Units.inchesToMeters(57.25);
         public static final double mountingHeight = Units.inchesToMeters(12.75);
         public static final double mountingAngle = Units.degreesToRadians(18.0);
+
+        /* Cutoff for target validity */
+        public static final double distanceCutoff = 5.0;
+    }
+
+    public static final class PhotonvisionConstants {
+        public static final String cameraName = "IntakeCamera";
+
+        /* Distance Constants */
+        public static final double targetHeight = Units.inchesToMeters(1);
+        public static final double cameraHeight = Units.inchesToMeters(10.25);
+        public static final double mountingAngle = Units.degreesToRadians(-10); 
     }
 
     /* Using CANIds 13-14 - 2 motors */
@@ -71,12 +83,10 @@ public final class Constants {
             12,
             360.0 / 60.0
         );
-        public static final boolean invertAbsoluteEncoder = false;
-        public static final double absoluteEncoderConversionFactor = 360.0;
-        public static final double absoluteEncoderOffset = 98.1747508;
         /* Arm Positions */
+        public static final double armPositionStarting = 229.0;
         public static final double armPositionGround = 26.5;
-        public static final double armPositionPassthrough = 225.0;
+        public static final double armPositionPassthrough = 227.0;
         public static final double armPositionAmp = 160.0;
 
         /* Intake Flywheel */
@@ -105,11 +115,11 @@ public final class Constants {
     public static final class ShooterConstants {
         /* Shooter Arm */
         public static final double armSetpointTolerance = 1.0;
-        public static final double minArmSetpoint = 90.0;
+        public static final double minArmSetpoint = 95.0;
         public static final double maxArmSetpoint = 180.0;
         public static final SparkMaxPIDConstants shooterArmPID = new SparkMaxPIDConstants(
-            0.05, 
-            0.0, 
+            0.04, 
+            0.00001, 
             0.01, 
             0.0,
             -0.3,
@@ -143,16 +153,23 @@ public final class Constants {
         public static final double absoluteEncoderOffset = 267.23;
 
         /* Arm Positions */
-        public static final double armPositionPassthrough = 130.0;
+        public static final double armPositionPassthrough = 133.0;
         public static final double armPositionStorage = 120.0;
         public static final double armPositionClimbing = 170.0;
         /* Key - Distance : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap distanceToArmPosTable = new InterpolatingDoubleTreeMap();
         static {
-            distanceToArmPosTable.put(-3.34, 128.0);
-            distanceToArmPosTable.put(-0.12, 129.0);
-            distanceToArmPosTable.put(4.58, 132.0);
-            distanceToArmPosTable.put(15.51, 142.0);
+            distanceToArmPosTable.put(1.335, 148.0);
+            distanceToArmPosTable.put(1.637, 146.0);
+            distanceToArmPosTable.put(1.833, 143.0);
+            distanceToArmPosTable.put(2.318, 138.5);
+            distanceToArmPosTable.put(2.91, 134.0);
+            distanceToArmPosTable.put(3.144, 132.0);
+            distanceToArmPosTable.put(3.32, 131.0);
+            distanceToArmPosTable.put(3.96, 130.0);
+            distanceToArmPosTable.put(4.36, 128.0);
+            distanceToArmPosTable.put(5.02, 127.8);
+            distanceToArmPosTable.put(5.41, 127.75);
         }
 
         /* Shooter Flywheels */
@@ -170,7 +187,7 @@ public final class Constants {
         public static final int rightFlywheelMotorID = 18;
         public static final InvertedValue rightFlywheelInvert = InvertedValue.CounterClockwise_Positive;
 
-        public static final double shotWaitTime = 1.0;//TODO change
+        public static final double shotWaitTime = 0.5;//TODO change
         public static final double minFlywheelSetpoint = 0.0;
         public static final double maxFlywheelSetpoint = 100.0;
 
@@ -262,7 +279,7 @@ public final class Constants {
         public static final int driveContinuousCurrentLimit = 60;
 
         /* Angle Motor PID Values */
-        public static final SparkMaxPIDConstants anglePIDConstants = new SparkMaxPIDConstants(//TODO Tune - needed for teleop
+        public static final SparkMaxPIDConstants anglePIDConstants = new SparkMaxPIDConstants(
             0.06, 
             0.0, 
             0.0, 
@@ -283,7 +300,7 @@ public final class Constants {
 
         /* Drive Motor Characterization Values */
         public static final double driveKS = 0.0; //TODO: This must be tuned to specific robot - needed for auto
-        public static final double driveKV = 2.5;
+        public static final double driveKV = 3.0;
         public static final double driveKA = 0.0;
 
         /* Drive Motor Conversion Factors */
@@ -422,35 +439,35 @@ public final class Constants {
     public static final class ClosedLoopConstants { 
         /* PID Constants for Path Following */
         public static final PIDConstants translationPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            0.8, 
+            2.0, 
             0.0, 
             0.0
         ); 
         public static final PIDConstants headingPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            0.85, 
+            2.0, 
             0.0, 
             0.0
         ); 
 
-        /* PID Constants for rotation and movement to a vision target */
-        public static final double kPRotationTarget = 0.09;
-        public static final double kIRotationTarget = 0.000011;
-        public static final double kDRotationTarget = 0.005;
-        public static final double kIZoneRotationTarget = 1.0;
+        /* PID Constants for rotation and movement to a vision target while moving */
+        public static final double kPRotationTargetWhileMoving = 0.14;
+        public static final double kDRotationTargetWhileMoving = 0.01;
 
-        public static final double kPTranslationTarget = 0.01;//TODO tune and test
+        /* For alignment without moving */
+        public static final double kPTranslationTarget = 1.7;        
         
+        public static final double kPRotationTarget = 0.12;
+        public static final double kDRotationTarget = 0.01;
+        
+        /* Setpoint tolerances */
         public static final double rotationSetpointTolerance = 1.0;
         public static final double translationSetpointTolerance = 0.5;
     }
 
     public static final class AutoConstants { //TODO tune
         /* Seconds */
-        public static final double notePickupTimeout = 2.0;
-
-        public static final double armPosNote1 = 140.0;
-        public static final double shooterVelocityNote1 = 95.0;
-        public static final double armPosNote2 = 140.0;
-        public static final double shooterVelocityNote2 = 95.0;
+        public static final double notePickupTimeout = 5.0;
+        public static final double passthroughWait = 0.5;
+        public static final double shootVelocity = 95.0;
     }
 }

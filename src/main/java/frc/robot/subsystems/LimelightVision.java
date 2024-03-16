@@ -12,9 +12,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.limelightutil.LimelightHelpers;
 import frc.lib.limelightutil.LimelightHelpers.PoseEstimate;
-import frc.robot.Constants;
 
-import static frc.robot.Constants.VisionConstants.*;
+import static frc.robot.Constants.LimelightConstants.*;
 
 public class LimelightVision extends SubsystemBase {
     private LimelightPoseEstimate currentPose = new LimelightPoseEstimate();
@@ -25,13 +24,6 @@ public class LimelightVision extends SubsystemBase {
     private final ShuffleboardTab limelightTab = Shuffleboard.getTab("Limelight");
 
     public LimelightVision() {
-        try {
-            limelightTab.addCamera("Limelight View", limelightName, "camera_server://" + limelightName)
-                .withPosition(0, 0).withSize(5, 5);
-        } catch (Exception e) {
-            System.err.println("Limelight view already added!");
-        }
-
         /* Add Telemetry */
         limelightTab.add(currentTarget)
             .withPosition(6, 0).withSize(2, 2);
@@ -48,30 +40,49 @@ public class LimelightVision extends SubsystemBase {
 
     }
 
+    public void addCameraToTab(ShuffleboardTab tab, int col, int row, int size) {
+        try {
+            tab.addCamera("Limelight View", limelightName, "camera_server://" + limelightName)
+                .withPosition(col, row).withSize(size, size);
+        } catch (Exception e) {
+            System.err.println("Limelight view already added!");
+        }
+    }
+
     @Override
     public void periodic() {
         if(isLocalizationPipeline) 
             currentPose.poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
 
-        else {
+        boolean isValid = LimelightHelpers.getTV(limelightName);
+
+        if(isValid) {
             currentTarget.xOffset = LimelightHelpers.getTX(limelightName);
             currentTarget.yOffset = LimelightHelpers.getTY(limelightName);
             currentTarget.area = LimelightHelpers.getTA(limelightName);
-            currentTarget.isValid = LimelightHelpers.getTV(limelightName);
             currentTarget.id = LimelightHelpers.getFiducialID(limelightName);
 
-            currentTarget.distance = (tagHeight - mountingHeight) / Math.tan(Units.degreesToRadians(currentTarget.yOffset) + mountingAngle);
+            currentTarget.distance = getDistanceFromYOffset(currentTarget.yOffset);
+
+            currentTarget.isValid = currentTarget.distance < distanceCutoff;
         }
+
+        else  
+            currentTarget.isValid = false;
+    }
+
+    private double getDistanceFromYOffset(double yOffset) {
+        return (tagHeight - mountingHeight) / Math.tan(Units.degreesToRadians(yOffset) + mountingAngle);
     }
 
     public void switchToTargetPipeline() {
-        LimelightHelpers.setPipelineIndex(limelightName, Constants.VisionConstants.targetPipelineID);
+        LimelightHelpers.setPipelineIndex(limelightName, targetPipelineID);
 
         isLocalizationPipeline = false;
     }
 
     public void switchToLocalizationPipeline() {
-        LimelightHelpers.setPipelineIndex(limelightName, Constants.VisionConstants.localizationPipelineID);
+        LimelightHelpers.setPipelineIndex(limelightName, localizationPipelineID);
         
         isLocalizationPipeline = true;
     }
@@ -92,11 +103,7 @@ public class LimelightVision extends SubsystemBase {
     }
 
     public AprilTagTarget getAprilTagTarget() {
-        if(!isLocalizationPipeline)
-            return currentTarget;
-
-        else
-            throw new IllegalStateException();
+        return currentTarget;
     }
 
     public static final class AprilTagTarget implements Sendable {

@@ -3,7 +3,9 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "MultiNoteAuto",
+    "Start Left",
+    "Start Middle",
+    "Start Right",
     "SwerveShakedown"
   ],
   "autoFolders": [],
