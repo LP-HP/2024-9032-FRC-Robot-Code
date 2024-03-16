@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.7866673263037751,
-        "y": 5.089373789198885
+        "x": 1.5526731290992286,
+        "y": 5.547612425391122
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.8354161173880559,
-        "y": 4.650634669440361
-      },
-      "isLocked": false,
-      "linkedName": "3rd note end"
-    },
-    {
-      "anchor": {
-        "x": 2.040161039942034,
-        "y": 4.211895549681836
-      },
-      "prevControl": {
-        "x": 1.6306711948340775,
-        "y": 4.3386424065009646
-      },
-      "nextControl": {
-        "x": 2.347375502504204,
-        "y": 4.116805358888785
+        "x": 1.7184190187857824,
+        "y": 5.557362183607978
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.9273890376759386,
-        "y": 5.089373789198885
+        "x": 2.0206615235083216,
+        "y": 5.547612425391122
       },
       "prevControl": {
-        "x": 1.884164908472336,
-        "y": 5.157622096716878
+        "x": 1.8451658756049119,
+        "y": 5.567111941824835
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "4th note end"
+      "linkedName": "shoot1fe"
     }
   ],
   "rotationTargets": [],
@@ -55,11 +39,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -14.03624346792636,
+    "rotation": 0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "MultiNoteAuto",
+  "folder": "Start Middle",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

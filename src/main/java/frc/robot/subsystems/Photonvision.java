@@ -21,17 +21,19 @@ public class Photonvision extends SubsystemBase {
     private boolean hasTargets = false;
 
     public Photonvision () {
-        try {
-            photonvisionTab.addCamera("PhotonVision View", cameraName, "http://photonvision.local:1182/")
-                .withPosition(0, 0).withSize(5, 5);
-        } catch (Exception e) {
-            System.err.println("PhotonVision view already added!");
-        }
-
         photonvisionTab.addDouble("Distance", () -> distance)
             .withPosition(0, 6).withSize(1, 1);
         photonvisionTab.addDouble("X Offset", () -> xOffset)
             .withPosition(1, 6).withSize(1, 1);
+    }
+
+    public void addCameraToTab(ShuffleboardTab tab, int col, int row, int size) {
+        try {
+            tab.addCamera("PhotonVision View", cameraName, "http://photonvision.local:1182/stream.mjpg")
+                .withPosition(col, row).withSize(size, size);
+        } catch (Exception e) {
+            System.err.println("PhotonVision view already added!");
+        }
     }
 
     @Override

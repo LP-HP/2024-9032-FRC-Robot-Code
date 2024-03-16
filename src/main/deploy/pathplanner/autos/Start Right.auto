@@ -1,6 +1,12 @@
 {
   "version": 1.0,
-  "startingPose": null,
+  "startingPose": {
+    "position": {
+      "x": 0.8,
+      "y": 4.25
+    },
+    "rotation": -60.0
+  },
   "command": {
     "type": "sequential",
     "data": {
@@ -8,31 +14,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "1rst shoot alignment"
+            "pathName": "shoot1r"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootAA"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "2nd note alignment"
+            "pathName": "shoot2r"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "3rd note alignment"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "4th note alignment"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "5th note alignment"
+            "name": "ShootAA"
           }
         }
       ]

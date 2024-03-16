@@ -1,11 +1,5 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.SwerveConstants.driveRadius;
-import static frc.robot.Constants.SwerveConstants.gyroPort;
-import static frc.robot.Constants.SwerveConstants.invertGyro;
-import static frc.robot.Constants.SwerveConstants.maxSpeed;
-import static frc.robot.Constants.SwerveConstants.swerveKinematics;
-
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -32,6 +26,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.limelightutil.LimelightHelpers.PoseEstimate;
 import frc.robot.Constants;
@@ -130,6 +125,11 @@ public class Swerve extends SubsystemBase {
             .withPosition(7, 4).withSize(1, 1);
     }
 
+    public Command getVisionLocalizationAuto(String autoName, Supplier<Optional<PoseEstimate>> visionSup) {
+        return addOptionalVisionPoseSupplier(visionSup)
+            .andThen(AutoBuilder.buildAuto(autoName));
+    }
+
     private void updateConstantsFromDashboard(GenericEntry kS, GenericEntry kV, GenericEntry kP, GenericEntry kD) {
         velocityFeedforward = new SimpleMotorFeedforward(kS.getDouble(0), kV.getDouble(0));
         velocityPID = new SparkMaxPIDConstants(kP.getDouble(0), 0.0, kD.getDouble(0), 0.0, -1.0, 1.0);
@@ -183,7 +183,11 @@ public class Swerve extends SubsystemBase {
         return swerveOdometry.getEstimatedPosition();
     }
 
-    public void resetOdometry(Pose2d pose) {
+    public Command resetOdometryCommand(Supplier<Pose2d> poseSup) {
+        return runOnce(() -> resetOdometry(poseSup.get()));
+    }
+
+    private void resetOdometry(Pose2d pose) {
         swerveOdometry.resetPosition(getGyroYaw(), getModulePositions(), pose);
     }
 
@@ -223,8 +227,8 @@ public class Swerve extends SubsystemBase {
         }
     }
 
-    public void addOptionalVisionPoseSupplier(Supplier<Optional<PoseEstimate>> poseSupplier) {
-        visionSup = poseSupplier;
+    public Command addOptionalVisionPoseSupplier(Supplier<Optional<PoseEstimate>> poseSupplier) {
+        return runOnce(() -> visionSup = poseSupplier);
     }
 
     private void updateVisionLocalization(PoseEstimate poseEstimate) {
@@ -232,23 +236,13 @@ public class Swerve extends SubsystemBase {
 
         double xyStandardDeviation;
         double headingStandardDeviation;
-        /* Multiple targets detected means a lower standard deviation */
+        /* Multiple targets detected means a lower standard deviation - set heading deviation high to only use gyro for heading */
         if (poseEstimate.tagCount >= 2 && poseDifference < 1.0) {
             xyStandardDeviation = 0.5;
-            headingStandardDeviation = 6;
-        }
-        /* 1 target with large area and close to estimated pose */
-        else if (poseEstimate.avgTagArea > 0.8 && poseDifference < 0.5) {
-            xyStandardDeviation = 1.0;
-            headingStandardDeviation = 12;
-        }
-        /* 1 target farther away and estimated pose is close */
-        else if (poseEstimate.avgTagArea > 0.1 && poseDifference < 0.3) {
-            xyStandardDeviation = 2.0;
-            headingStandardDeviation = 30;
+            headingStandardDeviation = 999999999;
         }
         else {
-            System.err.println("Discarded pose estimate " + poseEstimate.pose);
+            System.err.println("Discarded pose estimate | tag amt " + poseEstimate.tagCount + " | pose " + poseEstimate.pose);
 
             return;
         }        

@@ -37,7 +37,7 @@ public final class Constants {
     }
 
     public static final class LimelightConstants {
-        public static final String limelightName = "limelight";//TODO set name to real camera name
+        public static final String limelightName = "limelight";
         public static final int targetPipelineID = 0;
         public static final int localizationPipelineID = 1;
         public static final boolean startInLocalization = false;
@@ -46,6 +46,9 @@ public final class Constants {
         public static final double tagHeight = Units.inchesToMeters(57.25);
         public static final double mountingHeight = Units.inchesToMeters(12.75);
         public static final double mountingAngle = Units.degreesToRadians(18.0);
+
+        /* Cutoff for target validity */
+        public static final double distanceCutoff = 5.0;
     }
 
     public static final class PhotonvisionConstants {
@@ -183,7 +186,7 @@ public final class Constants {
         public static final int rightFlywheelMotorID = 18;
         public static final InvertedValue rightFlywheelInvert = InvertedValue.CounterClockwise_Positive;
 
-        public static final double shotWaitTime = 1.0;//TODO change
+        public static final double shotWaitTime = 0.5;//TODO change
         public static final double minFlywheelSetpoint = 0.0;
         public static final double maxFlywheelSetpoint = 100.0;
 
@@ -296,7 +299,7 @@ public final class Constants {
 
         /* Drive Motor Characterization Values */
         public static final double driveKS = 0.0; //TODO: This must be tuned to specific robot - needed for auto
-        public static final double driveKV = 2.5;
+        public static final double driveKV = 3.0;
         public static final double driveKA = 0.0;
 
         /* Drive Motor Conversion Factors */
@@ -435,33 +438,35 @@ public final class Constants {
     public static final class ClosedLoopConstants { 
         /* PID Constants for Path Following */
         public static final PIDConstants translationPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            0.8, 
+            2.0, 
             0.0, 
             0.0
         ); 
         public static final PIDConstants headingPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            0.85, 
+            2.0, 
             0.0, 
             0.0
         ); 
 
-        /* PID Constants for rotation and movement to a vision target */
-        public static final double kPRotationTarget = 0.14;
-        public static final double kDRotationTarget = 0.01;
+        /* PID Constants for rotation and movement to a vision target while moving */
+        public static final double kPRotationTargetWhileMoving = 0.14;
+        public static final double kDRotationTargetWhileMoving = 0.01;
 
-        public static final double kPTranslationTarget = 1.7;//TODO tune and test
+        /* For alignment without moving */
+        public static final double kPTranslationTarget = 1.7;        
         
+        public static final double kPRotationTarget = 0.12;
+        public static final double kDRotationTarget = 0.01;
+        
+        /* Setpoint tolerances */
         public static final double rotationSetpointTolerance = 1.0;
         public static final double translationSetpointTolerance = 0.5;
     }
 
     public static final class AutoConstants { //TODO tune
         /* Seconds */
-        public static final double notePickupTimeout = 2.0;
-
-        public static final double armPosNote1 = 140.0;
-        public static final double shooterVelocityNote1 = 95.0;
-        public static final double armPosNote2 = 140.0;
-        public static final double shooterVelocityNote2 = 95.0;
+        public static final double notePickupTimeout = 5.0;
+        public static final double passthroughWait = 0.5;
+        public static final double shootVelocity = 95.0;
     }
 }
