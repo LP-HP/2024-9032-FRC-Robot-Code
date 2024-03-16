@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 2.7031445986882483,
-        "y": 5.52811290895741
+        "x": 2.4789001597005584,
+        "y": 5.567111941824834
       },
       "prevControl": {
-        "x": 2.5373987090016947,
-        "y": 5.52811290895741
+        "x": 2.313154270014005,
+        "y": 5.567111941824834
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,15 +33,21 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.05,
+      "waypointRelativePos": 0.0,
       "command": {
-        "type": "parallel",
+        "type": "sequential",
         "data": {
           "commands": [
             {
               "type": "named",
               "data": {
                 "name": "Intake"
+              }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 0.75
               }
             }
           ]

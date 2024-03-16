@@ -3,6 +3,7 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
+    "Start Left",
     "Start Middle",
     "Start Right",
     "SwerveShakedown"

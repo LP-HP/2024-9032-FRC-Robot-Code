@@ -242,7 +242,7 @@ public class Swerve extends SubsystemBase {
             headingStandardDeviation = 999999999;
         }
         else {
-            System.err.println("Discarded pose estimate " + poseEstimate.pose);
+            System.err.println("Discarded pose estimate | tag amt " + poseEstimate.tagCount + " | pose " + poseEstimate.pose);
 
             return;
         }        

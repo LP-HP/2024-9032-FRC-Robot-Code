@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.7031445986882483,
-        "y": 5.52811290895741
+        "x": 2.4789001597005584,
+        "y": 5.567111941824834
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.5763977418691195,
-        "y": 4.855379591994339
+        "x": 2.3521533028814297,
+        "y": 4.894378624861763
       },
       "isLocked": false,
       "linkedName": "shoot3fe"
     },
     {
       "anchor": {
-        "x": 2.517899192567983,
-        "y": 4.153397000380699
+        "x": 2.4204016103994217,
+        "y": 4.211895549681836
       },
       "prevControl": {
-        "x": 1.4649253051475237,
-        "y": 4.4361399886695265
+        "x": 1.4844248215812361,
+        "y": 4.182646275031268
       },
       "nextControl": {
-        "x": 2.673765064965656,
-        "y": 4.111544127236879
+        "x": 2.58171008072797,
+        "y": 4.216936439379603
       },
       "isLocked": false,
       "linkedName": null
@@ -55,7 +55,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.25,
+      "waypointRelativePos": 0.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -64,23 +64,6 @@
               "type": "named",
               "data": {
                 "name": "Intake"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "New Event Marker",
-      "waypointRelativePos": 1.4500000000000002,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Passthrough"
               }
             }
           ]

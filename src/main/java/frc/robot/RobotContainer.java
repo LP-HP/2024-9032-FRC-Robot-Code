@@ -78,6 +78,7 @@ public class RobotContainer {
         autoChooser.addOption("Swerve Shakedown", AutoBuilder.buildAuto("Swerve Shakedown"));
         autoChooser.addOption("Start Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
         autoChooser.addOption("Start Right", swerve.getVisionLocalizationAuto("Start Right", limelight::getPoseEstimate));
+        autoChooser.addOption("Start Left", swerve.getVisionLocalizationAuto("Start Left", limelight::getPoseEstimate));
 
         /* Add debug tab telemetry */
         debugTab.add(
@@ -89,7 +90,7 @@ public class RobotContainer {
         /* Add driver tab telemetry */
         driverTab.addBoolean("No Motor Errors", () -> SparkMaxWrapper.noMotorErrors())
         .   withPosition(0, 0).withSize(1, 1);
-        driverTab.add(autoChooser)
+        driverTab.add("Choose Auto", autoChooser)
             .withPosition(1, 0).withSize(1, 1);
         driverTab.addBoolean("Valid Tag", () -> limelight.getAprilTagTarget().isValid)
             .withPosition(2, 0).withSize(1, 1);
@@ -127,16 +128,10 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("Intake", 
             intake.getNoteFromGround()
+            .andThen(Commands.waitSeconds(passthroughWait))
+            .andThen(new StoreNoteSequence(intake, shooter))
             .withTimeout(notePickupTimeout)
         );
-
-        NamedCommands.registerCommand("Passthrough",
-            new StoreNoteSequence(intake, shooter)
-        );
-
-        NamedCommands.registerCommand("ToStorage",
-            shooter.setToStoragePosition(false)
-        ); 
     }
 
     private void configureButtonBindings() {

@@ -438,12 +438,12 @@ public final class Constants {
     public static final class ClosedLoopConstants { 
         /* PID Constants for Path Following */
         public static final PIDConstants translationPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            0.9, 
+            2.0, 
             0.0, 
             0.0
         ); 
         public static final PIDConstants headingPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            0.95, 
+            2.0, 
             0.0, 
             0.0
         ); 

@@ -29,7 +29,7 @@ public class Photonvision extends SubsystemBase {
 
     public void addCameraToTab(ShuffleboardTab tab, int col, int row, int size) {
         try {
-            tab.addCamera("PhotonVision View", cameraName, "http://photonvision.local:1182/")
+            tab.addCamera("PhotonVision View", cameraName, "http://photonvision.local:1182/stream.mjpg")
                 .withPosition(col, row).withSize(size, size);
         } catch (Exception e) {
             System.err.println("PhotonVision view already added!");

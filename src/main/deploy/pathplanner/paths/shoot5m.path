@@ -32,15 +32,15 @@
     },
     {
       "anchor": {
-        "x": 8.270256540513081,
+        "x": 7.8217676625377015,
         "y": 4.1338974839469875
       },
       "prevControl": {
-        "x": 6.27155610605758,
+        "x": 5.8230672280822,
         "y": 4.299643373633542
       },
       "nextControl": {
-        "x": 8.691877848984564,
+        "x": 8.243388971009189,
         "y": 4.0989337656834985
       },
       "isLocked": false,
@@ -81,23 +81,6 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.15,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "ToStorage"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "New Event Marker",
       "waypointRelativePos": 1.65,
       "command": {
         "type": "parallel",
@@ -107,23 +90,6 @@
               "type": "named",
               "data": {
                 "name": "Intake"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "New Event Marker",
-      "waypointRelativePos": 2.5,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Passthrough"
               }
             }
           ]
