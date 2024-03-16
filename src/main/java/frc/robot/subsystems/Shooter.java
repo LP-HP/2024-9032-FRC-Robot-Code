@@ -239,6 +239,10 @@ public class Shooter extends SubsystemBase {
         return setTargetPosition(armPositionPassthrough, waitUntilAchieved).withName("To passthrough"); 
     }
 
+    public Command setToClimbingPosition(boolean waitUntilAchieved) {
+        return setTargetPosition(armPositionClimbing, waitUntilAchieved).withName("To climbing"); 
+    }
+
     public Command setToAutoPosition(double position, boolean waitUntilAchieved) {
         return setTargetPosition(position, waitUntilAchieved).withName("To auto pos");
     }
