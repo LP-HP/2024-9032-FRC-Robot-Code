@@ -188,7 +188,7 @@ public class RobotContainer {
             shooter.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround())
             .andThen(setAndDisableRumble())
-            .onlyIf(() -> !intake.hasNote() && !shooter.hasNote() && !shooter.isShooting())
+            // .onlyIf(() -> !intake.hasNote() && !shooter.hasNote() && !shooter.isShooting())
         );
 
         getNoteButton.and(() -> !intake.hasNote() && photonvision.hasTargets()).whileTrue(
@@ -230,7 +230,7 @@ public class RobotContainer {
             intake.setToPassthroughPosition(false)
             .andThen(intake.disableFlywheels())
             .andThen(shooter.setToStoragePosition(false))
-            .onlyIf(() -> !intake.hasNote())
+            // .onlyIf(() -> !intake.hasNote())
         );
     }
 

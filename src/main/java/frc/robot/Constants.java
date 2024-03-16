@@ -466,7 +466,7 @@ public final class Constants {
 
     public static final class AutoConstants { //TODO tune
         /* Seconds */
-        public static final double notePickupTimeout = 5.0;
+        public static final double notePickupTimeout = 3.0;
         public static final double passthroughWait = 0.5;
         public static final double shootVelocity = 95.0;
     }
