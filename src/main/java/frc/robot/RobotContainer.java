@@ -75,11 +75,12 @@ public class RobotContainer {
         configureButtonBindings();
 
         /* Add auto chooser */
-        autoChooser.setDefaultOption("Start Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
+        autoChooser.setDefaultOption("Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
         autoChooser.addOption("Swerve Shakedown", AutoBuilder.buildAuto("Swerve Shakedown"));
-        autoChooser.addOption("Start Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
-        autoChooser.addOption("Start Right", swerve.getVisionLocalizationAuto("Start Right", limelight::getPoseEstimate));
-        autoChooser.addOption("Start Left", swerve.getVisionLocalizationAuto("Start Left", limelight::getPoseEstimate));
+        autoChooser.addOption("Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
+        autoChooser.addOption("Right", swerve.getVisionLocalizationAuto("Start Right", limelight::getPoseEstimate));
+        autoChooser.addOption("Left", swerve.getVisionLocalizationAuto("Start Left", limelight::getPoseEstimate));
+        autoChooser.addOption("Aiming", swerve.getVisionLocalizationAuto("Auto Aiming", limelight::getPoseEstimate));
 
         /* Add debug tab telemetry */
         debugTab.add(
@@ -114,6 +115,8 @@ public class RobotContainer {
     /* Only reset variables - don't run any commands here */
     public void teleopInit() {
         limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
+        shooter.reset();
+        intake.reset();
     }
 
     /* Only reset variables - don't run any commands here */
@@ -129,6 +132,14 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("Intake", 
             intake.getNoteFromGround()
+            .andThen(Commands.waitSeconds(passthroughWait))
+            .andThen(new StoreNoteSequence(intake, shooter))
+            .withTimeout(notePickupTimeout)
+        );
+
+        NamedCommands.registerCommand("IntakeAA", 
+            intake.getNoteFromGround()
+                .deadlineWith(new AlignWithVisionTarget(swerve, photonvision, false, false))
             .andThen(Commands.waitSeconds(passthroughWait))
             .andThen(new StoreNoteSequence(intake, shooter))
             .withTimeout(notePickupTimeout)
