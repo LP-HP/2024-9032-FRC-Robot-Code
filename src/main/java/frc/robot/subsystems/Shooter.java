@@ -113,7 +113,7 @@ public class Shooter extends SubsystemBase {
             .withPosition(2, 3).withSize(1, 1);
         shooterTab.add(resetCommand())
             .withPosition(3, 3).withSize(1, 1);
-        shooterTab.add(setToStoragePosition(true))
+        shooterTab.add(setToUnderStagePosition(true))
             .withPosition(4, 3).withSize(1, 1);
         shooterTab.add(setToPassthroughPosition(true))
             .withPosition(5, 3).withSize(1, 1);
@@ -214,7 +214,7 @@ public class Shooter extends SubsystemBase {
         return enableStorageMotorToFlywheels()
            .andThen(Commands.waitSeconds(shotWaitTime))
            .andThen(disableFlywheels())
-           .andThen(setToStoragePosition(false));
+           .andThen(setToUpPosition(false));
     }
 
     public boolean isShooting() {
@@ -231,16 +231,16 @@ public class Shooter extends SubsystemBase {
         );
     }
 
-    public Command setToStoragePosition(boolean waitUntilAchieved) {
-        return setTargetPosition(armPositionStorage, waitUntilAchieved).withName("To storage"); 
+    public Command setToUnderStagePosition(boolean waitUntilAchieved) {
+        return setTargetPosition(armPositionUnderStage, waitUntilAchieved).withName("To understage"); 
     }
 
     public Command setToPassthroughPosition(boolean waitUntilAchieved) {
         return setTargetPosition(armPositionPassthrough, waitUntilAchieved).withName("To passthrough"); 
     }
 
-    public Command setToClimbingPosition(boolean waitUntilAchieved) {
-        return setTargetPosition(armPositionClimbing, waitUntilAchieved).withName("To climbing"); 
+    public Command setToUpPosition(boolean waitUntilAchieved) {
+        return setTargetPosition(armPositionUp, waitUntilAchieved).withName("To up"); 
     }
 
     public Command setToAutoPosition(double position, boolean waitUntilAchieved) {

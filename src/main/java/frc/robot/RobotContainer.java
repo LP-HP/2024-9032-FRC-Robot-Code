@@ -31,14 +31,13 @@ public class RobotContainer {
 
     /* Drive Controller Buttons */
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
-    private final Trigger climberDownButton = driveController.leftTrigger(0.05).debounce(0.025);
 
     /* Mechanism Controller Buttons */
     private final Trigger speakerScoreButton = mechanismController.rightBumper().debounce(0.025);
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
     private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
     private final Trigger ampScoreButton = mechanismController.y().debounce(0.025);
-    private final Trigger storageButton = mechanismController.x().debounce(0.025);
+    private final Trigger underStageButton = mechanismController.x().debounce(0.025);
     private final Trigger speakerAimButton = mechanismController.leftBumper().debounce(0.025);
     private final Trigger getNoteButton = mechanismController.rightTrigger(0.25).debounce(0.025);
     private final Trigger resetButton = mechanismController.back().debounce(1.0);
@@ -175,8 +174,6 @@ public class RobotContainer {
             )
         );
 
-        climberDownButton.onTrue(shooter.setToClimbingPosition(false));
-
         /* Mechanism Controls */
         speakerScoreButton.and(speakerAimButton).onTrue(
             shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance)//TODO do velocity lookup table if needed
@@ -226,12 +223,13 @@ public class RobotContainer {
             .onlyIf(shooter::hasNote)
         );
 
-        storageButton.onTrue(
+        underStageButton.onTrue(
             intake.setToPassthroughPosition(false)
             .andThen(intake.disableFlywheels())
-            .andThen(shooter.setToStoragePosition(false))
-            // .onlyIf(() -> !intake.hasNote())
+            .andThen(shooter.setToUnderStagePosition(false))
         );
+
+        underStageButton.onFalse(shooter.setToUpPosition(false));
     }
 
     private Command setAndDisableRumble() {

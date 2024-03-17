@@ -16,7 +16,7 @@ public class StoreNoteSequence extends SequentialCommandGroup {
             /* Make sure to put them back in the storage position and disable when the note arrives in the shooter */
             intake.disableFlywheels(),
             intake.setToPassthroughPosition(false),
-            shooter.setToStoragePosition(false)
+            shooter.setToUpPosition(false)
         );
     }
 }
