@@ -88,6 +88,7 @@ public final class Constants {
         public static final double armPositionGround = 26.5;
         public static final double armPositionPassthrough = 227.0;
         public static final double armPositionAmp = 160.0;
+        public static final double armPositionEject = 100.0;
 
         /* Intake Flywheel */
         public static final SparkMaxConstants intakeFlywheelConstants = new SparkMaxConstants(

@@ -40,6 +40,7 @@ public class RobotContainer {
     private final Trigger underStageButton = mechanismController.x().debounce(0.025);
     private final Trigger speakerAimButton = mechanismController.leftBumper().debounce(0.025);
     private final Trigger getNoteButton = mechanismController.rightTrigger(0.25).debounce(0.025);
+    private final Trigger ejectButton = mechanismController.leftTrigger(0.25).debounce(0.025);
     private final Trigger resetButton = mechanismController.back().debounce(1.0);
 
     /* Subsystems */
@@ -203,6 +204,8 @@ public class RobotContainer {
             intake.shootIntoAmp()
             .onlyIf(intake::hasNote)
         );
+
+        ejectButton.onTrue(intake.ejectNote());
 
         resetButton.onTrue(
             intake.resetCommand()

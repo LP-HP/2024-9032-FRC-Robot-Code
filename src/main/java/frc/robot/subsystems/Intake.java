@@ -87,6 +87,10 @@ public class Intake extends SubsystemBase {
         return setTargetPosition(armPositionAmp, waitUntilAchieved).withName("To amp");
     }
 
+    public Command setToEjectPosition(boolean waitUntilAchieved) {
+        return setTargetPosition(armPositionEject, waitUntilAchieved).withName("To eject");
+    }
+
     public Command disableFlywheels() {
         return setFlywheelPower(0.0);
     }
@@ -99,6 +103,16 @@ public class Intake extends SubsystemBase {
             .andThen(setNoteState(false))
             .andThen(setToPassthroughPosition(false))
             .withName("Shoot into amp");
+    }
+
+    public Command ejectNote() {
+        return setToEjectPosition(true)
+            .andThen(setFlywheelPower(outtakeAmpPower))
+            .andThen(Commands.waitSeconds(shotWaitTime))
+            .andThen(disableFlywheels())
+            .andThen(setNoteState(false))
+            .andThen(setToPassthroughPosition(false))
+            .withName("Eject");
     }
 
     public Command enableTransferToShooter() {
