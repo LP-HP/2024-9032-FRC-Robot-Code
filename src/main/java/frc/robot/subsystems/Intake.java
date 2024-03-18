@@ -96,7 +96,8 @@ public class Intake extends SubsystemBase {
     }
 
     public Command shootIntoAmp() {
-        return setToAmpPosition(true)
+        return disableFlywheels()
+            .andThen(setToAmpPosition(true))
             .andThen(setFlywheelPower(outtakeAmpPower))
             .andThen(Commands.waitSeconds(shotWaitTime))
             .andThen(disableFlywheels())
@@ -106,7 +107,8 @@ public class Intake extends SubsystemBase {
     }
 
     public Command ejectNote() {
-        return setToEjectPosition(true)
+        return disableFlywheels()
+            .andThen(setToEjectPosition(true))
             .andThen(setFlywheelPower(outtakeAmpPower))
             .andThen(Commands.waitSeconds(shotWaitTime))
             .andThen(disableFlywheels())
@@ -144,11 +146,11 @@ public class Intake extends SubsystemBase {
     }
 
     public void reset() {
-        flywheelMotor.set(0.0);
-        armMotor.setClosedLoopTarget(armMotor.relativeEncoder.getPosition());
-
         if(this.getCurrentCommand() != null) 
             this.getCurrentCommand().cancel();
+
+        flywheelMotor.set(0.0);
+        armMotor.setClosedLoopTarget(armMotor.relativeEncoder.getPosition());
 
         hasNoteState = false;
     }

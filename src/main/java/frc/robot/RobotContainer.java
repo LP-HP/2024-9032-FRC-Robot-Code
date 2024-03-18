@@ -41,7 +41,7 @@ public class RobotContainer {
     private final Trigger speakerAimButton = mechanismController.leftBumper().debounce(0.025);
     private final Trigger getNoteButton = mechanismController.rightTrigger(0.25).debounce(0.025);
     private final Trigger ejectButton = mechanismController.leftTrigger(0.25).debounce(0.025);
-    private final Trigger resetButton = mechanismController.back().debounce(1.0);
+    private final Trigger resetButton = mechanismController.back().debounce(0.5);
 
     /* Subsystems */
     private final LimelightVision limelight = new LimelightVision();
@@ -193,7 +193,10 @@ public class RobotContainer {
             new AlignWithVisionTarget(swerve, photonvision, false, false)
         );
         
-        getNoteButton.onFalse(intake.setToPassthroughPosition(false));   
+        getNoteButton.onFalse(
+            intake.disableFlywheels()
+            .andThen(intake.setToPassthroughPosition(false))
+        );   
 
         storeNoteButton.and(speakerAimButton.negate()).onTrue(
             new StoreNoteSequence(intake, shooter)

@@ -37,7 +37,6 @@ public class LimelightVision extends SubsystemBase {
             .withPosition(0, 4).withSize(2, 1);
         limelightTab.add("To Target", runOnce(this::switchToTargetPipeline))
             .withPosition(2, 4).withSize(2, 1);
-
     }
 
     public void addCameraToTab(ShuffleboardTab tab, int col, int row, int size) {

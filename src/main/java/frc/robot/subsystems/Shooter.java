@@ -278,14 +278,14 @@ public class Shooter extends SubsystemBase {
     }
 
     public void reset() {
+        if(getCurrentCommand() != null) 
+            getCurrentCommand().cancel();
+
         armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
         leftFlywheelMotor.disable();
         rightFlywheelMotor.disable();
         storageMotor.disable();
         isShooting = false;
-
-        if(getCurrentCommand() != null) 
-            getCurrentCommand().cancel();
     }
 
     public Command resetCommand() {
