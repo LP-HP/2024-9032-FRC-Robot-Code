@@ -87,18 +87,34 @@ public class Intake extends SubsystemBase {
         return setTargetPosition(armPositionAmp, waitUntilAchieved).withName("To amp");
     }
 
+    public Command setToEjectPosition(boolean waitUntilAchieved) {
+        return setTargetPosition(armPositionEject, waitUntilAchieved).withName("To eject");
+    }
+
     public Command disableFlywheels() {
         return setFlywheelPower(0.0);
     }
 
     public Command shootIntoAmp() {
-        return setToAmpPosition(true)
+        return disableFlywheels()
+            .andThen(setToAmpPosition(true))
             .andThen(setFlywheelPower(outtakeAmpPower))
             .andThen(Commands.waitSeconds(shotWaitTime))
             .andThen(disableFlywheels())
             .andThen(setNoteState(false))
             .andThen(setToPassthroughPosition(false))
             .withName("Shoot into amp");
+    }
+
+    public Command ejectNote() {
+        return disableFlywheels()
+            .andThen(setToEjectPosition(true))
+            .andThen(setFlywheelPower(outtakeAmpPower))
+            .andThen(Commands.waitSeconds(shotWaitTime))
+            .andThen(disableFlywheels())
+            .andThen(setNoteState(false))
+            .andThen(setToPassthroughPosition(false))
+            .withName("Eject");
     }
 
     public Command enableTransferToShooter() {
@@ -130,11 +146,11 @@ public class Intake extends SubsystemBase {
     }
 
     public void reset() {
-        flywheelMotor.set(0.0);
-        armMotor.setClosedLoopTarget(armMotor.relativeEncoder.getPosition());
-
         if(this.getCurrentCommand() != null) 
             this.getCurrentCommand().cancel();
+
+        flywheelMotor.set(0.0);
+        armMotor.setClosedLoopTarget(armMotor.relativeEncoder.getPosition());
 
         hasNoteState = false;
     }

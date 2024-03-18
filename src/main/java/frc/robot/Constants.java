@@ -29,7 +29,7 @@ public final class Constants {
         public static final double stickDeadband = 0.02;
         public static final boolean isFieldCentric = true;
         /* Meters per Second */
-        public static final double joystickToSpeedConversionFactor = 4.0;
+        public static final double joystickToSpeedConversionFactor = 4.15;
         /* Radians per Second */
         public static final double joystickToAngularVelocityConversionFactor = 2 * Math.PI;
         /* Meters per Second Squared */
@@ -88,6 +88,7 @@ public final class Constants {
         public static final double armPositionGround = 26.5;
         public static final double armPositionPassthrough = 227.0;
         public static final double armPositionAmp = 160.0;
+        public static final double armPositionEject = 100.0;
 
         /* Intake Flywheel */
         public static final SparkMaxConstants intakeFlywheelConstants = new SparkMaxConstants(
@@ -154,13 +155,13 @@ public final class Constants {
 
         /* Arm Positions */
         public static final double armPositionPassthrough = 133.0;
-        public static final double armPositionStorage = 120.0;
-        public static final double armPositionClimbing = 170.0;
+        public static final double armPositionUnderStage = 120.0;
+        public static final double armPositionUp = 170.0;
         /* Key - Distance : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap distanceToArmPosTable = new InterpolatingDoubleTreeMap();
         static {
-            distanceToArmPosTable.put(1.335, 148.0);
-            distanceToArmPosTable.put(1.637, 146.0);
+            distanceToArmPosTable.put(1.335, 147.0);
+            distanceToArmPosTable.put(1.637, 145.0);
             distanceToArmPosTable.put(1.833, 143.0);
             distanceToArmPosTable.put(2.318, 138.5);
             distanceToArmPosTable.put(2.91, 134.0);
@@ -187,7 +188,7 @@ public final class Constants {
         public static final int rightFlywheelMotorID = 18;
         public static final InvertedValue rightFlywheelInvert = InvertedValue.CounterClockwise_Positive;
 
-        public static final double shotWaitTime = 0.5;//TODO change
+        public static final double shotWaitTime = 0.5;
         public static final double minFlywheelSetpoint = 0.0;
         public static final double maxFlywheelSetpoint = 100.0;
 
@@ -464,9 +465,9 @@ public final class Constants {
         public static final double translationSetpointTolerance = 0.5;
     }
 
-    public static final class AutoConstants { //TODO tune
+    public static final class AutoConstants { 
         /* Seconds */
-        public static final double notePickupTimeout = 5.0;
+        public static final double notePickupTimeout = 3.0;
         public static final double passthroughWait = 0.5;
         public static final double shootVelocity = 95.0;
     }
