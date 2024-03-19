@@ -2,6 +2,8 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -31,15 +33,16 @@ public class RobotContainer {
 
     /* Drive Controller Buttons */
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
+    private final Trigger underStageButton = driveController.rightBumper().debounce(0.025);
+    private final Trigger overrideAutoAim = driveController.leftBumper().debounce(0.025);
 
     /* Mechanism Controller Buttons */
     private final Trigger speakerScoreButton = mechanismController.rightBumper().debounce(0.025);
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
     private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
     private final Trigger ampScoreButton = mechanismController.y().debounce(0.025);
-    private final Trigger underStageButton = mechanismController.x().debounce(0.025);
-    private final Trigger speakerAimButton = mechanismController.leftBumper().debounce(0.025);
-    private final Trigger getNoteButton = mechanismController.rightTrigger(0.25).debounce(0.025);
+    private final Trigger getNoteButton = mechanismController.rightTrigger(0.25).debounce(0.025)
+        .and(overrideAutoAim.negate());
     private final Trigger ejectButton = mechanismController.leftTrigger(0.25).debounce(0.025);
     private final Trigger resetButton = mechanismController.back().debounce(0.5);
 
@@ -55,6 +58,10 @@ public class RobotContainer {
     private final ShuffleboardTab debugTab = Shuffleboard.getTab("Debug");
     private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
     SendableChooser<Command> autoChooser = new SendableChooser<>();
+
+    /* Teleop Triggers */
+    private final Trigger speakerTagTargetSeen = new Trigger(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && limelight.isTargetPipeline())
+        .and(overrideAutoAim.negate());
 
     public RobotContainer() {
         /* Will run the following command when there is no other command set, such as during teleop */
@@ -72,7 +79,7 @@ public class RobotContainer {
         registerPathplannerCommands();
 
         /* Configure the button bindings */
-        configureButtonBindings();
+        configureTriggerBindings();
 
         /* Add auto chooser */
         autoChooser.setDefaultOption("Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
@@ -102,6 +109,8 @@ public class RobotContainer {
             .withPosition(4, 0).withSize(1, 1);
         driverTab.addBoolean("Shooter Has Note", () -> shooter.hasNote())
             .withPosition(5, 0).withSize(1, 1);
+        driverTab.addDouble("Match Time", () -> DriverStation.getMatchTime())
+            .withPosition(6, 0).withSize(2, 1);
         limelight.addCameraToTab(driverTab, 0, 1, 4);
         photonvision.addCameraToTab(driverTab, 5, 1, 4);
         Shuffleboard.selectTab(driverTab.getTitle());
@@ -131,22 +140,24 @@ public class RobotContainer {
         );
 
         NamedCommands.registerCommand("Intake", 
-            intake.getNoteFromGround()
+            shooter.setToPassthroughPosition(false)
+            .andThen(intake.getNoteFromGround())
             .andThen(Commands.waitSeconds(passthroughWait))
             .andThen(new StoreNoteSequence(intake, shooter))
             .withTimeout(notePickupTimeout)
         );
 
         NamedCommands.registerCommand("IntakeAA", 
-            intake.getNoteFromGround()
-                .deadlineWith(new AlignWithVisionTarget(swerve, photonvision, false, false))
+            shooter.setToPassthroughPosition(false)
+            .andThen(intake.getNoteFromGround()
+                .deadlineWith(new AlignWithVisionTarget(swerve, photonvision, false, false)))
             .andThen(Commands.waitSeconds(passthroughWait))
             .andThen(new StoreNoteSequence(intake, shooter))
             .withTimeout(notePickupTimeout)
         );
     }
 
-    private void configureButtonBindings() {
+    private void configureTriggerBindings() {
         /* 
          * Current driver controls: 
          * 
@@ -175,30 +186,39 @@ public class RobotContainer {
             )
         );
 
+        underStageButton.onTrue(
+            intake.setToPassthroughPosition(false)
+            .andThen(intake.disableRollers())
+            .andThen(shooter.setToUnderStagePosition(false))
+        );
+
+        underStageButton.onFalse(shooter.setToUpPosition(false));
+
         /* Mechanism Controls */
-        speakerScoreButton.and(speakerAimButton).onTrue(
+        speakerScoreButton.and(shooter::hasNote).onTrue(
             shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance)//TODO do velocity lookup table if needed
-             /* Only run if there is a valid target and it's a speaker tag and we have a note */
-            .onlyIf(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && shooter.hasNote())
         );
 
         enableIntakeButton.onTrue(
             shooter.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround())
             .andThen(setAndDisableRumble())
-            // .onlyIf(() -> !intake.hasNote() && !shooter.hasNote() && !shooter.isShooting())
         );
 
-        getNoteButton.and(() -> !intake.hasNote() && photonvision.hasTargets()).whileTrue(
-            new AlignWithVisionTarget(swerve, photonvision, false, false)
+        getNoteButton.whileTrue(
+            shooter.setToPassthroughPosition(false)
+            .andThen(intake.getNoteFromGround())
+                .deadlineWith(new AlignWithVisionTarget(swerve, photonvision, false, false))
+            .andThen(setAndDisableRumble())
+            .onlyIf(photonvision::hasTargets)
         );
         
         getNoteButton.onFalse(
-            intake.disableFlywheels()
+            intake.disableRollers()
             .andThen(intake.setToPassthroughPosition(false))
         );   
 
-        storeNoteButton.and(speakerAimButton.negate()).onTrue(
+        storeNoteButton.onTrue(
             new StoreNoteSequence(intake, shooter)
             .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
         );
@@ -215,7 +235,8 @@ public class RobotContainer {
             .andThen(shooter.resetCommand())
         );
 
-        speakerAimButton.whileTrue(
+        /* Teleop Triggers */
+        speakerTagTargetSeen.whileTrue(
             new LockToVisionTargetWhileMoving(swerve, limelight, 
                 () -> -driveController.getLeftY(), 
                 () -> -driveController.getLeftX(),
@@ -223,19 +244,14 @@ public class RobotContainer {
             .onlyIf(shooter::hasNote)
         );
 
-        speakerAimButton.whileTrue(
+        speakerTagTargetSeen.whileTrue(
             shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
+            .andThen(shooter.spinUpFlywheels(70.0))//TODO have a constant
                 .repeatedly()
             .onlyIf(shooter::hasNote)
         );
 
-        underStageButton.onTrue(
-            intake.setToPassthroughPosition(false)
-            .andThen(intake.disableFlywheels())
-            .andThen(shooter.setToUnderStagePosition(false))
-        );
-
-        underStageButton.onFalse(shooter.setToUpPosition(false));
+        speakerTagTargetSeen.onFalse(shooter.disableFlywheels());
     }
 
     private Command setAndDisableRumble() {

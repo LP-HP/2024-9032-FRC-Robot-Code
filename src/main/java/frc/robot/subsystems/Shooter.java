@@ -183,19 +183,26 @@ public class Shooter extends SubsystemBase {
         return setStorageMotorPower(storageMotorPowerToFlywheels).withName("Storage flywheels");
     }
 
-    private Command disableFlywheels() {
+    public Command disableFlywheels() {
         return runOnce(() -> { 
             leftFlywheelMotor.disable();
             rightFlywheelMotor.disable();
-            storageMotor.disable();
             isShooting = false;
         });
+    }
+
+    private Command disableStorageMotor() {
+        return runOnce(() -> storageMotor.disable());
     }
 
     public Command receiveNoteFromIntake() {
         return enableStorageMotorReceiving()
             .andThen(Commands.waitUntil(this::hasNote))
-            .andThen(disableFlywheels());
+            .andThen(disableStorageMotor());
+    }
+
+    public Command spinUpFlywheels(double velocityRPS) {
+        return setFlywheelVelocity(velocityRPS, false);
     }
 
     public Command shootSequence(double velocityRPS) {
@@ -214,6 +221,7 @@ public class Shooter extends SubsystemBase {
         return enableStorageMotorToFlywheels()
            .andThen(Commands.waitSeconds(shotWaitTime))
            .andThen(disableFlywheels())
+           .andThen(disableStorageMotor())
            .andThen(setToUpPosition(false));
     }
 

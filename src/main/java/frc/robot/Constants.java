@@ -29,7 +29,7 @@ public final class Constants {
         public static final double stickDeadband = 0.02;
         public static final boolean isFieldCentric = true;
         /* Meters per Second */
-        public static final double joystickToSpeedConversionFactor = 4.15;
+        public static final double joystickToSpeedConversionFactor = SwerveConstants.maxSpeed;
         /* Radians per Second */
         public static final double joystickToAngularVelocityConversionFactor = 2 * Math.PI;
         /* Meters per Second Squared */
@@ -45,7 +45,7 @@ public final class Constants {
         /* Distance Constants */
         public static final double tagHeight = Units.inchesToMeters(57.25);
         public static final double mountingHeight = Units.inchesToMeters(12.75);
-        public static final double mountingAngle = Units.degreesToRadians(18.0);
+        public static final double mountingAngle = Units.degreesToRadians(30.0);
 
         /* Cutoff for target validity */
         public static final double distanceCutoff = 5.0;
@@ -91,9 +91,9 @@ public final class Constants {
         public static final double armPositionEject = 100.0;
 
         /* Intake Flywheel */
-        public static final SparkMaxConstants intakeFlywheelConstants = new SparkMaxConstants(
+        public static final SparkMaxConstants intakeRollerConstants = new SparkMaxConstants(
             14,
-            "Intake Flywheels",
+            "Intake Roller",
             ControlMode.percentOutput,
             null,
             40,
@@ -103,9 +103,10 @@ public final class Constants {
             1.0
         );
         public static final double shotWaitTime = 0.25;
+        public static final double ampWaitTime = 1.0;
         /* Flyhweel Powers */
         public static final double intakePower = -0.3;
-        public static final double outtakeAmpPower = 0.7;
+        public static final double outtakeAmpPower = 0.5;
         public static final double transferToShooterPower = 0.4;
 
         /* Sensors */
