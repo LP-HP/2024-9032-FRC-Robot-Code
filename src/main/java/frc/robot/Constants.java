@@ -28,13 +28,14 @@ public final class Constants {
     public static final class TeleopConstants {
         public static final double stickDeadband = 0.02;
         public static final boolean isFieldCentric = true;
-        public static final double flywheelIdleVelocity = 70.0;
         /* Meters per Second */
         public static final double joystickToSpeedConversionFactor = SwerveConstants.maxSpeed;
         /* Radians per Second */
         public static final double joystickToAngularVelocityConversionFactor = 2 * Math.PI;
         /* Meters per Second Squared */
         public static final double accelerationLimit = 32.0;
+
+        public static final double flywheelIdleVelocity = 70.0;
     }
 
     public static final class LimelightConstants {
@@ -88,7 +89,7 @@ public final class Constants {
         public static final double armPositionStarting = 229.0;
         public static final double armPositionGround = 26.5;
         public static final double armPositionPassthrough = 227.0;
-        public static final double armPositionAmp = 160.0;
+        public static final double armPositionAmp = 150.0;
         public static final double armPositionEject = 100.0;
 
         /* Intake Flywheel */

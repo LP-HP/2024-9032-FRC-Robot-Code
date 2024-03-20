@@ -12,9 +12,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.TeleopConstants;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.SparkMaxWrapper;
@@ -223,7 +223,6 @@ public class RobotContainer {
 
         storeNoteButton.onTrue(
             new StoreNoteSequence(intake, shooter)
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
             .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
         );
  
@@ -254,8 +253,8 @@ public class RobotContainer {
                 driveController::getRightX)
         );
 
-        autoAimSpeaker.whileTrue(
-            shooter.spinUpFlywheels(Constants.TeleopConstants.flywheelIdleVelocity)
+        autoAimSpeaker.and(() -> shooter.getCurrentCommand() == null).whileTrue(
+            shooter.spinUpFlywheels(TeleopConstants.flywheelIdleVelocity)
             .andThen(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
                 .repeatedly())
         );
