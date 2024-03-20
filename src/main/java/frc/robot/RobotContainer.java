@@ -37,12 +37,13 @@ public class RobotContainer {
     private final Trigger overrideAutoAim = driveController.leftBumper().debounce(0.025);
 
     /* Mechanism Controller Buttons */
-    private final Trigger speakerScoreButton = mechanismController.rightBumper().debounce(0.025);
+    private final Trigger shootButton = mechanismController.rightBumper().debounce(0.025);
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
     private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
     private final Trigger ampScoreButton = mechanismController.y().debounce(0.025);
-    private final Trigger getNoteButton = mechanismController.rightTrigger(0.25).debounce(0.025)
+    private final Trigger noteAimButton = mechanismController.rightTrigger(0.25).debounce(0.025)
         .and(overrideAutoAim.negate());
+    private final Trigger resetIntakeAndShooterButton = mechanismController.x().debounce(0.025);
     private final Trigger ejectButton = mechanismController.leftTrigger(0.25).debounce(0.025);
     private final Trigger resetButton = mechanismController.back().debounce(0.5);
 
@@ -60,8 +61,9 @@ public class RobotContainer {
     SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     /* Teleop Triggers */
-    private final Trigger speakerTagTargetSeen = new Trigger(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && limelight.isTargetPipeline())
-        .and(overrideAutoAim.negate());
+    private final Trigger autoAimSpeaker = 
+        new Trigger(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && limelight.isTargetPipeline() && shooter.hasNote())
+            .and(overrideAutoAim.negate()).and(underStageButton.negate());
 
     public RobotContainer() {
         /* Will run the following command when there is no other command set, such as during teleop */
@@ -186,36 +188,33 @@ public class RobotContainer {
             )
         );
 
-        underStageButton.onTrue(
-            intake.setToPassthroughPosition(false)
-            .andThen(intake.disableRollers())
-            .andThen(shooter.setToUnderStagePosition(false))
-        );
+        underStageButton.onTrue(shooter.setToUnderStagePosition(false));
 
         underStageButton.onFalse(shooter.setToUpPosition(false));
 
         /* Mechanism Controls */
-        speakerScoreButton.and(shooter::hasNote).onTrue(
-            shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance)//TODO do velocity lookup table if needed
+        shootButton.onTrue(
+            shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance)
+            .onlyIf(shooter::hasNote)//TODO do velocity lookup table if needed
         );
 
         enableIntakeButton.onTrue(
             shooter.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround())
             .andThen(setAndDisableRumble())
+            .onlyIf(() -> !intake.hasNote())
         );
 
-        getNoteButton.whileTrue(
-            shooter.setToPassthroughPosition(false)
-            .andThen(intake.getNoteFromGround())
-                .deadlineWith(new AlignWithVisionTarget(swerve, photonvision, false, false))
-            .andThen(setAndDisableRumble())
-            .onlyIf(photonvision::hasTargets)
+        noteAimButton.whileTrue(
+            new AlignWithVisionTarget(swerve, photonvision, false, false)
+            .onlyIf(() -> photonvision.hasTargets() && !intake.hasNote())
         );
         
-        getNoteButton.onFalse(
+        noteAimButton.onFalse(
             intake.disableRollers()
             .andThen(intake.setToPassthroughPosition(false))
+            .andThen(shooter.setToUpPosition(false))
+            .onlyIf(() -> !intake.hasNote())
         );   
 
         storeNoteButton.onTrue(
@@ -228,7 +227,14 @@ public class RobotContainer {
             .onlyIf(intake::hasNote)
         );
 
+        /* Reset Buttons */
         ejectButton.onTrue(intake.ejectNote());
+
+        resetIntakeAndShooterButton.onTrue(
+            intake.setToPassthroughPosition(false)
+            .andThen(intake.disableRollers())
+            .andThen(shooter.setToUpPosition(false))
+        );
 
         resetButton.onTrue(
             intake.resetCommand()
@@ -236,28 +242,29 @@ public class RobotContainer {
         );
 
         /* Teleop Triggers */
-        speakerTagTargetSeen.whileTrue(
-            new LockToVisionTargetWhileMoving(swerve, limelight, 
-                () -> -driveController.getLeftY(), 
-                () -> -driveController.getLeftX(),
-                driveController::getRightX)
-            .onlyIf(shooter::hasNote)
-        );
+        // autoAimSpeaker.whileTrue(
+        //     new LockToVisionTargetWhileMoving(swerve, limelight, 
+        //         () -> -driveController.getLeftY(), 
+        //         () -> -driveController.getLeftX(),
+        //         driveController::getRightX)
+        // );
 
-        speakerTagTargetSeen.whileTrue(
-            shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
-            .andThen(shooter.spinUpFlywheels(70.0))//TODO have a constant
-                .repeatedly()
-            .onlyIf(shooter::hasNote)
-        );
+        // autoAimSpeaker.whileTrue(
+        //     shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
+        //     .andThen(shooter.spinUpFlywheels(70.0))//TODO have a constant
+        //         .repeatedly()
+        // );
 
-        speakerTagTargetSeen.onFalse(shooter.disableFlywheels());
+        // autoAimSpeaker.onFalse(
+        //     shooter.disableFlywheels()
+        //     .andThen(shooter.setToUpPosition(false))
+        // );
     }
 
     private Command setAndDisableRumble() {
         return new SequentialCommandGroup(
             new InstantCommand(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 1)),
-            Commands.waitSeconds(0.25),
+            Commands.waitSeconds(0.5),
             new InstantCommand(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 0))
         );
     }

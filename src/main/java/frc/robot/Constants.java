@@ -105,7 +105,7 @@ public final class Constants {
         public static final double shotWaitTime = 0.25;
         public static final double ampWaitTime = 1.0;
         /* Flyhweel Powers */
-        public static final double intakePower = -0.3;
+        public static final double intakePower = -0.6;
         public static final double outtakeAmpPower = 0.5;
         public static final double transferToShooterPower = 0.4;
 
@@ -205,7 +205,7 @@ public final class Constants {
             12,
             1.0
         );
-        public static final double storageMotorPowerReceiving = 0.25;
+        public static final double storageMotorPowerReceiving = 0.2;
         public static final double storageMotorPowerToFlywheels = 0.75;
 
         /* Sensors */

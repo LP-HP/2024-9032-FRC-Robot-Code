@@ -67,7 +67,7 @@ public class Intake extends SubsystemBase {
         return blocking ? setTargetCommand.andThen(Commands.waitUntil(this::armAtSetpoint)) : setTargetCommand;
     }
 
-    private Command setFlywheelPower(double power) {
+    private Command setRollerPower(double power) {
         return runOnce(() -> rollerMotor.set(power));
     }
 
@@ -92,14 +92,14 @@ public class Intake extends SubsystemBase {
     }
 
     public Command disableRollers() {
-        return setFlywheelPower(0.0);
+        return setRollerPower(0.0);
     }
 
     public Command shootIntoAmp() {
         return disableRollers()
             .andThen(setToAmpPosition(true))
             .andThen(Commands.waitSeconds(ampWaitTime))
-            .andThen(setFlywheelPower(outtakeAmpPower))
+            .andThen(setRollerPower(outtakeAmpPower))
             .andThen(Commands.waitSeconds(shotWaitTime))
             .andThen(disableRollers())
             .andThen(setNoteState(false))
@@ -110,7 +110,7 @@ public class Intake extends SubsystemBase {
     public Command ejectNote() {
         return disableRollers()
             .andThen(setToEjectPosition(true))
-            .andThen(setFlywheelPower(outtakeAmpPower))
+            .andThen(setRollerPower(outtakeAmpPower))
             .andThen(Commands.waitSeconds(shotWaitTime))
             .andThen(disableRollers())
             .andThen(setNoteState(false))
@@ -119,14 +119,14 @@ public class Intake extends SubsystemBase {
     }
 
     public Command enableTransferToShooter() {
-        return setFlywheelPower(transferToShooterPower)
+        return setRollerPower(transferToShooterPower)
             .andThen(setNoteState(false))
             .withName("Transfer");
     }
 
     public Command getNoteFromGround() {
         return setTargetPosition(armPositionGround, false)
-            .andThen(setFlywheelPower(intakePower))
+            .andThen(setRollerPower(intakePower))
             .andThen(Commands.waitUntil(this::beamBreakTriggered))
             .andThen(disableRollers())
             .andThen(setNoteState(true))
