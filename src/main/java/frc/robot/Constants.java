@@ -28,6 +28,7 @@ public final class Constants {
     public static final class TeleopConstants {
         public static final double stickDeadband = 0.02;
         public static final boolean isFieldCentric = true;
+        public static final double flywheelIdleVelocity = 70.0;
         /* Meters per Second */
         public static final double joystickToSpeedConversionFactor = SwerveConstants.maxSpeed;
         /* Radians per Second */

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
@@ -188,7 +189,10 @@ public class RobotContainer {
             )
         );
 
-        underStageButton.onTrue(shooter.setToUnderStagePosition(false));
+        underStageButton.onTrue(
+            shooter.setToUnderStagePosition(false)
+            .andThen(shooter.disableFlywheels())
+        );
 
         underStageButton.onFalse(shooter.setToUpPosition(false));
 
@@ -219,6 +223,7 @@ public class RobotContainer {
 
         storeNoteButton.onTrue(
             new StoreNoteSequence(intake, shooter)
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
             .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
         );
  
@@ -230,7 +235,7 @@ public class RobotContainer {
         /* Reset Buttons */
         ejectButton.onTrue(intake.ejectNote());
 
-        resetIntakeAndShooterButton.onTrue(
+        resetIntakeAndShooterButton.or(overrideAutoAim).onTrue(
             intake.setToPassthroughPosition(false)
             .andThen(intake.disableRollers())
             .andThen(shooter.setToUpPosition(false))
@@ -242,23 +247,18 @@ public class RobotContainer {
         );
 
         /* Teleop Triggers */
-        // autoAimSpeaker.whileTrue(
-        //     new LockToVisionTargetWhileMoving(swerve, limelight, 
-        //         () -> -driveController.getLeftY(), 
-        //         () -> -driveController.getLeftX(),
-        //         driveController::getRightX)
-        // );
+        autoAimSpeaker.whileTrue(
+            new LockToVisionTargetWhileMoving(swerve, limelight, 
+                () -> -driveController.getLeftY(), 
+                () -> -driveController.getLeftX(),
+                driveController::getRightX)
+        );
 
-        // autoAimSpeaker.whileTrue(
-        //     shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
-        //     .andThen(shooter.spinUpFlywheels(70.0))//TODO have a constant
-        //         .repeatedly()
-        // );
-
-        // autoAimSpeaker.onFalse(
-        //     shooter.disableFlywheels()
-        //     .andThen(shooter.setToUpPosition(false))
-        // );
+        autoAimSpeaker.whileTrue(
+            shooter.spinUpFlywheels(Constants.TeleopConstants.flywheelIdleVelocity)
+            .andThen(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
+                .repeatedly())
+        );
     }
 
     private Command setAndDisableRumble() {
