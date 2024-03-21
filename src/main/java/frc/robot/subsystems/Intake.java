@@ -12,7 +12,7 @@ import static frc.robot.Constants.IntakeConstants.*;
 
 public class Intake extends SubsystemBase {
     private final SparkMaxWrapper armMotor;    
-    private final SparkMaxWrapper flywheelMotor;
+    private final SparkMaxWrapper rollerMotor;
 
     private final ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
 
@@ -24,15 +24,15 @@ public class Intake extends SubsystemBase {
         armMotor = new SparkMaxWrapper(intakeArmConstants);
         armMotor.config();
 
-        flywheelMotor = new SparkMaxWrapper(intakeFlywheelConstants);
-        flywheelMotor.config();
+        rollerMotor = new SparkMaxWrapper(intakeRollerConstants);
+        rollerMotor.config();
 
         armMotor.relativeEncoder.setPosition(armPositionStarting);
 
         /* Add Telemetry */
         intakeTab.add(armMotor)
             .withPosition(0, 0).withSize(2, 2);
-        intakeTab.add(flywheelMotor)
+        intakeTab.add(rollerMotor)
             .withPosition(3, 0).withSize(2, 1);
         intakeTab.addBoolean("Beam Break Triggered", this::beamBreakTriggered)
             .withPosition(6, 0).withSize(2, 1);
@@ -67,8 +67,8 @@ public class Intake extends SubsystemBase {
         return blocking ? setTargetCommand.andThen(Commands.waitUntil(this::armAtSetpoint)) : setTargetCommand;
     }
 
-    private Command setFlywheelPower(double power) {
-        return runOnce(() -> flywheelMotor.set(power));
+    private Command setRollerPower(double power) {
+        return runOnce(() -> rollerMotor.set(power));
     }
 
     private Command setNoteState(boolean hasNoteState) {
@@ -91,43 +91,44 @@ public class Intake extends SubsystemBase {
         return setTargetPosition(armPositionEject, waitUntilAchieved).withName("To eject");
     }
 
-    public Command disableFlywheels() {
-        return setFlywheelPower(0.0);
+    public Command disableRollers() {
+        return setRollerPower(0.0);
     }
 
     public Command shootIntoAmp() {
-        return disableFlywheels()
+        return disableRollers()
             .andThen(setToAmpPosition(true))
-            .andThen(setFlywheelPower(outtakeAmpPower))
+            .andThen(Commands.waitSeconds(ampWaitTime))
+            .andThen(setRollerPower(outtakeAmpPower))
             .andThen(Commands.waitSeconds(shotWaitTime))
-            .andThen(disableFlywheels())
+            .andThen(disableRollers())
             .andThen(setNoteState(false))
             .andThen(setToPassthroughPosition(false))
             .withName("Shoot into amp");
     }
 
     public Command ejectNote() {
-        return disableFlywheels()
+        return disableRollers()
             .andThen(setToEjectPosition(true))
-            .andThen(setFlywheelPower(outtakeAmpPower))
+            .andThen(setRollerPower(outtakeAmpPower))
             .andThen(Commands.waitSeconds(shotWaitTime))
-            .andThen(disableFlywheels())
+            .andThen(disableRollers())
             .andThen(setNoteState(false))
             .andThen(setToPassthroughPosition(false))
             .withName("Eject");
     }
 
     public Command enableTransferToShooter() {
-        return setFlywheelPower(transferToShooterPower)
+        return setRollerPower(transferToShooterPower)
             .andThen(setNoteState(false))
             .withName("Transfer");
     }
 
     public Command getNoteFromGround() {
         return setTargetPosition(armPositionGround, false)
-            .andThen(setFlywheelPower(intakePower))
+            .andThen(setRollerPower(intakePower))
             .andThen(Commands.waitUntil(this::beamBreakTriggered))
-            .andThen(disableFlywheels())
+            .andThen(disableRollers())
             .andThen(setNoteState(true))
             .andThen(setToPassthroughPosition(false))
             .withName("Get note");
@@ -149,7 +150,7 @@ public class Intake extends SubsystemBase {
         if(this.getCurrentCommand() != null) 
             this.getCurrentCommand().cancel();
 
-        flywheelMotor.set(0.0);
+        rollerMotor.set(0.0);
         armMotor.setClosedLoopTarget(armMotor.relativeEncoder.getPosition());
 
         hasNoteState = false;

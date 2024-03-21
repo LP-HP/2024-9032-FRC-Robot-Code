@@ -86,6 +86,10 @@ public class LimelightVision extends SubsystemBase {
         isLocalizationPipeline = true;
     }
 
+    public boolean isTargetPipeline() {
+        return !isLocalizationPipeline;
+    }
+
     public Optional<PoseEstimate> getPoseEstimate() {
         PoseEstimate currentReading = currentPose.poseEstimate;
         /* Do not return an estimate if we are in the wrong pipeline or the estimate is invalid */
