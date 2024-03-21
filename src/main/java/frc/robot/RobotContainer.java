@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.TeleopConstants;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.SparkMaxWrapper;
@@ -209,9 +208,9 @@ public class RobotContainer {
             .onlyIf(() -> !intake.hasNote())
         );
 
-        noteAimButton.whileTrue(
+        noteAimButton.and(() -> !intake.hasNote()).whileTrue(
             new AlignWithVisionTarget(swerve, photonvision, false, false)
-            .onlyIf(() -> photonvision.hasTargets() && !intake.hasNote())
+            .onlyIf(photonvision::hasTargets)
         );
         
         noteAimButton.onFalse(
@@ -246,18 +245,18 @@ public class RobotContainer {
         );
 
         /* Teleop Triggers */
-        // autoAimSpeaker.whileTrue(
-        //     new LockToVisionTargetWhileMoving(swerve, limelight, 
-        //         () -> -driveController.getLeftY(), 
-        //         () -> -driveController.getLeftX(),
-        //         driveController::getRightX)
-        // );
+        autoAimSpeaker.whileTrue(
+            new LockToVisionTargetWhileMoving(swerve, limelight, 
+                () -> -driveController.getLeftY(), 
+                () -> -driveController.getLeftX(),
+                driveController::getRightX)
+        );
 
-        // autoAimSpeaker.and(() -> shooter.getCurrentCommand() == null).whileTrue(
-        //     shooter.spinUpFlywheels(TeleopConstants.flywheelIdleVelocity)
-        //     .andThen(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
-        //         .repeatedly())
-        // );
+        autoAimSpeaker.and(() -> shooter.getCurrentCommand() == null).whileTrue(
+            shooter.spinUpFlywheels(95.0)//TODO do velocity lookup table if needed
+            .andThen(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
+                .repeatedly())
+        );
     }
 
     private Command setAndDisableRumble() {

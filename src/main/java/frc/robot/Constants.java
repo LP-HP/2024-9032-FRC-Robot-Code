@@ -34,8 +34,6 @@ public final class Constants {
         public static final double joystickToAngularVelocityConversionFactor = 2 * Math.PI;
         /* Meters per Second Squared */
         public static final double accelerationLimit = 32.0;
-
-        public static final double flywheelIdleVelocity = 70.0;
     }
 
     public static final class LimelightConstants {
