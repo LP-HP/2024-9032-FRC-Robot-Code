@@ -246,18 +246,18 @@ public class RobotContainer {
         );
 
         /* Teleop Triggers */
-        autoAimSpeaker.whileTrue(
-            new LockToVisionTargetWhileMoving(swerve, limelight, 
-                () -> -driveController.getLeftY(), 
-                () -> -driveController.getLeftX(),
-                driveController::getRightX)
-        );
+        // autoAimSpeaker.whileTrue(
+        //     new LockToVisionTargetWhileMoving(swerve, limelight, 
+        //         () -> -driveController.getLeftY(), 
+        //         () -> -driveController.getLeftX(),
+        //         driveController::getRightX)
+        // );
 
-        autoAimSpeaker.and(() -> shooter.getCurrentCommand() == null).whileTrue(
-            shooter.spinUpFlywheels(TeleopConstants.flywheelIdleVelocity)
-            .andThen(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
-                .repeatedly())
-        );
+        // autoAimSpeaker.and(() -> shooter.getCurrentCommand() == null).whileTrue(
+        //     shooter.spinUpFlywheels(TeleopConstants.flywheelIdleVelocity)
+        //     .andThen(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
+        //         .repeatedly())
+        // );
     }
 
     private Command setAndDisableRumble() {

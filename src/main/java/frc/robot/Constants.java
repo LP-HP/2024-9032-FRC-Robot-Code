@@ -163,17 +163,15 @@ public final class Constants {
         /* Key - Distance : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap distanceToArmPosTable = new InterpolatingDoubleTreeMap();
         static {
-            distanceToArmPosTable.put(1.335, 147.0);
-            distanceToArmPosTable.put(1.637, 145.0);
-            distanceToArmPosTable.put(1.833, 143.0);
-            distanceToArmPosTable.put(2.318, 138.5);
-            distanceToArmPosTable.put(2.91, 134.0);
-            distanceToArmPosTable.put(3.144, 132.0);
-            distanceToArmPosTable.put(3.32, 131.0);
-            distanceToArmPosTable.put(3.96, 130.0);
-            distanceToArmPosTable.put(4.36, 128.0);
-            distanceToArmPosTable.put(5.02, 127.8);
-            distanceToArmPosTable.put(5.41, 127.75);
+            distanceToArmPosTable.put(1.105, 149.0);
+            distanceToArmPosTable.put(1.296, 148.0);
+            distanceToArmPosTable.put(1.452, 146.5);
+            distanceToArmPosTable.put(1.636, 145.0);
+            distanceToArmPosTable.put(1.97, 140.5);
+            distanceToArmPosTable.put(2.12, 139.0);
+            distanceToArmPosTable.put(2.291, 137.0);
+            distanceToArmPosTable.put(2.577, 135.5);
+            distanceToArmPosTable.put(2.77, 135.0);
         }
 
         /* Shooter Flywheels */
