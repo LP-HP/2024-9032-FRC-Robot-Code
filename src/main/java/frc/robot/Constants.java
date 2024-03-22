@@ -48,7 +48,7 @@ public final class Constants {
         public static final double mountingAngle = Units.degreesToRadians(30.0);
 
         /* Cutoff for target validity */
-        public static final double distanceCutoff = 5.0;
+        public static final double distanceCutoff = 4.25;
     }
 
     public static final class PhotonvisionConstants {
@@ -124,7 +124,7 @@ public final class Constants {
             0.00001, 
             0.01, 
             0.0,
-            -0.3,
+            -0.4,
             0.5
         );
         public static final SparkMaxConstants shooterArmConstants = new SparkMaxConstants(
@@ -170,6 +170,12 @@ public final class Constants {
             distanceToArmPosTable.put(2.291, 137.0);
             distanceToArmPosTable.put(2.577, 135.5);
             distanceToArmPosTable.put(2.77, 135.0);
+            distanceToArmPosTable.put(2.942, 132.0);
+            distanceToArmPosTable.put(3.202, 130.0);
+            distanceToArmPosTable.put(3.427, 129.0);
+            distanceToArmPosTable.put(3.638, 128.0);
+            distanceToArmPosTable.put(3.972, 127.5);
+            distanceToArmPosTable.put(4.27, 127.0);
         }
 
         /* Shooter Flywheels */
@@ -439,12 +445,12 @@ public final class Constants {
     public static final class ClosedLoopConstants { 
         /* PID Constants for Path Following */
         public static final PIDConstants translationPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            2.0, 
+            5.0, 
             0.0, 
             0.0
         ); 
         public static final PIDConstants headingPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            2.0, 
+            5.0, 
             0.0, 
             0.0
         ); 
@@ -454,7 +460,7 @@ public final class Constants {
         public static final double kDRotationTargetWhileMoving = 0.01;
 
         /* For alignment without moving */
-        public static final double kPTranslationTarget = 1.7;        
+        public static final double kPTranslationTarget = 2.0;        
         
         public static final double kPRotationTarget = 0.12;
         public static final double kDRotationTarget = 0.01;
@@ -466,8 +472,7 @@ public final class Constants {
 
     public static final class AutoConstants { 
         /* Seconds */
-        public static final double notePickupTimeout = 3.0;
-        public static final double passthroughWait = 0.5;
+        public static final double notePickupTimeout = 10.0;
         public static final double shootVelocity = 95.0;
     }
 }

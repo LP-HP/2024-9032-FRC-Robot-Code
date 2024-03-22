@@ -138,13 +138,12 @@ public class RobotContainer {
 
     private void registerPathplannerCommands() {
         NamedCommands.registerCommand("ShootAA", 
-            shooter.shootSequenceWithDistanceLockOn(shootVelocity, () -> limelight.getAprilTagTarget().distance)
+            shooter.shootSequenceWithDistanceLockOn(shootVelocity, () -> limelight.getAprilTagTarget().distance, false)
         );
 
         NamedCommands.registerCommand("Intake", 
             shooter.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround())
-            .andThen(Commands.waitSeconds(passthroughWait))
             .andThen(new StoreNoteSequence(intake, shooter))
             .withTimeout(notePickupTimeout)
         );
@@ -153,7 +152,6 @@ public class RobotContainer {
             shooter.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround()
                 .deadlineWith(new AlignWithVisionTarget(swerve, photonvision, false, false)))
-            .andThen(Commands.waitSeconds(passthroughWait))
             .andThen(new StoreNoteSequence(intake, shooter))
             .withTimeout(notePickupTimeout)
         );
@@ -197,7 +195,7 @@ public class RobotContainer {
 
         /* Mechanism Controls */
         shootButton.onTrue(
-            shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance)
+            shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance, true)
             .onlyIf(shooter::hasNote)//TODO do velocity lookup table if needed
         );
 

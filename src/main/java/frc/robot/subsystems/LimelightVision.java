@@ -82,6 +82,7 @@ public class LimelightVision extends SubsystemBase {
 
     public void switchToLocalizationPipeline() {
         LimelightHelpers.setPipelineIndex(limelightName, localizationPipelineID);
+        LimelightHelpers.setPriorityTagID(limelightName, 4);
         
         isLocalizationPipeline = true;
     }

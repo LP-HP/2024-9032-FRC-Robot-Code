@@ -58,18 +58,6 @@
           "data": {
             "name": "ShootAA"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "shoot5m"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ShootAA"
-          }
         }
       ]
     }
