@@ -22,9 +22,9 @@ public class Photonvision extends SubsystemBase {
 
     public Photonvision () {
         photonvisionTab.addDouble("Distance", () -> distance)
-            .withPosition(0, 6).withSize(1, 1);
+            .withPosition(0, 0).withSize(2, 1);
         photonvisionTab.addDouble("X Offset", () -> xOffset)
-            .withPosition(1, 6).withSize(1, 1);
+            .withPosition(2, 0).withSize(2, 1);
     }
 
     public void addCameraToTab(ShuffleboardTab tab, int col, int row, int size) {

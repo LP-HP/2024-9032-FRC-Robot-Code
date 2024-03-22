@@ -84,7 +84,7 @@ public class RobotContainer {
         configureTriggerBindings();
 
         /* Add auto chooser */
-        autoChooser.setDefaultOption("Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
+        autoChooser.setDefaultOption("Aiming", swerve.getVisionLocalizationAuto("Auto Aiming", limelight::getPoseEstimate));
         autoChooser.addOption("Swerve Shakedown", AutoBuilder.buildAuto("Swerve Shakedown"));
         autoChooser.addOption("Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
         autoChooser.addOption("Wide", swerve.getVisionLocalizationAuto("Start Right", limelight::getPoseEstimate));
@@ -113,8 +113,14 @@ public class RobotContainer {
             .withPosition(5, 0).withSize(1, 1);
         driverTab.addDouble("Match Time", () -> DriverStation.getMatchTime())
             .withPosition(6, 0).withSize(2, 1);
+        driverTab.add(
+                shooter.setToAutoPosition(140.0, true)
+                .andThen(shooter.shootSequence(95.0)
+                .withName("Shoot 140")))
+            .withPosition(7, 0).withSize(1, 1);
         limelight.addCameraToTab(driverTab, 0, 1, 4);
         photonvision.addCameraToTab(driverTab, 5, 1, 4);
+        
         Shuffleboard.selectTab(driverTab.getTitle());
     }
 
