@@ -7,6 +7,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -82,8 +84,14 @@ public class LimelightVision extends SubsystemBase {
 
     public void switchToLocalizationPipeline() {
         LimelightHelpers.setPipelineIndex(limelightName, localizationPipelineID);
-        LimelightHelpers.setPriorityTagID(limelightName, 4);
-        
+
+        /* Switch speaker tag target based on alliance */
+        if(DriverStation.getAlliance().get().equals(Alliance.Red))
+            LimelightHelpers.setPriorityTagID(limelightName, 4);
+            
+        else
+            LimelightHelpers.setPriorityTagID(limelightName, 7);
+
         isLocalizationPipeline = true;
     }
 
