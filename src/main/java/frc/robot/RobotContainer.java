@@ -266,18 +266,14 @@ public class RobotContainer {
 
         /* Teleop Triggers */
         autoAimSpeaker.whileTrue(
-            Commands.print("Auto aiming swerve for speaker")
-            .andThen(
-                new LockToVisionTargetWhileMoving(swerve, limelight, 
+            new LockToVisionTargetWhileMoving(swerve, limelight, 
                 () -> -driveController.getLeftY(), 
                 () -> -driveController.getLeftX(),
                 driveController::getRightX)
-            )
         );
 
         autoAimSpeaker.and(() -> shooter.getCurrentCommand() == null).whileTrue(
-            Commands.print("Auto aiming shooter for speaker")
-            .andThen(shooter.spinUpFlywheels(95.0))//TODO do velocity lookup table if needed
+            shooter.spinUpFlywheels(95.0)//TODO do velocity lookup table if needed
             .andThen(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
                 .repeatedly())
         );
