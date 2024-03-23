@@ -193,71 +193,90 @@ public class RobotContainer {
         );
 
         underStageButton.onTrue(
-            shooter.setToUnderStagePosition(false)
+            Commands.print("Going under stage")
+            .andThen(shooter.setToUnderStagePosition(false))
             .andThen(shooter.disableFlywheels())
         );
 
-        underStageButton.onFalse(shooter.setToUpPosition(false));
+        underStageButton.onFalse(
+            Commands.print("Going under stage released")
+            .andThen(shooter.setToUpPosition(false))
+        );
 
         /* Mechanism Controls */
         shootButton.onTrue(
-            shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance, true)
+            Commands.print("Shooting")
+            .andThen(shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance, true))
             .onlyIf(shooter::hasNote)//TODO do velocity lookup table if needed
         );
 
         enableIntakeButton.onTrue(
-            shooter.setToPassthroughPosition(false)
+            Commands.print("Enabling intake")
+            .andThen(shooter.setToPassthroughPosition(false))
             .andThen(intake.getNoteFromGround())
             .andThen(setAndDisableRumble())
             .onlyIf(() -> !intake.hasNote())
         );
 
         noteAimButton.and(() -> !intake.hasNote()).whileTrue(
-            new AlignWithVisionTarget(swerve, photonvision, false, false)
+            Commands.print("Aiming for note")
+            .andThen(new AlignWithVisionTarget(swerve, photonvision, false, false))
             .onlyIf(photonvision::hasTargets)
         );
         
         noteAimButton.onFalse(
-            intake.disableRollers()
+            Commands.print("Canceled note aiming")
+            .andThen(intake.disableRollers())
             .andThen(intake.setToPassthroughPosition(false))
             .andThen(shooter.setToUpPosition(false))
             .onlyIf(() -> !intake.hasNote())
         );   
 
         storeNoteButton.and(underStageButton.negate()).onTrue(
-            new StoreNoteSequence(intake, shooter)
+            Commands.print("Transfering note")
+            .andThen(new StoreNoteSequence(intake, shooter))
             .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
         );
  
         ampScoreButton.onTrue(
-            intake.shootIntoAmp()
+            Commands.print("Scoring in amp")
+            .andThen(intake.shootIntoAmp())
             .onlyIf(intake::hasNote)
         );
 
         /* Reset Buttons */
-        ejectButton.onTrue(intake.ejectNote());
+        ejectButton.onTrue(
+            Commands.print("Ejecting note")
+            .andThen(intake.ejectNote())
+        );
 
         resetIntakeAndShooterButton.or(overrideAutoAim).onTrue(
-            intake.setToPassthroughPosition(false)
+            Commands.print("Overriding auto aim or reseting intake and shoooter")
+            .andThen(intake.setToPassthroughPosition(false))
             .andThen(intake.disableRollers())
             .andThen(shooter.setToUpPosition(false))
         );
 
         resetButton.onTrue(
-            intake.resetCommand()
+            Commands.print("Reseting shooter and intake commands")
+            .andThen(intake.resetCommand())
             .andThen(shooter.resetCommand())
         );
 
         /* Teleop Triggers */
         autoAimSpeaker.whileTrue(
-            new LockToVisionTargetWhileMoving(swerve, limelight, 
+            Commands.print("Auto aiming swerve for speaker")
+            .andThen(
+                new LockToVisionTargetWhileMoving(swerve, limelight, 
                 () -> -driveController.getLeftY(), 
                 () -> -driveController.getLeftX(),
                 driveController::getRightX)
+            )
         );
 
         autoAimSpeaker.and(() -> shooter.getCurrentCommand() == null).whileTrue(
-            shooter.spinUpFlywheels(95.0)//TODO do velocity lookup table if needed
+            Commands.print("Auto aiming shooter for speaker")
+            .andThen(shooter.spinUpFlywheels(95.0))//TODO do velocity lookup table if needed
             .andThen(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
                 .repeatedly())
         );
