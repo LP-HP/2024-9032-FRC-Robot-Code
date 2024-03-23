@@ -48,7 +48,7 @@ public final class Constants {
         public static final double mountingAngle = Units.degreesToRadians(30.0);
 
         /* Cutoff for target validity */
-        public static final double distanceCutoff = 4.25;
+        public static final double distanceCutoff = 5.0;
     }
 
     public static final class PhotonvisionConstants {
@@ -460,7 +460,7 @@ public final class Constants {
         public static final double kDRotationTargetWhileMoving = 0.01;
 
         /* For alignment without moving */
-        public static final double kPTranslationTarget = 2.0;        
+        public static final double kPTranslationTarget = 2.4;        
         
         public static final double kPRotationTarget = 0.12;
         public static final double kDRotationTarget = 0.01;
