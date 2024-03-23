@@ -130,6 +130,7 @@ public class Intake extends SubsystemBase {
             .andThen(Commands.waitUntil(this::beamBreakTriggered))
             .andThen(disableRollers())
             .andThen(setNoteState(true))
+            .andThen(Commands.print("Intake received note"))
             .andThen(setToPassthroughPosition(false))
             .withName("Get note");
     }

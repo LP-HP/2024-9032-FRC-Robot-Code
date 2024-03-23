@@ -33,7 +33,7 @@ public final class Constants {
         /* Radians per Second */
         public static final double joystickToAngularVelocityConversionFactor = 2 * Math.PI;
         /* Meters per Second Squared */
-        public static final double accelerationLimit = 32.0;
+        public static final double accelerationLimit = 49.0;
     }
 
     public static final class LimelightConstants {
@@ -157,7 +157,7 @@ public final class Constants {
         /* Arm Positions */
         public static final double armPositionPassthrough = 133.0;
         public static final double armPositionUnderStage = 120.0;
-        public static final double armPositionUp = 170.0;
+        public static final double armPositionUp = 160.0;
         /* Key - Distance : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap distanceToArmPosTable = new InterpolatingDoubleTreeMap();
         static {

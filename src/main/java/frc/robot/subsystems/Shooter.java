@@ -198,7 +198,8 @@ public class Shooter extends SubsystemBase {
     public Command receiveNoteFromIntake() {
         return enableStorageMotorReceiving()
             .andThen(Commands.waitUntil(this::hasNote))
-            .andThen(disableStorageMotor());
+            .andThen(disableStorageMotor())
+            .andThen(Commands.print("Shooter received note"));
     }
 
     public Command spinUpFlywheels(double velocityRPS) {

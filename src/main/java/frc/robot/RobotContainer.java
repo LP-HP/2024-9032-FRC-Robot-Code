@@ -116,7 +116,9 @@ public class RobotContainer {
                 shooter.setToAutoPosition(140.0, true)
                 .andThen(shooter.shootSequence(95.0))
                 .withName("Shoot 140"))
-            .withPosition(7, 0).withSize(1, 1);
+            .withPosition(8, 0).withSize(1, 1);
+        driverTab.add(shooter.shootSequence(95.0))
+            .withPosition(9, 0).withSize(1, 1);
         limelight.addCameraToTab(driverTab, 0, 1, 4);
         photonvision.addCameraToTab(driverTab, 5, 1, 4);
         
@@ -204,10 +206,9 @@ public class RobotContainer {
         );
 
         /* Mechanism Controls */
-        shootButton.onTrue(
+        shootButton.and(autoAimSpeaker).onTrue(
             Commands.print("Shooting")
-            .andThen(shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance, true))
-            .onlyIf(shooter::hasNote)//TODO do velocity lookup table if needed
+            .andThen(shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance, true))//TODO do velocity lookup table if needed
         );
 
         enableIntakeButton.onTrue(
@@ -251,7 +252,7 @@ public class RobotContainer {
         );
 
         resetIntakeAndShooterButton.or(overrideAutoAim).onTrue(
-            Commands.print("Overriding auto aim or reseting intake and shoooter")
+            Commands.print("Overriding auto aim or reseting intake and shooter")
             .andThen(intake.setToPassthroughPosition(false))
             .andThen(intake.disableRollers())
             .andThen(shooter.setToUpPosition(false))
