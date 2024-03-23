@@ -198,7 +198,8 @@ public class Shooter extends SubsystemBase {
     public Command receiveNoteFromIntake() {
         return enableStorageMotorReceiving()
             .andThen(Commands.waitUntil(this::hasNote))
-            .andThen(disableStorageMotor());
+            .andThen(disableStorageMotor())
+            .andThen(Commands.print("Shooter received note"));
     }
 
     public Command spinUpFlywheels(double velocityRPS) {
@@ -207,20 +208,20 @@ public class Shooter extends SubsystemBase {
 
     public Command shootSequence(double velocityRPS) {
         return setFlywheelVelocity(velocityRPS, true)
-           .andThen(feedRingSequence())
+           .andThen(feedRingSequence(true))
            .withName("Shoot");
     }
 
-    public Command shootSequenceWithDistanceLockOn(double velocityRPS, DoubleSupplier distanceSup) {
+    public Command shootSequenceWithDistanceLockOn(double velocityRPS, DoubleSupplier distanceSup, boolean disableOnExit) {
         return setVelocityWhileMovingArm(velocityRPS, distanceSup)
-           .andThen(feedRingSequence())
+           .andThen(feedRingSequence(disableOnExit))
            .withName("Shoot locked on");
     }
 
-    private Command feedRingSequence() {
+    private Command feedRingSequence(boolean disableFlywheels) {
         return enableStorageMotorToFlywheels()
            .andThen(Commands.waitSeconds(shotWaitTime))
-           .andThen(disableFlywheels())
+           .andThen(disableFlywheels ? disableFlywheels() : Commands.none())
            .andThen(disableStorageMotor())
            .andThen(setToUpPosition(false));
     }

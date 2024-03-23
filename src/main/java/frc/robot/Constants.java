@@ -33,9 +33,7 @@ public final class Constants {
         /* Radians per Second */
         public static final double joystickToAngularVelocityConversionFactor = 2 * Math.PI;
         /* Meters per Second Squared */
-        public static final double accelerationLimit = 32.0;
-
-        public static final double flywheelIdleVelocity = 70.0;
+        public static final double accelerationLimit = 49.0;
     }
 
     public static final class LimelightConstants {
@@ -50,7 +48,7 @@ public final class Constants {
         public static final double mountingAngle = Units.degreesToRadians(30.0);
 
         /* Cutoff for target validity */
-        public static final double distanceCutoff = 5.0;
+        public static final double distanceCutoff = 4.25;
     }
 
     public static final class PhotonvisionConstants {
@@ -126,7 +124,7 @@ public final class Constants {
             0.00001, 
             0.01, 
             0.0,
-            -0.3,
+            -0.4,
             0.5
         );
         public static final SparkMaxConstants shooterArmConstants = new SparkMaxConstants(
@@ -159,21 +157,25 @@ public final class Constants {
         /* Arm Positions */
         public static final double armPositionPassthrough = 133.0;
         public static final double armPositionUnderStage = 120.0;
-        public static final double armPositionUp = 170.0;
+        public static final double armPositionUp = 160.0;
         /* Key - Distance : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap distanceToArmPosTable = new InterpolatingDoubleTreeMap();
         static {
-            distanceToArmPosTable.put(1.335, 147.0);
-            distanceToArmPosTable.put(1.637, 145.0);
-            distanceToArmPosTable.put(1.833, 143.0);
-            distanceToArmPosTable.put(2.318, 138.5);
-            distanceToArmPosTable.put(2.91, 134.0);
-            distanceToArmPosTable.put(3.144, 132.0);
-            distanceToArmPosTable.put(3.32, 131.0);
-            distanceToArmPosTable.put(3.96, 130.0);
-            distanceToArmPosTable.put(4.36, 128.0);
-            distanceToArmPosTable.put(5.02, 127.8);
-            distanceToArmPosTable.put(5.41, 127.75);
+            distanceToArmPosTable.put(1.105, 149.0);
+            distanceToArmPosTable.put(1.296, 148.0);
+            distanceToArmPosTable.put(1.452, 146.5);
+            distanceToArmPosTable.put(1.636, 145.0);
+            distanceToArmPosTable.put(1.97, 140.5);
+            distanceToArmPosTable.put(2.12, 139.0);
+            distanceToArmPosTable.put(2.291, 137.0);
+            distanceToArmPosTable.put(2.577, 135.5);
+            distanceToArmPosTable.put(2.77, 135.0);
+            distanceToArmPosTable.put(2.942, 132.0);
+            distanceToArmPosTable.put(3.202, 130.0);
+            distanceToArmPosTable.put(3.427, 129.0);
+            distanceToArmPosTable.put(3.638, 128.0);
+            distanceToArmPosTable.put(3.972, 127.5);
+            distanceToArmPosTable.put(4.27, 127.0);
         }
 
         /* Shooter Flywheels */
@@ -443,12 +445,12 @@ public final class Constants {
     public static final class ClosedLoopConstants { 
         /* PID Constants for Path Following */
         public static final PIDConstants translationPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            2.0, 
+            5.0, 
             0.0, 
             0.0
         ); 
         public static final PIDConstants headingPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            2.0, 
+            5.0, 
             0.0, 
             0.0
         ); 
@@ -458,7 +460,7 @@ public final class Constants {
         public static final double kDRotationTargetWhileMoving = 0.01;
 
         /* For alignment without moving */
-        public static final double kPTranslationTarget = 1.7;        
+        public static final double kPTranslationTarget = 2.0;        
         
         public static final double kPRotationTarget = 0.12;
         public static final double kDRotationTarget = 0.01;
@@ -470,8 +472,7 @@ public final class Constants {
 
     public static final class AutoConstants { 
         /* Seconds */
-        public static final double notePickupTimeout = 3.0;
-        public static final double passthroughWait = 0.5;
+        public static final double notePickupTimeout = 10.0;
         public static final double shootVelocity = 95.0;
     }
 }

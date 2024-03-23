@@ -11,10 +11,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.TeleopConstants;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.SparkMaxWrapper;
@@ -85,7 +83,7 @@ public class RobotContainer {
         configureTriggerBindings();
 
         /* Add auto chooser */
-        autoChooser.setDefaultOption("Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
+        autoChooser.setDefaultOption("Aiming", swerve.getVisionLocalizationAuto("Auto Aiming", limelight::getPoseEstimate));
         autoChooser.addOption("Swerve Shakedown", AutoBuilder.buildAuto("Swerve Shakedown"));
         autoChooser.addOption("Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
         autoChooser.addOption("Wide", swerve.getVisionLocalizationAuto("Start Right", limelight::getPoseEstimate));
@@ -114,8 +112,16 @@ public class RobotContainer {
             .withPosition(5, 0).withSize(1, 1);
         driverTab.addDouble("Match Time", () -> DriverStation.getMatchTime())
             .withPosition(6, 0).withSize(2, 1);
+        driverTab.add(
+                shooter.setToAutoPosition(140.0, true)
+                .andThen(shooter.shootSequence(95.0))
+                .withName("Shoot 140"))
+            .withPosition(8, 0).withSize(1, 1);
+        driverTab.add(shooter.shootSequence(95.0))
+            .withPosition(9, 0).withSize(1, 1);
         limelight.addCameraToTab(driverTab, 0, 1, 4);
         photonvision.addCameraToTab(driverTab, 5, 1, 4);
+        
         Shuffleboard.selectTab(driverTab.getTitle());
     }
 
@@ -135,17 +141,17 @@ public class RobotContainer {
     public void disabledExit() {
         shooter.reset();
         intake.reset();
+        driveController.getHID().setRumble(RumbleType.kBothRumble, 0);
     }
 
     private void registerPathplannerCommands() {
         NamedCommands.registerCommand("ShootAA", 
-            shooter.shootSequenceWithDistanceLockOn(shootVelocity, () -> limelight.getAprilTagTarget().distance)
+            shooter.shootSequenceWithDistanceLockOn(shootVelocity, () -> limelight.getAprilTagTarget().distance, false)
         );
 
         NamedCommands.registerCommand("Intake", 
             shooter.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround())
-            .andThen(Commands.waitSeconds(passthroughWait))
             .andThen(new StoreNoteSequence(intake, shooter))
             .withTimeout(notePickupTimeout)
         );
@@ -154,7 +160,6 @@ public class RobotContainer {
             shooter.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround()
                 .deadlineWith(new AlignWithVisionTarget(swerve, photonvision, false, false)))
-            .andThen(Commands.waitSeconds(passthroughWait))
             .andThen(new StoreNoteSequence(intake, shooter))
             .withTimeout(notePickupTimeout)
         );
@@ -190,58 +195,72 @@ public class RobotContainer {
         );
 
         underStageButton.onTrue(
-            shooter.setToUnderStagePosition(false)
+            Commands.print("Going under stage")
+            .andThen(shooter.setToUnderStagePosition(false))
             .andThen(shooter.disableFlywheels())
         );
 
-        underStageButton.onFalse(shooter.setToUpPosition(false));
+        underStageButton.onFalse(
+            Commands.print("Going under stage released")
+            .andThen(shooter.setToUpPosition(false))
+        );
 
         /* Mechanism Controls */
-        shootButton.onTrue(
-            shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance)
-            .onlyIf(shooter::hasNote)//TODO do velocity lookup table if needed
+        shootButton.and(autoAimSpeaker).onTrue(
+            Commands.print("Shooting")
+            .andThen(shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance, true))//TODO do velocity lookup table if needed
         );
 
         enableIntakeButton.onTrue(
-            shooter.setToPassthroughPosition(false)
+            Commands.print("Enabling intake")
+            .andThen(shooter.setToPassthroughPosition(false))
             .andThen(intake.getNoteFromGround())
             .andThen(setAndDisableRumble())
             .onlyIf(() -> !intake.hasNote())
         );
 
-        noteAimButton.whileTrue(
-            new AlignWithVisionTarget(swerve, photonvision, false, false)
-            .onlyIf(() -> photonvision.hasTargets() && !intake.hasNote())
+        noteAimButton.and(() -> !intake.hasNote()).whileTrue(
+            Commands.print("Aiming for note")
+            .andThen(new AlignWithVisionTarget(swerve, photonvision, false, false))
+            .onlyIf(photonvision::hasTargets)
         );
         
         noteAimButton.onFalse(
-            intake.disableRollers()
+            Commands.print("Canceled note aiming")
+            .andThen(intake.disableRollers())
             .andThen(intake.setToPassthroughPosition(false))
             .andThen(shooter.setToUpPosition(false))
             .onlyIf(() -> !intake.hasNote())
         );   
 
-        storeNoteButton.onTrue(
-            new StoreNoteSequence(intake, shooter)
+        storeNoteButton.and(underStageButton.negate()).onTrue(
+            Commands.print("Transfering note")
+            .andThen(new StoreNoteSequence(intake, shooter))
             .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
         );
  
         ampScoreButton.onTrue(
-            intake.shootIntoAmp()
+            Commands.print("Scoring in amp")
+            .andThen(intake.shootIntoAmp())
             .onlyIf(intake::hasNote)
         );
 
         /* Reset Buttons */
-        ejectButton.onTrue(intake.ejectNote());
+        ejectButton.onTrue(
+            Commands.print("Ejecting note")
+            .andThen(intake.ejectNote())
+        );
 
         resetIntakeAndShooterButton.or(overrideAutoAim).onTrue(
-            intake.setToPassthroughPosition(false)
+            Commands.print("Overriding auto aim or reseting intake and shooter")
+            .andThen(intake.setToPassthroughPosition(false))
             .andThen(intake.disableRollers())
             .andThen(shooter.setToUpPosition(false))
         );
 
         resetButton.onTrue(
-            intake.resetCommand()
+            Commands.print("Reseting shooter and intake commands")
+            .andThen(intake.resetCommand())
             .andThen(shooter.resetCommand())
         );
 
@@ -254,18 +273,16 @@ public class RobotContainer {
         );
 
         autoAimSpeaker.and(() -> shooter.getCurrentCommand() == null).whileTrue(
-            shooter.spinUpFlywheels(TeleopConstants.flywheelIdleVelocity)
+            shooter.spinUpFlywheels(95.0)//TODO do velocity lookup table if needed
             .andThen(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
                 .repeatedly())
         );
     }
 
     private Command setAndDisableRumble() {
-        return new SequentialCommandGroup(
-            new InstantCommand(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 1)),
-            Commands.waitSeconds(0.5),
-            new InstantCommand(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 0))
-        );
+        return new InstantCommand(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 1.0))
+        .andThen(Commands.waitSeconds(0.5))
+        .finallyDo(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 0.0));
     }
 
     /* Only return the auto command here */
