@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
@@ -115,8 +114,8 @@ public class RobotContainer {
             .withPosition(6, 0).withSize(2, 1);
         driverTab.add(
                 shooter.setToAutoPosition(140.0, true)
-                .andThen(shooter.shootSequence(95.0)
-                .withName("Shoot 140")))
+                .andThen(shooter.shootSequence(95.0))
+                .withName("Shoot 140"))
             .withPosition(7, 0).withSize(1, 1);
         limelight.addCameraToTab(driverTab, 0, 1, 4);
         photonvision.addCameraToTab(driverTab, 5, 1, 4);
@@ -140,6 +139,7 @@ public class RobotContainer {
     public void disabledExit() {
         shooter.reset();
         intake.reset();
+        driveController.getHID().setRumble(RumbleType.kBothRumble, 0);
     }
 
     private void registerPathplannerCommands() {
@@ -264,11 +264,9 @@ public class RobotContainer {
     }
 
     private Command setAndDisableRumble() {
-        return new SequentialCommandGroup(
-            new InstantCommand(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 1)),
-            Commands.waitSeconds(0.5),
-            new InstantCommand(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 0))
-        );
+        return new InstantCommand(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 1.0))
+        .andThen(Commands.waitSeconds(0.5))
+        .finallyDo(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 0.0));
     }
 
     /* Only return the auto command here */
