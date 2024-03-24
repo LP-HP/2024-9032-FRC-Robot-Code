@@ -46,6 +46,24 @@
           "data": {
             "name": "ShootAA"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot4r"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeAA"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot5r"
+          }
         }
       ]
     }

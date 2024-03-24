@@ -12,7 +12,7 @@
         "y": 2.866428915755695
       },
       "isLocked": false,
-      "linkedName": "shoot1re"
+      "linkedName": "shootr"
     },
     {
       "anchor": {
@@ -45,7 +45,19 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "New Constraints Zone",
+      "minWaypointRelativePos": 0.0,
+      "maxWaypointRelativePos": 1.1,
+      "constraints": {
+        "maxVelocity": 4.0,
+        "maxAcceleration": 16.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    }
+  ],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 2.0,
