@@ -222,7 +222,7 @@ public final class Constants {
         public static final SparkMaxConstants leftClimberConstants = new SparkMaxConstants(
             20, 
             "Left Climber", 
-            ControlMode.percentOutput, 
+            ControlMode.position, 
             null, 
             60, 
             false, 
@@ -234,7 +234,7 @@ public final class Constants {
         public static final SparkMaxConstants rightClimberConstants = new SparkMaxConstants(
             21, 
             "Right Climber", 
-            ControlMode.percentOutput, 
+            ControlMode.position, 
             null, 
             60, 
             true, 
@@ -242,6 +242,9 @@ public final class Constants {
             12, 
             1.0
         );
+
+        public static final double maxHeight = 61.0;//TODO set this
+        public static final double minHeight = -1.0;
     }
 
     /* Using CANIds 1-12 - 8 motors and 4 cancoders */
