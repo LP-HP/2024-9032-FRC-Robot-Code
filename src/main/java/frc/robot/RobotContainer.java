@@ -60,10 +60,9 @@ public class RobotContainer {
     SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     /* Teleop Triggers */
-    private final Trigger shooterHasNote = new Trigger(() -> shooter.hasNote() && limelight.isTargetPipeline());
     private final Trigger autoAimSpeaker = 
-        new Trigger(() -> limelight.getAprilTagTarget().isValidSpeakerTag())
-            .and(overrideAutoAim.negate()).and(underStageButton.negate()).and(shooterHasNote);
+        new Trigger(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && shooter.hasNote() && limelight.isTargetPipeline())
+            .and(overrideAutoAim.negate()).and(underStageButton.negate());
 
     public RobotContainer() {
         /* Will run the following command when there is no other command set, such as during teleop */
@@ -276,11 +275,6 @@ public class RobotContainer {
         autoAimSpeaker.and(() -> shooter.getCurrentCommand() == null).whileTrue(
             shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
                 .repeatedly()
-        );
-
-        shooterHasNote.and(() -> shooter.getCurrentCommand() == null).onTrue(
-            Commands.print("Spinning up flywheels")
-            .andThen(shooter.spinUpFlywheels(95.0))//TODO do velocity lookup table if needed
         );
     }
 
