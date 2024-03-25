@@ -272,7 +272,7 @@ public class RobotContainer {
                 driveController::getRightX)
         );
 
-        autoAimSpeaker.and(() -> shooter.getCurrentCommand() == null).whileTrue(
+        autoAimSpeaker.and(() -> shooter.getCurrentCommand() == null).onTrue(
             shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
                 .repeatedly()
         );
