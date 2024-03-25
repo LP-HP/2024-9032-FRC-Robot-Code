@@ -60,9 +60,10 @@ public class RobotContainer {
     SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     /* Teleop Triggers */
+    private final Trigger shooterHasNote = new Trigger(() -> shooter.hasNote() && limelight.isTargetPipeline());
     private final Trigger autoAimSpeaker = 
-        new Trigger(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && limelight.isTargetPipeline() && shooter.hasNote())
-            .and(overrideAutoAim.negate()).and(underStageButton.negate());
+        new Trigger(() -> limelight.getAprilTagTarget().isValidSpeakerTag())
+            .and(overrideAutoAim.negate()).and(underStageButton.negate()).and(shooterHasNote);
 
     public RobotContainer() {
         /* Will run the following command when there is no other command set, such as during teleop */
@@ -197,7 +198,6 @@ public class RobotContainer {
         underStageButton.onTrue(
             Commands.print("Going under stage")
             .andThen(shooter.setToUnderStagePosition(false))
-            .andThen(shooter.disableFlywheels())
         );
 
         underStageButton.onFalse(
@@ -256,6 +256,7 @@ public class RobotContainer {
             .andThen(intake.setToPassthroughPosition(false))
             .andThen(intake.disableRollers())
             .andThen(shooter.setToUpPosition(false))
+            .andThen(shooter.disableFlywheels())
         );
 
         resetButton.onTrue(
@@ -273,9 +274,13 @@ public class RobotContainer {
         );
 
         autoAimSpeaker.and(() -> shooter.getCurrentCommand() == null).whileTrue(
-            shooter.spinUpFlywheels(95.0)//TODO do velocity lookup table if needed
-            .andThen(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
-                .repeatedly())
+            shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
+                .repeatedly()
+        );
+
+        shooterHasNote.and(() -> shooter.getCurrentCommand() == null).onTrue(
+            Commands.print("Spinning up flywheels")
+            .andThen(shooter.spinUpFlywheels(95.0))//TODO do velocity lookup table if needed
         );
     }
 
