@@ -25,15 +25,31 @@ public class Climbers extends SubsystemBase {
 
         /* Add Telemetry */
         climberTab.add(leftClimber)
-            .withPosition(0, 0).withSize(2, 1);
+            .withPosition(0, 0).withSize(2, 3);
         climberTab.add(rightClimber)
-            .withPosition(3, 0).withSize(2, 1);
+            .withPosition(3, 0).withSize(2, 3);
     }
 
     public Command setClimberPower(DoubleSupplier powerSup) {
-        return runOnce(() -> {
-            leftClimber.set(powerSup.getAsDouble());
-            rightClimber.set(powerSup.getAsDouble());
-        });
+        return runOnce(() -> setClimberRangeChecked(powerSup.getAsDouble()));
+    }
+
+    private void setClimberRangeChecked(double power) {
+        if(power >= 0.0 && leftClimber.relativeEncoder.getPosition() < maxHeight && rightClimber.relativeEncoder.getPosition() < maxHeight) {
+            leftClimber.set(power);
+            rightClimber.set(power);
+        }
+
+        else if(power < 0.0 && leftClimber.relativeEncoder.getPosition() > minHeight && rightClimber.relativeEncoder.getPosition() > minHeight) {
+            leftClimber.set(power);
+            rightClimber.set(power);
+        }
+
+        else {
+            leftClimber.set(0.0);
+            rightClimber.set(0.0);
+
+            System.out.println("Tried to set climbers out of range!");
+        }
     }
 }   
