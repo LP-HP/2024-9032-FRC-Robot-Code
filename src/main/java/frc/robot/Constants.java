@@ -105,7 +105,7 @@ public final class Constants {
         public static final double shotWaitTime = 0.25;
         public static final double ampWaitTime = 1.0;
         /* Flyhweel Powers */
-        public static final double intakePower = -0.6;
+        public static final double intakePower = -1.0;
         public static final double outtakeAmpPower = 0.5;
         public static final double transferToShooterPower = 0.4;
 

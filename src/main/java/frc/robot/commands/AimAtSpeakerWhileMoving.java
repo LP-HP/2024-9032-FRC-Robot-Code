@@ -19,9 +19,9 @@ public class AimAtSpeakerWhileMoving extends Command {
     private final Swerve swerve;    
     private final LimelightVision limelight;
 
-    private DoubleSupplier translationSup;
-    private DoubleSupplier strafeSup;
-    private DoubleSupplier rotationSup;
+    private final DoubleSupplier translationSup;
+    private final DoubleSupplier strafeSup;
+    private final DoubleSupplier rotationSup;
 
     private final SlewRateLimiter accelerationLimiterTranslation = new SlewRateLimiter(accelerationLimit);
     private final SlewRateLimiter accelerationLimiterStrafe = new SlewRateLimiter(accelerationLimit);

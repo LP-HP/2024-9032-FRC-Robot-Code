@@ -12,11 +12,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import static frc.robot.Constants.TeleopConstants.*;
 
 public class TeleopSwerve extends Command {    
-    private Swerve swerve;    
+    private final Swerve swerve;    
 
-    private DoubleSupplier translationSup;
-    private DoubleSupplier strafeSup;
-    private DoubleSupplier rotationSup;
+    private final DoubleSupplier translationSup;
+    private final DoubleSupplier strafeSup;
+    private final DoubleSupplier rotationSup;
 
     private final SlewRateLimiter accelerationLimiterTranslation = new SlewRateLimiter(accelerationLimit);
     private final SlewRateLimiter accelerationLimiterStrafe = new SlewRateLimiter(accelerationLimit);
