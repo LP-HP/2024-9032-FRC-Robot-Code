@@ -462,6 +462,8 @@ public final class Constants {
         public static final double kPSpeakerRotation = 0.14;
         public static final double kDSpeakerRotation = 0.01;
 
+        public static final double xOffsetVelocityCompAmt = -0.2;
+
         /* Constants for note alignment */        
         public static final double kPNoteRotation = 0.12;
         public static final double kDNoteRotation = 0.01;

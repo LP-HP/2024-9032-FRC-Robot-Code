@@ -62,10 +62,14 @@ public class AimAtSpeakerWhileMoving extends Command {
 
         rotationVal *= joystickToAngularVelocityConversionFactor;
 
-        /* Override rotation to tag x-offset using PID */
+        /* Override rotation to velocity compensated tag x-offset using PID */
         AprilTagTarget aprilTag = limelight.getAprilTagTarget();
-        if(aprilTag.isValidSpeakerTag()) 
-            rotationVal = swerveRotController.calculate(aprilTag.xOffset);
+        if(aprilTag.isValidSpeakerTag()) {
+            /* Aim slightly further than the tag based on current strafe velocity*/
+            double velocityCompensatedXOffset = aprilTag.xOffset + (swerve.getSpeeds().vyMetersPerSecond * xOffsetVelocityCompAmt);
+
+            rotationVal = swerveRotController.calculate(velocityCompensatedXOffset);
+        }
 
         else {
             swerveRotController.reset();
