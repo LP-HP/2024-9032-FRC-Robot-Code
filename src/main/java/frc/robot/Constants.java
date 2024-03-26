@@ -32,8 +32,6 @@ public final class Constants {
         public static final double joystickToSpeedConversionFactor = SwerveConstants.maxSpeed;
         /* Radians per Second */
         public static final double joystickToAngularVelocityConversionFactor = 2 * Math.PI;
-        /* Meters per Second Squared */
-        public static final double accelerationLimit = 100000000;
     }
 
     public static final class LimelightConstants {

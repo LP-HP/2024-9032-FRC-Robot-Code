@@ -5,7 +5,6 @@ import frc.robot.subsystems.Swerve;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -17,9 +16,6 @@ public class TeleopSwerve extends Command {
     private final DoubleSupplier translationSup;
     private final DoubleSupplier strafeSup;
     private final DoubleSupplier rotationSup;
-
-    private final SlewRateLimiter accelerationLimiterTranslation = new SlewRateLimiter(accelerationLimit);
-    private final SlewRateLimiter accelerationLimiterStrafe = new SlewRateLimiter(accelerationLimit);
 
     public TeleopSwerve(Swerve swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {
         this.swerve = swerve;
@@ -42,13 +38,9 @@ public class TeleopSwerve extends Command {
         strafeVal = applyInputCurve(strafeVal);
         rotationVal = applyInputCurve(rotationVal);
 
-        /* Multiply by conversion factor to get the joystick value in m/s and apply acceleration limits */
+        /* Multiply by conversion factor to get the joystick value in m/s */
         translationVal *= joystickToSpeedConversionFactor;
-        translationVal = accelerationLimiterTranslation.calculate(translationVal);
-
         strafeVal *= joystickToSpeedConversionFactor;
-        strafeVal = accelerationLimiterStrafe.calculate(strafeVal);
-
         rotationVal *= joystickToAngularVelocityConversionFactor;
 
         /* Run the open loop drive using speed values  */
