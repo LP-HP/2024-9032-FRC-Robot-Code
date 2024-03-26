@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.function.DoubleSupplier;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -13,38 +11,23 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.SparkMaxWrapper;
 
 import static frc.robot.Constants.ShooterConstants.*;
 
-public class Shooter extends SubsystemBase {
-    private final SparkMaxWrapper armMotor;    
-    private final SparkMaxWrapper armMotorFollower;    
-
-    private final SparkMaxWrapper storageMotor;
-
+public class ShooterFlywheels extends SubsystemBase {
     private final TalonFX leftFlywheelMotor;
     private final TalonFX rightFlywheelMotor;
     private final VelocityVoltage flywheelController = new VelocityVoltage(0.0);
 
-    private final ShuffleboardTab shooterTab = Shuffleboard.getTab("Shooter");
+    private final SparkMaxWrapper storageMotor;
 
     private final DigitalInput beamBreak = new DigitalInput(beamBreakPort);
 
-    private boolean isShooting = false;
+    private final ShuffleboardTab shooterTab = Shuffleboard.getTab("Shooter");
 
-    public Shooter() { 
-        armMotor = new SparkMaxWrapper(shooterArmConstants);
-        armMotor.configAbsoluteEncoder(invertAbsoluteEncoder, absoluteEncoderConversionFactor, absoluteEncoderOffset);
-        armMotor.setAbsoluteEncoderAsFeedback();
-        armMotor.config();
-
-        armMotorFollower = new SparkMaxWrapper(shooterArmFolllowerConstants);
-        armMotorFollower.follow(armMotor, invertArmFollower);
-        armMotorFollower.config();
-
+    public ShooterFlywheels() { 
         storageMotor = new SparkMaxWrapper(shooterStorageConstants);
         storageMotor.config();
 
@@ -83,8 +66,6 @@ public class Shooter extends SubsystemBase {
         );
 
         /* Add Telemetry */
-        shooterTab.add(armMotor)
-            .withPosition(0, 0).withSize(2, 2);
         shooterTab.add(leftFlywheelMotor)
             .withPosition(3, 0).withSize(1, 1);
         shooterTab.addDouble("Left Velocity", () -> leftFlywheelMotor.getVelocity().getValueAsDouble())
@@ -97,8 +78,6 @@ public class Shooter extends SubsystemBase {
             .withPosition(0, 2).withSize(2, 1);
         shooterTab.addBoolean("Has Note", this::hasNote)
             .withPosition(6, 0).withSize(2, 1);
-        shooterTab.addBoolean("Arm At Setpoint", this::armAtSetpoint)
-            .withPosition(6, 1).withSize(2, 1);
         shooterTab.addBoolean("Flywheels At Setpoint", this::flywheelsAtSetpoint)
             .withPosition(6, 2).withSize(2, 1);
         shooterTab.add(this)
@@ -109,20 +88,8 @@ public class Shooter extends SubsystemBase {
             .withPosition(0, 3).withSize(1, 1);
         shooterTab.add(enableStorageMotorToFlywheels())
             .withPosition(1, 3).withSize(1, 1);
-        shooterTab.add(shootSequence(95.0))
-            .withPosition(2, 3).withSize(1, 1);
         shooterTab.add(resetCommand())
             .withPosition(3, 3).withSize(1, 1);
-        shooterTab.add(setToUnderStagePosition(true))
-            .withPosition(4, 3).withSize(1, 1);
-        shooterTab.add(setToPassthroughPosition(true))
-            .withPosition(5, 3).withSize(1, 1);
-        /* Add widget to modify the arm setpoint */
-        GenericEntry armSetpointEntry = shooterTab.add("Arm Override", 0.0)
-            .withPosition(6, 3).withSize(1, 1)
-            .getEntry();
-        shooterTab.add(runOnce(() -> setArmSetpoint(armSetpointEntry.getDouble(armMotor.getSetpoint()))).withName("Override Arm"))
-            .withPosition(7, 3).withSize(1, 1);
         /* Add widget to modify the flywheel setpoint */
         GenericEntry velocitySetpointEntry = shooterTab.add("Flywheel Override", 0.0)
             .withPosition(6, 4).withSize(1, 1)
@@ -152,27 +119,8 @@ public class Shooter extends SubsystemBase {
             return;
         }
 
-        isShooting = true;
-
         leftFlywheelMotor.setControl(flywheelController.withVelocity(setpoint));
         rightFlywheelMotor.setControl(flywheelController.withVelocity(setpoint));
-    }
-
-    /* Sets the target and if blocking, waits until the setpoint is achieved */
-    private Command setTargetPosition(double setpoint, boolean blocking) {
-        Command setTargetCommand = runOnce(() -> setArmSetpoint(setpoint));
-
-        return blocking ? setTargetCommand.andThen(Commands.waitUntil(this::armAtSetpoint)) : setTargetCommand;
-    }
-
-    private void setArmSetpoint(double setpoint) {
-        if(setpoint > maxArmSetpoint || setpoint < minArmSetpoint) {
-            System.err.println("Shooter arm setpoint " + setpoint + " is out of bounds!");
-
-            return;
-        }
-
-        armMotor.setClosedLoopTarget(setpoint);
     }
 
     private Command enableStorageMotorReceiving() {
@@ -187,7 +135,6 @@ public class Shooter extends SubsystemBase {
         return runOnce(() -> { 
             leftFlywheelMotor.disable();
             rightFlywheelMotor.disable();
-            isShooting = false;
         });
     }
 
@@ -206,80 +153,16 @@ public class Shooter extends SubsystemBase {
         return setFlywheelVelocity(velocityRPS, false);
     }
 
-    public Command shootSequence(double velocityRPS) {
+    public Command shoot(double velocityRPS, boolean disableFlywheels) {
         return setFlywheelVelocity(velocityRPS, true)
-           .andThen(feedRingSequence(true))
-           .withName("Shoot");
-    }
-
-    public Command shootSequenceWhileMoving(double velocityRPS, DoubleSupplier distanceSup, DoubleSupplier chassisXVelocitySup, boolean disableOnExit) {
-        return setVelocityWhileMovingArm(velocityRPS, distanceSup, chassisXVelocitySup)
-           .andThen(feedRingSequence(disableOnExit))
-           .withName("Shoot locked on");
-    }
-
-    private Command feedRingSequence(boolean disableFlywheels) {
-        return enableStorageMotorToFlywheels()
+           .andThen(enableStorageMotorToFlywheels())
            .andThen(Commands.waitSeconds(shotWaitTime))
            .andThen(disableFlywheels ? disableFlywheels() : Commands.none())
-           .andThen(disableStorageMotor())
-           .andThen(setToUpPosition(false));
-    }
-
-    public boolean isShooting() {
-        return isShooting;
-    }
-
-    private Command setVelocityWhileMovingArm(double setpoint, DoubleSupplier distanceSup, DoubleSupplier chassisXVelocitySup) {
-        return new FunctionalCommand(
-            () -> setVelocitySetpoint(setpoint), 
-            () -> setArmSetpoint(distanceAndVelocityToArmAngle(distanceSup.getAsDouble(), chassisXVelocitySup.getAsDouble())), 
-            unused -> {}, 
-            this::flywheelsAtSetpoint, 
-            this
-        );
-    }
-
-    public Command setToUnderStagePosition(boolean waitUntilAchieved) {
-        return setTargetPosition(armPositionUnderStage, waitUntilAchieved).withName("To understage"); 
-    }
-
-    public Command setToPassthroughPosition(boolean waitUntilAchieved) {
-        return setTargetPosition(armPositionPassthrough, waitUntilAchieved).withName("To passthrough"); 
-    }
-
-    public Command setToUpPosition(boolean waitUntilAchieved) {
-        return setTargetPosition(armPositionUp, waitUntilAchieved).withName("To up"); 
-    }
-
-    public Command setToAutoPosition(double position, boolean waitUntilAchieved) {
-        return setTargetPosition(position, waitUntilAchieved).withName("To auto pos");
-    }
-
-    /* Moves to the target position from a vision target y offset */
-    public Command setToTargetPositionFromDistance(DoubleSupplier distanceSup, DoubleSupplier chassisXVelocitySup, boolean waitUntilAchieved) {
-        Command setTargetCommand = runOnce(() -> setArmSetpoint(distanceAndVelocityToArmAngle(distanceSup.getAsDouble(), chassisXVelocitySup.getAsDouble())));
-                
-        setTargetCommand = waitUntilAchieved ? setTargetCommand.andThen(Commands.waitUntil(this::armAtSetpoint)) : setTargetCommand;
-
-        return setTargetCommand.withName("To distance pos");
-    }   
-
-    private double distanceAndVelocityToArmAngle(double distance, double chassisXVelocity) {
-        /* Use the interpolated lookup table with the velocity compensated distance value */
-        double targetPos = distanceToArmPosTable.get(distance + (chassisXVelocity * distanceVelocityCompAmt));
-
-        System.out.println("Target pos " + targetPos + " distance " + distance + " velocity " + chassisXVelocity);
-
-        return targetPos;
+           .andThen(disableStorageMotor());
     }
 
     public boolean hasNote() {
         return !beamBreak.get();
-    }
- 
-    public boolean armAtSetpoint() {
-        return Math.abs(armMotor.getAbsolutePosition() - armMotor.getSetpoint()) < armSetpointTolerance;
     }
 
     private boolean flywheelsAtSetpoint() {
@@ -291,11 +174,9 @@ public class Shooter extends SubsystemBase {
         if(getCurrentCommand() != null) 
             getCurrentCommand().cancel();
 
-        armMotor.setClosedLoopTarget(armMotor.getAbsolutePosition());
         leftFlywheelMotor.disable();
         rightFlywheelMotor.disable();
         storageMotor.disable();
-        isShooting = false;
     }
 
     public Command resetCommand() {
