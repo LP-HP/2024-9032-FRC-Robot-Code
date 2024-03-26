@@ -212,6 +212,8 @@ public class RobotContainer {
         shootButton.and(autoAimSpeaker).onTrue(
             Commands.print("Shooting")
             .andThen(shooterFlywheels.shoot(95.0, true))//TODO do velocity lookup table if needed
+                .asProxy()
+            .andThen(shooterArm.setToUpPosition(false))
         );
 
         enableIntakeButton.onTrue(
@@ -280,6 +282,7 @@ public class RobotContainer {
         autoAimSpeaker.and(() -> shooterArm.getCurrentCommand() == null).onTrue(
             shooterArm.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, () -> swerve.getSpeeds().vxMetersPerSecond, false)
                 .repeatedly()
+                    .until(() -> !autoAimSpeaker.getAsBoolean())
         );
     }
 
