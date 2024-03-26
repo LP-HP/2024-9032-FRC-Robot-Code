@@ -40,7 +40,7 @@ public class RobotContainer {
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
     private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
     private final Trigger ampScoreButton = mechanismController.y().debounce(0.025);
-    private final Trigger noteAimButton = mechanismController.rightTrigger(0.25).debounce(0.025)
+    private final Trigger driveToNoteButton = mechanismController.rightTrigger(0.25).debounce(0.025)
         .and(overrideAutoAim.negate());
     private final Trigger resetIntakeAndShooterButton = mechanismController.x().debounce(0.025);
     private final Trigger ejectButton = mechanismController.leftTrigger(0.25).debounce(0.025);
@@ -159,7 +159,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("IntakeAA", 
             shooter.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround()
-                .deadlineWith(new AlignWithVisionTarget(swerve, photonvision, false, false)))
+                .deadlineWith(new DriveToNote(swerve, photonvision)))
             .andThen(new StoreNoteSequence(intake, shooter))
             .withTimeout(notePickupTimeout)
         );
@@ -218,14 +218,14 @@ public class RobotContainer {
             .onlyIf(() -> !intake.hasNote())
         );
 
-        noteAimButton.and(() -> !intake.hasNote()).whileTrue(
-            Commands.print("Aiming for note")
-            .andThen(new AlignWithVisionTarget(swerve, photonvision, false, false))
+        driveToNoteButton.and(() -> !intake.hasNote()).whileTrue(
+            Commands.print("Driving to note")
+            .andThen(new DriveToNote(swerve, photonvision))
             .onlyIf(photonvision::hasTargets)
         );
         
-        noteAimButton.onFalse(
-            Commands.print("Canceled note aiming")
+        driveToNoteButton.onFalse(
+            Commands.print("Canceled driving to note")
             .andThen(intake.disableRollers())
             .andThen(intake.setToPassthroughPosition(false))
             .andThen(shooter.setToUpPosition(false))
@@ -266,7 +266,7 @@ public class RobotContainer {
 
         /* Teleop Triggers */
         autoAimSpeaker.whileTrue(
-            new LockToVisionTargetWhileMoving(swerve, limelight, 
+            new AimAtSpeakerWhileMoving(swerve, limelight, 
                 () -> -driveController.getLeftY(), 
                 () -> -driveController.getLeftX(),
                 driveController::getRightX)

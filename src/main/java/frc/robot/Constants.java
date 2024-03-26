@@ -458,24 +458,21 @@ public final class Constants {
             0.0
         ); 
 
-        /* PID Constants for rotation and movement to a vision target while moving */
-        public static final double kPRotationTargetWhileMoving = 0.14;
-        public static final double kDRotationTargetWhileMoving = 0.01;
+        /* Constants for aiming at the speaker while moving */
+        public static final double kPSpeakerRotation = 0.14;
+        public static final double kDSpeakerRotation = 0.01;
 
-        /* For alignment without moving */
-        public static final double kPTranslationTarget = 2.4;        
+        /* Constants for note alignment */        
+        public static final double kPNoteRotation = 0.12;
+        public static final double kDNoteRotation = 0.01;
         
-        public static final double kPRotationTarget = 0.12;
-        public static final double kDRotationTarget = 0.01;
-        
-        /* Setpoint tolerances */
-        public static final double rotationSetpointTolerance = 1.0;
-        public static final double translationSetpointTolerance = 0.5;
+        public static final double noteDrivingSpeed = 3.0;
     }
 
     public static final class AutoConstants { 
         /* Seconds */
         public static final double notePickupTimeout = 10.0;
+
         public static final double shootVelocity = 95.0;
     }
 }

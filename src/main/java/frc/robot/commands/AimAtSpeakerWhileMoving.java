@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import static frc.robot.Constants.TeleopConstants.*;
 import static frc.robot.Constants.ClosedLoopConstants.*;
 
-public class LockToVisionTargetWhileMoving extends Command {    
+public class AimAtSpeakerWhileMoving extends Command {    
     private final Swerve swerve;    
     private final LimelightVision limelight;
 
@@ -28,14 +28,14 @@ public class LockToVisionTargetWhileMoving extends Command {
 
     private final PIDController swerveRotController;
 
-    public LockToVisionTargetWhileMoving(Swerve swerve, LimelightVision limelight, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {
+    public AimAtSpeakerWhileMoving(Swerve swerve, LimelightVision limelight, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {
         this.swerve = swerve;
         this.limelight = limelight;
         this.translationSup = translationSup;
         this.strafeSup = strafeSup;
         this.rotationSup = rotationSup;
 
-        swerveRotController = new PIDController(kPRotationTargetWhileMoving, 0.0, kDRotationTargetWhileMoving);
+        swerveRotController = new PIDController(kPSpeakerRotation, 0.0, kDSpeakerRotation);
         swerveRotController.setSetpoint(0.0);
 
         addRequirements(swerve, limelight);
@@ -62,15 +62,15 @@ public class LockToVisionTargetWhileMoving extends Command {
 
         rotationVal *= joystickToAngularVelocityConversionFactor;
 
-        /* Override rotation to tag x-offset */
+        /* Override rotation to tag x-offset using PID */
         AprilTagTarget aprilTag = limelight.getAprilTagTarget();
-        if(aprilTag.isValid) 
+        if(aprilTag.isValidSpeakerTag()) 
             rotationVal = swerveRotController.calculate(aprilTag.xOffset);
 
         else {
             swerveRotController.reset();
 
-            System.err.println("Missed target while locking on!");
+            System.err.println("Speaker tag tracking lost while locking on!");
         }
 
         /* Run the open loop drive using speed values  */
