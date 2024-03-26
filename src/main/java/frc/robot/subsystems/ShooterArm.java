@@ -117,6 +117,6 @@ public class ShooterArm extends SubsystemBase {
     }
 
     public Command resetCommand() {
-        return runOnce(this::reset).withName("Reset");
+        return runOnce(this::reset).withName("Reset Arm");
     }
 }

@@ -89,7 +89,7 @@ public class ShooterFlywheels extends SubsystemBase {
         shooterTab.add(enableStorageMotorToFlywheels())
             .withPosition(1, 3).withSize(1, 1);
         shooterTab.add(resetCommand())
-            .withPosition(3, 3).withSize(1, 1);
+            .withPosition(4, 3).withSize(1, 1);
         /* Add widget to modify the flywheel setpoint */
         GenericEntry velocitySetpointEntry = shooterTab.add("Flywheel Override", 0.0)
             .withPosition(6, 4).withSize(1, 1)
@@ -180,6 +180,6 @@ public class ShooterFlywheels extends SubsystemBase {
     }
 
     public Command resetCommand() {
-        return runOnce(this::reset).withName("Reset");
+        return runOnce(this::reset).withName("Reset Flywheels");
     }
 }

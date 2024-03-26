@@ -34,9 +34,9 @@ public class RobotContainer {
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
     private final Trigger underStageButton = driveController.rightBumper().debounce(0.025);
     private final Trigger overrideAutoAim = driveController.leftBumper().debounce(0.025);
+    private final Trigger shootButton = driveController.b().debounce(0.025);
 
     /* Mechanism Controller Buttons */
-    private final Trigger shootButton = mechanismController.rightBumper().debounce(0.025);
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
     private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
     private final Trigger ampScoreButton = mechanismController.y().debounce(0.025);
@@ -280,9 +280,10 @@ public class RobotContainer {
         );
 
         autoAimSpeaker.and(() -> shooterArm.getCurrentCommand() == null).onTrue(
-            shooterArm.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, () -> swerve.getSpeeds().vxMetersPerSecond, false)
+            shooterFlywheels.spinUpFlywheels(95.0)
+            .andThen(shooterArm.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, () -> swerve.getSpeeds().vxMetersPerSecond, false)
                 .repeatedly()
-                    .until(() -> !autoAimSpeaker.getAsBoolean())
+                    .until(() -> !autoAimSpeaker.getAsBoolean()))
         );
     }
 
