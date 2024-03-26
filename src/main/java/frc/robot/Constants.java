@@ -48,7 +48,7 @@ public final class Constants {
         public static final double mountingAngle = Units.degreesToRadians(30.0);
 
         /* Cutoff for target validity */
-        public static final double distanceCutoff = 5.0;
+        public static final double distanceCutoff = 4.27;
     }
 
     public static final class PhotonvisionConstants {
@@ -158,6 +158,7 @@ public final class Constants {
         public static final double armPositionPassthrough = 133.0;
         public static final double armPositionUnderStage = 120.0;
         public static final double armPositionUp = 160.0;
+        /* Auto Arm Aiming */
         /* Key - Distance : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap distanceToArmPosTable = new InterpolatingDoubleTreeMap();
         static {
@@ -177,6 +178,7 @@ public final class Constants {
             distanceToArmPosTable.put(3.972, 127.5);
             distanceToArmPosTable.put(4.27, 127.0);
         }
+        public static final double distanceVelocityCompAmt = -0.2;//TODO test
 
         /* Shooter Flywheels */
         public static final double flywheelVelocityTolerance = 1.0;
@@ -462,7 +464,7 @@ public final class Constants {
         public static final double kPSpeakerRotation = 0.14;
         public static final double kDSpeakerRotation = 0.01;
 
-        public static final double xOffsetVelocityCompAmt = -0.2;
+        public static final double xOffsetVelocityCompAmt = -0.2;//TODO test
 
         /* Constants for note alignment */        
         public static final double kPNoteRotation = 0.12;

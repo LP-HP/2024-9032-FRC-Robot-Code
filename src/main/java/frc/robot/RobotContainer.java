@@ -146,7 +146,7 @@ public class RobotContainer {
 
     private void registerPathplannerCommands() {
         NamedCommands.registerCommand("ShootAA", 
-            shooter.shootSequenceWithDistanceLockOn(shootVelocity, () -> limelight.getAprilTagTarget().distance, false)
+            shooter.shootSequenceWhileMoving(shootVelocity, () -> limelight.getAprilTagTarget().distance, () -> swerve.getSpeeds().vxMetersPerSecond, false)
         );
 
         NamedCommands.registerCommand("Intake", 
@@ -207,7 +207,7 @@ public class RobotContainer {
         /* Mechanism Controls */
         shootButton.and(autoAimSpeaker).onTrue(
             Commands.print("Shooting")
-            .andThen(shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance, true))//TODO do velocity lookup table if needed
+            .andThen(shooter.shootSequenceWhileMoving(95.0, () -> limelight.getAprilTagTarget().distance, () -> swerve.getSpeeds().vxMetersPerSecond, true))//TODO do velocity lookup table if needed
         );
 
         enableIntakeButton.onTrue(
@@ -273,7 +273,7 @@ public class RobotContainer {
         );
 
         autoAimSpeaker.and(() -> shooter.getCurrentCommand() == null).onTrue(
-            shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
+            shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, () -> swerve.getSpeeds().vxMetersPerSecond, false)
                 .repeatedly()
         );
     }

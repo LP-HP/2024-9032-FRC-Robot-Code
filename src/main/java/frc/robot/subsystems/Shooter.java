@@ -212,8 +212,8 @@ public class Shooter extends SubsystemBase {
            .withName("Shoot");
     }
 
-    public Command shootSequenceWithDistanceLockOn(double velocityRPS, DoubleSupplier distanceSup, boolean disableOnExit) {
-        return setVelocityWhileMovingArm(velocityRPS, distanceSup)
+    public Command shootSequenceWhileMoving(double velocityRPS, DoubleSupplier distanceSup, DoubleSupplier chassisXVelocitySup, boolean disableOnExit) {
+        return setVelocityWhileMovingArm(velocityRPS, distanceSup, chassisXVelocitySup)
            .andThen(feedRingSequence(disableOnExit))
            .withName("Shoot locked on");
     }
@@ -230,10 +230,10 @@ public class Shooter extends SubsystemBase {
         return isShooting;
     }
 
-    private Command setVelocityWhileMovingArm(double setpoint, DoubleSupplier distanceSup) {
+    private Command setVelocityWhileMovingArm(double setpoint, DoubleSupplier distanceSup, DoubleSupplier chassisXVelocitySup) {
         return new FunctionalCommand(
             () -> setVelocitySetpoint(setpoint), 
-            () -> setArmSetpoint(applyLookupTable(distanceSup.getAsDouble())), 
+            () -> setArmSetpoint(distanceAndVelocityToArmAngle(distanceSup.getAsDouble(), chassisXVelocitySup.getAsDouble())), 
             unused -> {}, 
             this::flywheelsAtSetpoint, 
             this
@@ -257,18 +257,19 @@ public class Shooter extends SubsystemBase {
     }
 
     /* Moves to the target position from a vision target y offset */
-    public Command setToTargetPositionFromDistance(DoubleSupplier distanceSup, boolean waitUntilAchieved) {
-        Command setTargetCommand = runOnce(() -> setArmSetpoint(applyLookupTable(distanceSup.getAsDouble())));
+    public Command setToTargetPositionFromDistance(DoubleSupplier distanceSup, DoubleSupplier chassisXVelocitySup, boolean waitUntilAchieved) {
+        Command setTargetCommand = runOnce(() -> setArmSetpoint(distanceAndVelocityToArmAngle(distanceSup.getAsDouble(), chassisXVelocitySup.getAsDouble())));
                 
         setTargetCommand = waitUntilAchieved ? setTargetCommand.andThen(Commands.waitUntil(this::armAtSetpoint)) : setTargetCommand;
 
         return setTargetCommand.withName("To distance pos");
     }   
 
-    private double applyLookupTable(double distance) {
-        double targetPos = distanceToArmPosTable.get(distance);
+    private double distanceAndVelocityToArmAngle(double distance, double chassisXVelocity) {
+        /* Use the interpolated lookup table with the velocity compensated distance value */
+        double targetPos = distanceToArmPosTable.get(distance + (chassisXVelocity * distanceVelocityCompAmt));
 
-        System.out.println("Target pos " + targetPos + " at distance " + distance);
+        System.out.println("Target pos " + targetPos + " distance " + distance + " velocity " + chassisXVelocity);
 
         return targetPos;
     }
