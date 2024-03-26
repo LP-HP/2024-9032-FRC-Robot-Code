@@ -98,7 +98,7 @@ public class ShooterArm extends SubsystemBase {
 
     private double distanceAndVelocityToArmAngle(double distance, double chassisXVelocity) {
         /* Use the interpolated lookup table with the velocity compensated distance value */
-        double targetPos = distanceToArmPosTable.get(distance + (chassisXVelocity * distanceVelocityCompAmt));
+        double targetPos = distanceToArmPosTable.get(distance) + (chassisXVelocity * distanceVelocityCompAmt);
 
         System.out.println("Target pos " + targetPos + " distance " + distance + " velocity " + chassisXVelocity);
 

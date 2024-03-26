@@ -66,9 +66,11 @@ public class AimAtSpeakerWhileMoving extends Command {
         AprilTagTarget aprilTag = limelight.getAprilTagTarget();
         if(aprilTag.isValidSpeakerTag()) {
             /* Aim slightly further than the tag based on current strafe velocity*/
-            double velocityCompensatedXOffset = aprilTag.xOffset + (swerve.getSpeeds().vyMetersPerSecond * xOffsetVelocityCompAmt);
+            double targetOffset = swerve.getSpeeds().vyMetersPerSecond * xOffsetVelocityCompAmt;
 
-            rotationVal = swerveRotController.calculate(velocityCompensatedXOffset);
+            swerveRotController.setSetpoint(targetOffset);
+
+            rotationVal = swerveRotController.calculate(aprilTag.xOffset);
         }
 
         else {
