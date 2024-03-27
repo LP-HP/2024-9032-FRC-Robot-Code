@@ -16,7 +16,7 @@ public class ShooterArm extends SubsystemBase {
     private final SparkMaxWrapper armMotor;    
     private final SparkMaxWrapper armMotorFollower;    
 
-    private final ShuffleboardTab shooterTab = Shuffleboard.getTab("Shooter");
+    private final ShuffleboardTab shooterTab = Shuffleboard.getTab("Shooter Arm");
 
     public ShooterArm() {
         armMotor = new SparkMaxWrapper(shooterArmConstants);
@@ -38,11 +38,15 @@ public class ShooterArm extends SubsystemBase {
 
         /* Add Command Testing Butons */
         shooterTab.add(resetCommand())
-            .withPosition(3, 3).withSize(1, 1);
+            .withPosition(0, 3).withSize(1, 1);
         shooterTab.add(setToUnderStagePosition(true))
-            .withPosition(4, 3).withSize(1, 1);
+            .withPosition(1, 3).withSize(1, 1);
         shooterTab.add(setToPassthroughPosition(true))
-            .withPosition(5, 3).withSize(1, 1);
+            .withPosition(2, 3).withSize(1, 1);
+        shooterTab.add(setToUpPosition(true))
+            .withPosition(3, 3).withSize(1, 1);
+        shooterTab.add(setToAmpPosition(true))
+            .withPosition(4, 3).withSize(1, 1);
         /* Add widget to modify the arm setpoint */
         GenericEntry armSetpointEntry = shooterTab.add("Arm Override", 0.0)
             .withPosition(6, 3).withSize(1, 1)

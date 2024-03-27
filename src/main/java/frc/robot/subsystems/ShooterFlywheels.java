@@ -25,7 +25,7 @@ public class ShooterFlywheels extends SubsystemBase {
 
     private final DigitalInput beamBreak = new DigitalInput(beamBreakPort);
 
-    private final ShuffleboardTab shooterTab = Shuffleboard.getTab("Shooter");
+    private final ShuffleboardTab shooterTab = Shuffleboard.getTab("Flywheels");
 
     public ShooterFlywheels() { 
         storageMotor = new SparkMaxWrapper(shooterStorageConstants);
@@ -67,15 +67,15 @@ public class ShooterFlywheels extends SubsystemBase {
 
         /* Add Telemetry */
         shooterTab.add(leftFlywheelMotor)
-            .withPosition(3, 0).withSize(1, 1);
+            .withPosition(0, 0).withSize(2, 1);
         shooterTab.addDouble("Left Velocity", () -> leftFlywheelMotor.getVelocity().getValueAsDouble())
-            .withPosition(3, 1).withSize(1, 1);
+            .withPosition(0, 1).withSize(2, 1);
         shooterTab.add(rightFlywheelMotor)
-            .withPosition(4, 0).withSize(1, 1);
+            .withPosition(2, 0).withSize(2, 1);
         shooterTab.addDouble("Right Velocity", () -> rightFlywheelMotor.getVelocity().getValueAsDouble())
-            .withPosition(4, 1).withSize(1, 1);
+            .withPosition(2, 1).withSize(2, 1);
         shooterTab.add(storageMotor)
-            .withPosition(0, 2).withSize(2, 1);
+            .withPosition(4, 0).withSize(2, 1);
         shooterTab.addBoolean("Has Note", this::hasNote)
             .withPosition(6, 0).withSize(2, 1);
         shooterTab.addBoolean("Flywheels At Setpoint", this::flywheelsAtSetpoint)
@@ -89,7 +89,9 @@ public class ShooterFlywheels extends SubsystemBase {
         shooterTab.add(enableStorageMotorToFlywheels())
             .withPosition(1, 3).withSize(1, 1);
         shooterTab.add(resetCommand())
-            .withPosition(4, 3).withSize(1, 1);
+            .withPosition(2, 3).withSize(1, 1);
+        shooterTab.add(receiveNoteFromIntake())
+            .withPosition(3, 3).withSize(1, 1);
         /* Add widget to modify the flywheel setpoint */
         GenericEntry velocitySetpointEntry = shooterTab.add("Flywheel Override", 0.0)
             .withPosition(6, 4).withSize(1, 1)
@@ -150,7 +152,8 @@ public class ShooterFlywheels extends SubsystemBase {
         return enableStorageMotorReceiving()
             .andThen(Commands.waitUntil(this::hasNote))
             .andThen(disableStorageMotor())
-            .andThen(Commands.print("Shooter received note"));
+            .andThen(Commands.print("Shooter received note"))
+            .withName("Receive Note");
     }
 
     public Command spinUpFlywheels(double velocityRPS) {
