@@ -177,16 +177,21 @@ public class RobotContainer {
          * 
          * left stick x and y - controls strafing
          * right stick x - controls rotation 
+         * 
          * right trigger -> move climbers up by trigger amount
          * left trigger -> move climbers down by trigger amount and put the shooter into climber position
+         * left bumper -> override auto aim
+         * right bumper (cancelable) -> go under stage
          * a -> zero gyro
+         * b [must have a valid speaker target and a note in the shooter] -> shoot
+         * y [must have a valid stage target] -> drive to stage
          * 
          * Current mechanism controls:
-         * right bumper [must have a valid speaker target and a note] -> run speaker scoring sequence (align with tag, move shooter arm, shoot, reset arm)
-         * left bumper [must have a valid speaker target] -> aim swerve for april tag
+         * right bumper [must have a note in the shooter] -> score in amp
+         * right trigger [must have a note target] -> drive to note
+         * left trigger -> eject note
          * b -> [must not have a note] set intake to ground position and enable intake - when a note is gained, then move the intake to storage
          * a [must have a note in the intake] -> run store note sequence
-         * y [must have a note in the intake] -> move intake to amp position and shoot into amp
          * x -> set intake and shooter to the default positions
          * back [hold 1 second] -> reset states
         */
@@ -224,7 +229,7 @@ public class RobotContainer {
             .andThen(shooterArm.setToPassthroughPosition(false))
             .andThen(intake.getNoteFromGround())
             .andThen(setAndDisableRumble())
-            .onlyIf(() -> !intake.hasNote())
+            .onlyIf(() -> !intake.hasNote() && !shooterFlywheels.hasNote())
         );
 
         driveToNoteButton.and(() -> !intake.hasNote()).whileTrue(
@@ -260,7 +265,7 @@ public class RobotContainer {
             .andThen(shooterArm.setToUnderStagePosition(false))
             .andThen(new DriveToStage(swerve, limelight)
                 .alongWith(
-                    Commands.waitUntil(() -> limelight.getAprilTagTarget().distance < ClosedLoopConstants.shooterUpDistance)
+                    Commands.waitUntil(() -> limelight.getAprilTagTarget().distance <= ClosedLoopConstants.shooterUpDistance)
                     .andThen(shooterArm.setToUpPosition(false))
                 )
             )
