@@ -85,7 +85,6 @@ public final class Constants {
         public static final double armPositionStarting = 229.0;
         public static final double armPositionGround = 26.5;
         public static final double armPositionPassthrough = 227.0;
-        public static final double armPositionAmp = 150.0;
         public static final double armPositionEject = 100.0;
 
         /* Intake Flywheel */
@@ -101,10 +100,9 @@ public final class Constants {
             1.0
         );
         public static final double shotWaitTime = 0.25;
-        public static final double ampWaitTime = 1.0;
         /* Flyhweel Powers */
         public static final double intakePower = -1.0;
-        public static final double outtakeAmpPower = 0.5;
+        public static final double ejectPower = 0.5;
         public static final double transferToShooterPower = 0.4;
 
         /* Sensors */
@@ -156,6 +154,7 @@ public final class Constants {
         public static final double armPositionPassthrough = 133.0;
         public static final double armPositionUnderStage = 120.0;
         public static final double armPositionUp = 160.0;
+        public static final double armPositionAmp = 142.0;
         /* Auto Arm Aiming */
         /* Key - Distance : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap distanceToArmPosTable = new InterpolatingDoubleTreeMap();
@@ -193,9 +192,11 @@ public final class Constants {
         public static final int rightFlywheelMotorID = 18;
         public static final InvertedValue rightFlywheelInvert = InvertedValue.CounterClockwise_Positive;
 
-        public static final double shotWaitTime = 0.5;
+        public static final double speakerShotWaitTime = 0.5;
+        public static final double ampShotWaitTime = 1.0;
         public static final double minFlywheelSetpoint = 0.0;
         public static final double maxFlywheelSetpoint = 100.0;
+        public static final double flywheelAmpSetpoint = 15.0;
 
         /* Storage Motor */
         public static final SparkMaxConstants shooterStorageConstants = new SparkMaxConstants(
@@ -211,6 +212,7 @@ public final class Constants {
         );
         public static final double storageMotorPowerReceiving = 0.2;
         public static final double storageMotorPowerToFlywheels = 0.75;
+        public static final double storageMotorPowerToAmp = 0.3;
 
         /* Sensors */
         public static final int beamBreakPort = 2;

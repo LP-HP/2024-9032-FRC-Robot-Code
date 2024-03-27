@@ -131,6 +131,10 @@ public class ShooterFlywheels extends SubsystemBase {
         return setStorageMotorPower(storageMotorPowerToFlywheels).withName("Storage flywheels");
     }
 
+    private Command enableStorageMotorToAmp() {
+        return setStorageMotorPower(storageMotorPowerToAmp).withName("Storage amp");
+    }
+
     public Command disableFlywheels() {
         return runOnce(() -> { 
             leftFlywheelMotor.disable();
@@ -156,9 +160,17 @@ public class ShooterFlywheels extends SubsystemBase {
     public Command shoot(double velocityRPS, boolean disableFlywheels) {
         return setFlywheelVelocity(velocityRPS, true)
            .andThen(enableStorageMotorToFlywheels())
-           .andThen(Commands.waitSeconds(shotWaitTime))
+           .andThen(Commands.waitSeconds(speakerShotWaitTime))
            .andThen(disableFlywheels ? disableFlywheels() : Commands.none())
            .andThen(disableStorageMotor());
+    }
+
+    public Command shootIntoAmp() {
+        return setFlywheelVelocity(flywheelAmpSetpoint, true)
+            .andThen(enableStorageMotorToAmp())
+            .andThen(Commands.waitSeconds(ampShotWaitTime))
+            .andThen(disableStorageMotor())
+            .andThen(disableFlywheels());
     }
 
     public boolean hasNote() {

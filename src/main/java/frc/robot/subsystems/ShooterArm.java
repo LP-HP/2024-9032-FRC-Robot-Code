@@ -83,6 +83,10 @@ public class ShooterArm extends SubsystemBase {
         return setTargetPosition(armPositionUp, waitUntilAchieved).withName("To up"); 
     }
 
+    public Command setToAmpPosition(boolean waitUntilAchieved) {
+        return setTargetPosition(armPositionAmp, waitUntilAchieved).withName("To amp"); 
+    }
+
     public Command setToAutoPosition(double position, boolean waitUntilAchieved) {
         return setTargetPosition(position, waitUntilAchieved).withName("To auto pos");
     }

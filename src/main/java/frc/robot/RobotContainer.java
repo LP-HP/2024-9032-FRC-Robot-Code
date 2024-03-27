@@ -39,7 +39,8 @@ public class RobotContainer {
     /* Mechanism Controller Buttons */
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
     private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
-    private final Trigger ampScoreButton = mechanismController.y().debounce(0.025);
+    private final Trigger ampAlignButton = mechanismController.y().debounce(0.025);
+    private final Trigger ampScoreButton = mechanismController.rightBumper().debounce(0.025);
     private final Trigger driveToNoteButton = mechanismController.rightTrigger(0.25).debounce(0.025)
         .and(overrideAutoAim.negate());
     private final Trigger resetIntakeAndShooterButton = mechanismController.x().debounce(0.025);
@@ -244,10 +245,18 @@ public class RobotContainer {
             .onlyIf(() -> intake.hasNote() && !shooterFlywheels.hasNote())
         );
  
+        ampAlignButton.onTrue(
+            Commands.print("Aligning with amp")
+            .andThen(shooterArm.setToAmpPosition(false))
+            .andThen(shooterFlywheels.spinUpFlywheels(Constants.ShooterConstants.flywheelAmpSetpoint))
+            .onlyIf(shooterFlywheels::hasNote)
+        );
+
         ampScoreButton.onTrue(
-            Commands.print("Scoring in amp")
-            .andThen(intake.shootIntoAmp())
-            .onlyIf(intake::hasNote)
+            Commands.print("Shooting in amp")
+            .andThen(shooterArm.setToAmpPosition(true))
+            .andThen(shooterFlywheels.shootIntoAmp())
+            .onlyIf(shooterFlywheels::hasNote)
         );
 
         /* Reset Buttons */
