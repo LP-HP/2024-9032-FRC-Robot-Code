@@ -18,8 +18,6 @@ public class Intake extends SubsystemBase {
 
     private final DigitalInput beamBreak = new DigitalInput(beamBreakPort);
 
-    private boolean hasNoteState = false;
-
     public Intake() {
         armMotor = new SparkMaxWrapper(intakeArmConstants);
         armMotor.config();
@@ -34,10 +32,8 @@ public class Intake extends SubsystemBase {
             .withPosition(0, 0).withSize(2, 2);
         intakeTab.add(rollerMotor)
             .withPosition(3, 0).withSize(2, 1);
-        intakeTab.addBoolean("Beam Break Triggered", this::beamBreakTriggered)
+        intakeTab.addBoolean("Has Note", this::hasNote)
             .withPosition(6, 0).withSize(2, 1);
-        intakeTab.addBoolean("Has Note State", () -> hasNoteState)
-            .withPosition(6, 2).withSize(2, 1);
         intakeTab.addBoolean("At Setpoint", this::armAtSetpoint)
             .withPosition(6, 1).withSize(2, 1);
         intakeTab.add(this)
@@ -67,10 +63,6 @@ public class Intake extends SubsystemBase {
         return runOnce(() -> rollerMotor.set(power));
     }
 
-    private Command setNoteState(boolean hasNoteState) {
-        return runOnce(() -> this.hasNoteState = hasNoteState);
-    }
-
     public Command setToGroundPosition(boolean waitUntilAchieved) {
         return setTargetPosition(armPositionGround, waitUntilAchieved).withName("To ground");
     }
@@ -93,37 +85,30 @@ public class Intake extends SubsystemBase {
             .andThen(setRollerPower(ejectPower))
             .andThen(Commands.waitSeconds(shotWaitTime))
             .andThen(disableRollers())
-            .andThen(setNoteState(false))
             .andThen(setToPassthroughPosition(false))
             .withName("Eject");
     }
 
     public Command enableTransferToShooter() {
         return setRollerPower(transferToShooterPower)
-            .andThen(setNoteState(false))
             .withName("Transfer");
     }
 
     public Command getNoteFromGround() {
         return setTargetPosition(armPositionGround, false)
             .andThen(setRollerPower(intakePower))
-            .andThen(Commands.waitUntil(this::beamBreakTriggered))
+            .andThen(Commands.waitUntil(this::hasNote))
             .andThen(disableRollers())
-            .andThen(setNoteState(true))
             .andThen(Commands.print("Intake received note"))
             .andThen(setToPassthroughPosition(false))
             .withName("Get note");
-    }
-
-    public boolean hasNote() {
-        return hasNoteState;
     }
 
     public boolean armAtSetpoint() {
         return Math.abs(armMotor.relativeEncoder.getPosition() - armMotor.getSetpoint()) < armSetpointTolerance;
     }
 
-    private boolean beamBreakTriggered() {
+    public boolean hasNote() {
         return !beamBreak.get();
     }
 
@@ -133,8 +118,6 @@ public class Intake extends SubsystemBase {
 
         rollerMotor.set(0.0);
         armMotor.setClosedLoopTarget(armMotor.relativeEncoder.getPosition());
-
-        hasNoteState = false;
     }
 
     public Command resetCommand() {
