@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ClosedLoopConstants;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.SparkMaxWrapper;
@@ -35,7 +36,7 @@ public class RobotContainer {
     private final Trigger underStageButton = driveController.rightBumper().debounce(0.025);
     private final Trigger overrideAutoAim = driveController.leftBumper().debounce(0.025);
     private final Trigger shootButton = driveController.b().debounce(0.025);
-    private final Trigger stageAlignButton = driveController.y().debounce(0.025);
+    private final Trigger driveToStageButton = driveController.y().debounce(0.025);
 
     /* Mechanism Controller Buttons */
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
@@ -254,9 +255,18 @@ public class RobotContainer {
             .onlyIf(shooterFlywheels::hasNote)
         );
 
-        stageAlignButton.whileTrue(
-            new DriveToStage(swerve, limelight)
+        driveToStageButton.whileTrue(
+            Commands.print("Driving to stage")
+            .andThen(shooterArm.setToUnderStagePosition(false))
+            .andThen(new DriveToStage(swerve, limelight)
+                .alongWith(
+                    Commands.waitUntil(() -> limelight.getAprilTagTarget().distance < ClosedLoopConstants.shooterUpDistance)
+                    .andThen(shooterArm.setToUpPosition(false))
+                )
+            )
         );
+
+        driveToStageButton.onFalse(Commands.print("Released stage driving"));
 
         /* Reset Buttons */
         ejectButton.onTrue(
