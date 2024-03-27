@@ -48,10 +48,6 @@ public class Intake extends SubsystemBase {
             .withPosition(0, 3).withSize(1, 1);
         intakeTab.add(setToPassthroughPosition(true))
             .withPosition(1, 3).withSize(1, 1);
-        intakeTab.add(setToAmpPosition(true))
-            .withPosition(2, 3).withSize(1, 1);
-        intakeTab.add(shootIntoAmp())
-            .withPosition(3, 3).withSize(1, 1);
         intakeTab.add(enableTransferToShooter())
             .withPosition(4, 3).withSize(1, 1);
         intakeTab.add(getNoteFromGround())
@@ -83,10 +79,6 @@ public class Intake extends SubsystemBase {
         return setTargetPosition(armPositionPassthrough, waitUntilAchieved).withName("To passthrough");
     }
 
-    public Command setToAmpPosition(boolean waitUntilAchieved) {
-        return setTargetPosition(armPositionAmp, waitUntilAchieved).withName("To amp");
-    }
-
     public Command setToEjectPosition(boolean waitUntilAchieved) {
         return setTargetPosition(armPositionEject, waitUntilAchieved).withName("To eject");
     }
@@ -95,22 +87,10 @@ public class Intake extends SubsystemBase {
         return setRollerPower(0.0);
     }
 
-    public Command shootIntoAmp() {
-        return disableRollers()
-            .andThen(setToAmpPosition(true))
-            .andThen(Commands.waitSeconds(ampWaitTime))
-            .andThen(setRollerPower(outtakeAmpPower))
-            .andThen(Commands.waitSeconds(shotWaitTime))
-            .andThen(disableRollers())
-            .andThen(setNoteState(false))
-            .andThen(setToPassthroughPosition(false))
-            .withName("Shoot into amp");
-    }
-
     public Command ejectNote() {
         return disableRollers()
             .andThen(setToEjectPosition(true))
-            .andThen(setRollerPower(outtakeAmpPower))
+            .andThen(setRollerPower(ejectPower))
             .andThen(Commands.waitSeconds(shotWaitTime))
             .andThen(disableRollers())
             .andThen(setNoteState(false))

@@ -34,13 +34,13 @@ public class RobotContainer {
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
     private final Trigger underStageButton = driveController.rightBumper().debounce(0.025);
     private final Trigger overrideAutoAim = driveController.leftBumper().debounce(0.025);
+    private final Trigger shootButton = driveController.b().debounce(0.025);
 
     /* Mechanism Controller Buttons */
-    private final Trigger shootButton = mechanismController.rightBumper().debounce(0.025);
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
     private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
-    private final Trigger ampScoreButton = mechanismController.y().debounce(0.025);
-    private final Trigger noteAimButton = mechanismController.rightTrigger(0.25).debounce(0.025)
+    private final Trigger ampScoreButton = mechanismController.rightBumper().debounce(0.025);
+    private final Trigger driveToNoteButton = mechanismController.rightTrigger(0.25).debounce(0.025)
         .and(overrideAutoAim.negate());
     private final Trigger resetIntakeAndShooterButton = mechanismController.x().debounce(0.025);
     private final Trigger ejectButton = mechanismController.leftTrigger(0.25).debounce(0.025);
@@ -51,7 +51,8 @@ public class RobotContainer {
     private final Photonvision photonvision = new Photonvision();
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
-    private final Shooter shooter = new Shooter();
+    private final ShooterFlywheels shooterFlywheels = new ShooterFlywheels();
+    private final ShooterArm shooterArm = new ShooterArm();
     private final Climbers climbers = new Climbers();
 
     /* Shuffleboard */
@@ -61,7 +62,7 @@ public class RobotContainer {
 
     /* Teleop Triggers */
     private final Trigger autoAimSpeaker = 
-        new Trigger(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && limelight.isTargetPipeline() && shooter.hasNote())
+        new Trigger(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && shooterFlywheels.hasNote() && limelight.isTargetPipeline())
             .and(overrideAutoAim.negate()).and(underStageButton.negate());
 
     public RobotContainer() {
@@ -104,20 +105,20 @@ public class RobotContainer {
             .withPosition(1, 0).withSize(1, 1);
         driverTab.addBoolean("Valid Tag", () -> limelight.getAprilTagTarget().isValid)
             .withPosition(2, 0).withSize(1, 1);
-        driverTab.addBoolean("Arms at Setpoint", () -> intake.armAtSetpoint() && shooter.armAtSetpoint())
+        driverTab.addBoolean("Arms at Setpoint", () -> intake.armAtSetpoint() && shooterArm.armAtSetpoint())
             .withPosition(3, 0).withSize(1, 1);
         driverTab.addBoolean("Intake Has Note", () -> intake.hasNote())
             .withPosition(4, 0).withSize(1, 1);
-        driverTab.addBoolean("Shooter Has Note", () -> shooter.hasNote())
+        driverTab.addBoolean("Shooter Has Note", () -> shooterFlywheels.hasNote())
             .withPosition(5, 0).withSize(1, 1);
         driverTab.addDouble("Match Time", () -> DriverStation.getMatchTime())
             .withPosition(6, 0).withSize(2, 1);
         driverTab.add(
-                shooter.setToAutoPosition(140.0, true)
-                .andThen(shooter.shootSequence(95.0))
+                shooterArm.setToAutoPosition(140.0, true)
+                .andThen(shooterFlywheels.shoot(95.0, true))
                 .withName("Shoot 140"))
             .withPosition(8, 0).withSize(1, 1);
-        driverTab.add(shooter.shootSequence(95.0))
+        driverTab.add(shooterFlywheels.shoot(95.0, true))
             .withPosition(9, 0).withSize(1, 1);
         limelight.addCameraToTab(driverTab, 0, 1, 4);
         photonvision.addCameraToTab(driverTab, 5, 1, 4);
@@ -133,34 +134,37 @@ public class RobotContainer {
     /* Only reset variables - don't run any commands here */
     public void teleopInit() {
         limelight.switchToTargetPipeline();//Ensures that the limelight is never stuck in the wrong pipeline
-        shooter.reset();
+        shooterArm.reset();
+        shooterFlywheels.reset();
         intake.reset();
     }
 
     /* Only reset variables - don't run any commands here */
     public void disabledExit() {
-        shooter.reset();
+        shooterArm.reset();
+        shooterFlywheels.reset();
         intake.reset();
-        driveController.getHID().setRumble(RumbleType.kBothRumble, 0);
+        setRumble(0.0);
     }
 
     private void registerPathplannerCommands() {
         NamedCommands.registerCommand("ShootAA", 
-            shooter.shootSequenceWithDistanceLockOn(shootVelocity, () -> limelight.getAprilTagTarget().distance, false)
+            shooterArm.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, () -> 0.0, true)
+            .andThen(shooterFlywheels.shoot(shootVelocity, false))
         );
 
         NamedCommands.registerCommand("Intake", 
-            shooter.setToPassthroughPosition(false)
+            shooterArm.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround())
-            .andThen(new StoreNoteSequence(intake, shooter))
+            .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels))
             .withTimeout(notePickupTimeout)
         );
 
         NamedCommands.registerCommand("IntakeAA", 
-            shooter.setToPassthroughPosition(false)
+            shooterArm.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround()
-                .deadlineWith(new AlignWithVisionTarget(swerve, photonvision, false, false)))
-            .andThen(new StoreNoteSequence(intake, shooter))
+                .deadlineWith(new DriveToNote(swerve, photonvision)))
+            .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels))
             .withTimeout(notePickupTimeout)
         );
     }
@@ -196,53 +200,57 @@ public class RobotContainer {
 
         underStageButton.onTrue(
             Commands.print("Going under stage")
-            .andThen(shooter.setToUnderStagePosition(false))
-            .andThen(shooter.disableFlywheels())
+            .andThen(shooterArm.setToUnderStagePosition(false))
         );
 
         underStageButton.onFalse(
             Commands.print("Going under stage released")
-            .andThen(shooter.setToUpPosition(false))
+            .andThen(shooterArm.setToUpPosition(false))
         );
 
         /* Mechanism Controls */
         shootButton.and(autoAimSpeaker).onTrue(
             Commands.print("Shooting")
-            .andThen(shooter.shootSequenceWithDistanceLockOn(95.0, () -> limelight.getAprilTagTarget().distance, true))//TODO do velocity lookup table if needed
+            .andThen(shooterFlywheels.shoot(95.0, true)
+                .asProxy())//TODO do velocity lookup table if needed
+            .andThen(shooterArm.setToUpPosition(false)
+                .asProxy())
         );
 
         enableIntakeButton.onTrue(
             Commands.print("Enabling intake")
-            .andThen(shooter.setToPassthroughPosition(false))
+            .andThen(shooterArm.setToPassthroughPosition(false))
             .andThen(intake.getNoteFromGround())
             .andThen(setAndDisableRumble())
             .onlyIf(() -> !intake.hasNote())
         );
 
-        noteAimButton.and(() -> !intake.hasNote()).whileTrue(
-            Commands.print("Aiming for note")
-            .andThen(new AlignWithVisionTarget(swerve, photonvision, false, false))
+        driveToNoteButton.and(() -> !intake.hasNote()).whileTrue(
+            Commands.print("Driving to note")
+            .andThen(new DriveToNote(swerve, photonvision))
             .onlyIf(photonvision::hasTargets)
         );
         
-        noteAimButton.onFalse(
-            Commands.print("Canceled note aiming")
+        driveToNoteButton.onFalse(
+            Commands.print("Canceled driving to note")
             .andThen(intake.disableRollers())
             .andThen(intake.setToPassthroughPosition(false))
-            .andThen(shooter.setToUpPosition(false))
+            .andThen(shooterArm.setToUpPosition(false))
             .onlyIf(() -> !intake.hasNote())
         );   
 
         storeNoteButton.and(underStageButton.negate()).onTrue(
             Commands.print("Transfering note")
-            .andThen(new StoreNoteSequence(intake, shooter))
-            .onlyIf(() -> intake.hasNote() && !shooter.hasNote())
+            .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels))
+            .onlyIf(() -> intake.hasNote() && !shooterFlywheels.hasNote())
         );
- 
+
         ampScoreButton.onTrue(
-            Commands.print("Scoring in amp")
-            .andThen(intake.shootIntoAmp())
-            .onlyIf(intake::hasNote)
+            Commands.print("Shooting in amp")
+            .andThen(shooterArm.setToAmpPosition(true))
+            .andThen(shooterFlywheels.shootIntoAmp())
+            .andThen(shooterArm.setToUpPosition(false))
+            .onlyIf(shooterFlywheels::hasNote)
         );
 
         /* Reset Buttons */
@@ -255,34 +263,45 @@ public class RobotContainer {
             Commands.print("Overriding auto aim or reseting intake and shooter")
             .andThen(intake.setToPassthroughPosition(false))
             .andThen(intake.disableRollers())
-            .andThen(shooter.setToUpPosition(false))
+            .andThen(shooterArm.setToUpPosition(false))
+            .andThen(shooterFlywheels.disableFlywheels())
         );
 
         resetButton.onTrue(
             Commands.print("Reseting shooter and intake commands")
             .andThen(intake.resetCommand())
-            .andThen(shooter.resetCommand())
+            .andThen(shooterArm.resetCommand())
+            .andThen(shooterFlywheels.resetCommand())
         );
 
         /* Teleop Triggers */
         autoAimSpeaker.whileTrue(
-            new LockToVisionTargetWhileMoving(swerve, limelight, 
+            new AimAtSpeakerWhileMoving(swerve, limelight, 
                 () -> -driveController.getLeftY(), 
                 () -> -driveController.getLeftX(),
                 driveController::getRightX)
         );
 
-        autoAimSpeaker.and(() -> shooter.getCurrentCommand() == null).whileTrue(
-            shooter.spinUpFlywheels(95.0)//TODO do velocity lookup table if needed
-            .andThen(shooter.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, false)
-                .repeatedly())
+        autoAimSpeaker.and(() -> shooterFlywheels.getCurrentCommand() == null).onTrue(
+            shooterFlywheels.spinUpFlywheels(95.0)
+        );
+
+        autoAimSpeaker.and(() -> shooterArm.getCurrentCommand() == null).onTrue(
+            shooterArm.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, () -> swerve.getSpeeds().vxMetersPerSecond, false)
+                .repeatedly()
+                    .until(() -> !autoAimSpeaker.getAsBoolean())
         );
     }
 
     private Command setAndDisableRumble() {
-        return new InstantCommand(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 1.0))
+        return new InstantCommand(() -> setRumble(1.0))
         .andThen(Commands.waitSeconds(0.5))
-        .finallyDo(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 0.0));
+        .finallyDo(() -> setRumble(0.0));
+    }
+
+    private void setRumble(double power) {
+        driveController.getHID().setRumble(RumbleType.kBothRumble, power);
+        mechanismController.getHID().setRumble(RumbleType.kBothRumble, power);
     }
 
     /* Only return the auto command here */

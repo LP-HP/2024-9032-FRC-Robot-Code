@@ -8,34 +8,30 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import static frc.robot.Constants.TeleopConstants.*;
 import static frc.robot.Constants.ClosedLoopConstants.*;
 
-public class LockToVisionTargetWhileMoving extends Command {    
+public class AimAtSpeakerWhileMoving extends Command {    
     private final Swerve swerve;    
     private final LimelightVision limelight;
 
-    private DoubleSupplier translationSup;
-    private DoubleSupplier strafeSup;
-    private DoubleSupplier rotationSup;
-
-    private final SlewRateLimiter accelerationLimiterTranslation = new SlewRateLimiter(accelerationLimit);
-    private final SlewRateLimiter accelerationLimiterStrafe = new SlewRateLimiter(accelerationLimit);
+    private final DoubleSupplier translationSup;
+    private final DoubleSupplier strafeSup;
+    private final DoubleSupplier rotationSup;
 
     private final PIDController swerveRotController;
 
-    public LockToVisionTargetWhileMoving(Swerve swerve, LimelightVision limelight, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {
+    public AimAtSpeakerWhileMoving(Swerve swerve, LimelightVision limelight, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {
         this.swerve = swerve;
         this.limelight = limelight;
         this.translationSup = translationSup;
         this.strafeSup = strafeSup;
         this.rotationSup = rotationSup;
 
-        swerveRotController = new PIDController(kPRotationTargetWhileMoving, 0.0, kDRotationTargetWhileMoving);
+        swerveRotController = new PIDController(kPSpeakerRotation, 0.0, kDSpeakerRotation);
         swerveRotController.setSetpoint(0.0);
 
         addRequirements(swerve, limelight);
@@ -53,24 +49,26 @@ public class LockToVisionTargetWhileMoving extends Command {
         strafeVal = applyInputCurve(strafeVal);
         rotationVal = applyInputCurve(rotationVal);
 
-        /* Multiply by conversion factor to get the joystick value in m/s and apply acceleration limits */
+        /* Multiply by conversion factor to get the joystick value in m/s */
         translationVal *= joystickToSpeedConversionFactor;
-        translationVal = accelerationLimiterTranslation.calculate(translationVal);
-
         strafeVal *= joystickToSpeedConversionFactor;
-        strafeVal = accelerationLimiterStrafe.calculate(strafeVal);
-
         rotationVal *= joystickToAngularVelocityConversionFactor;
 
-        /* Override rotation to tag x-offset */
+        /* Override rotation to velocity compensated tag x-offset using PID */
         AprilTagTarget aprilTag = limelight.getAprilTagTarget();
-        if(aprilTag.isValid) 
+        if(aprilTag.isValidSpeakerTag()) {
+            /* Aim slightly further than the tag based on current strafe velocity*/
+            double targetOffset = swerve.getSpeeds().vyMetersPerSecond * xOffsetVelocityCompAmt;
+
+            swerveRotController.setSetpoint(targetOffset);
+
             rotationVal = swerveRotController.calculate(aprilTag.xOffset);
+        }
 
         else {
             swerveRotController.reset();
 
-            System.err.println("Missed target while locking on!");
+            System.err.println("Speaker tag tracking lost while locking on!");
         }
 
         /* Run the open loop drive using speed values  */

@@ -32,8 +32,6 @@ public final class Constants {
         public static final double joystickToSpeedConversionFactor = SwerveConstants.maxSpeed;
         /* Radians per Second */
         public static final double joystickToAngularVelocityConversionFactor = 2 * Math.PI;
-        /* Meters per Second Squared */
-        public static final double accelerationLimit = 49.0;
     }
 
     public static final class LimelightConstants {
@@ -48,7 +46,7 @@ public final class Constants {
         public static final double mountingAngle = Units.degreesToRadians(30.0);
 
         /* Cutoff for target validity */
-        public static final double distanceCutoff = 5.0;
+        public static final double distanceCutoff = 4.27;
     }
 
     public static final class PhotonvisionConstants {
@@ -87,7 +85,6 @@ public final class Constants {
         public static final double armPositionStarting = 229.0;
         public static final double armPositionGround = 26.5;
         public static final double armPositionPassthrough = 227.0;
-        public static final double armPositionAmp = 150.0;
         public static final double armPositionEject = 100.0;
 
         /* Intake Flywheel */
@@ -103,10 +100,9 @@ public final class Constants {
             1.0
         );
         public static final double shotWaitTime = 0.25;
-        public static final double ampWaitTime = 1.0;
         /* Flyhweel Powers */
-        public static final double intakePower = -0.6;
-        public static final double outtakeAmpPower = 0.5;
+        public static final double intakePower = -1.0;
+        public static final double ejectPower = 0.5;
         public static final double transferToShooterPower = 0.4;
 
         /* Sensors */
@@ -158,6 +154,8 @@ public final class Constants {
         public static final double armPositionPassthrough = 133.0;
         public static final double armPositionUnderStage = 120.0;
         public static final double armPositionUp = 160.0;
+        public static final double armPositionAmp = 142.0;
+        /* Auto Arm Aiming */
         /* Key - Distance : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap distanceToArmPosTable = new InterpolatingDoubleTreeMap();
         static {
@@ -177,6 +175,7 @@ public final class Constants {
             distanceToArmPosTable.put(3.972, 127.5);
             distanceToArmPosTable.put(4.27, 127.0);
         }
+        public static final double distanceVelocityCompAmt = 0.0;//TODO test
 
         /* Shooter Flywheels */
         public static final double flywheelVelocityTolerance = 1.0;
@@ -193,9 +192,11 @@ public final class Constants {
         public static final int rightFlywheelMotorID = 18;
         public static final InvertedValue rightFlywheelInvert = InvertedValue.CounterClockwise_Positive;
 
-        public static final double shotWaitTime = 0.5;
+        public static final double speakerShotWaitTime = 0.5;
+        public static final double ampShotWaitTime = 1.0;
         public static final double minFlywheelSetpoint = 0.0;
         public static final double maxFlywheelSetpoint = 100.0;
+        public static final double flywheelAmpSetpoint = 15.0;
 
         /* Storage Motor */
         public static final SparkMaxConstants shooterStorageConstants = new SparkMaxConstants(
@@ -211,6 +212,7 @@ public final class Constants {
         );
         public static final double storageMotorPowerReceiving = 0.2;
         public static final double storageMotorPowerToFlywheels = 0.75;
+        public static final double storageMotorPowerToAmp = 0.3;
 
         /* Sensors */
         public static final int beamBreakPort = 2;
@@ -458,24 +460,23 @@ public final class Constants {
             0.0
         ); 
 
-        /* PID Constants for rotation and movement to a vision target while moving */
-        public static final double kPRotationTargetWhileMoving = 0.14;
-        public static final double kDRotationTargetWhileMoving = 0.01;
+        /* Constants for aiming at the speaker while moving */
+        public static final double kPSpeakerRotation = 0.14;
+        public static final double kDSpeakerRotation = 0.01;
 
-        /* For alignment without moving */
-        public static final double kPTranslationTarget = 2.4;        
+        public static final double xOffsetVelocityCompAmt = 0.0;//TODO test
+
+        /* Constants for note alignment */        
+        public static final double kPNoteRotation = 0.12;
+        public static final double kDNoteRotation = 0.01;
         
-        public static final double kPRotationTarget = 0.12;
-        public static final double kDRotationTarget = 0.01;
-        
-        /* Setpoint tolerances */
-        public static final double rotationSetpointTolerance = 1.0;
-        public static final double translationSetpointTolerance = 0.5;
+        public static final double noteDrivingSpeed = 3.0;
     }
 
     public static final class AutoConstants { 
         /* Seconds */
         public static final double notePickupTimeout = 10.0;
+
         public static final double shootVelocity = 95.0;
     }
 }
