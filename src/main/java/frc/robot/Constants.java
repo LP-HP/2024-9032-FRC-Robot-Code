@@ -471,6 +471,7 @@ public final class Constants {
         public static final double kDNoteRotation = 0.01;
         
         public static final double noteDrivingSpeed = 3.0;
+        public static final int cycleAmtSinceTargetSeenCutoff = 3;
     }
 
     public static final class AutoConstants { 

@@ -14,6 +14,9 @@ public class DriveToNote extends Command {
 
     private final PIDController swerveRotController;
 
+    private double lastXOffset;
+    private int cycleAmtSinceTargetSeen;
+
     public DriveToNote(Swerve swerve, Photonvision photonvision) {
         this.swerve = swerve;       
         this.photonvision = photonvision;
@@ -26,15 +29,23 @@ public class DriveToNote extends Command {
 
     @Override
     public void execute() {
+        /* Find targets - if there is no target, use the last one seen if it has not expired */
         if(photonvision.hasTargets()) {
+            lastXOffset = photonvision.getLatestXOffset();
+            cycleAmtSinceTargetSeen = 0;
+        }
+
+        else
+            cycleAmtSinceTargetSeen++;
+
+        if(cycleAmtSinceTargetSeen < cycleAmtSinceTargetSeenCutoff) {
             swerve.driveOpenLoop(
                 new Translation2d(noteDrivingSpeed, 0.0),
-                swerveRotController.calculate(photonvision.getLatestXOffset()), false);
+                swerveRotController.calculate(lastXOffset), false);
         }
 
         else {
-            swerveRotController.reset();
-            swerve.driveOpenLoop(new Translation2d(), 0.0, false);
+            reset();
 
             System.err.println("Note tracking lost while driving!");
         }
@@ -42,7 +53,12 @@ public class DriveToNote extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        swerve.driveOpenLoop(new Translation2d(), 0.0, false);
+        reset();
+    }
+
+    private void reset() {
         swerveRotController.reset();
+        swerve.driveOpenLoop(new Translation2d(), 0.0, false);
+        cycleAmtSinceTargetSeen = 0;
     }
 }
