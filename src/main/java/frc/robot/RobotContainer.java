@@ -39,7 +39,6 @@ public class RobotContainer {
     /* Mechanism Controller Buttons */
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
     private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
-    private final Trigger ampAlignButton = mechanismController.y().debounce(0.025);
     private final Trigger ampScoreButton = mechanismController.rightBumper().debounce(0.025);
     private final Trigger driveToNoteButton = mechanismController.rightTrigger(0.25).debounce(0.025)
         .and(overrideAutoAim.negate());
@@ -145,7 +144,7 @@ public class RobotContainer {
         shooterArm.reset();
         shooterFlywheels.reset();
         intake.reset();
-        driveController.getHID().setRumble(RumbleType.kBothRumble, 0);
+        setRumble(0.0);
     }
 
     private void registerPathplannerCommands() {
@@ -212,9 +211,10 @@ public class RobotContainer {
         /* Mechanism Controls */
         shootButton.and(autoAimSpeaker).onTrue(
             Commands.print("Shooting")
-            .andThen(shooterFlywheels.shoot(95.0, true))//TODO do velocity lookup table if needed
-                .asProxy()
-            .andThen(shooterArm.setToUpPosition(false))
+            .andThen(shooterFlywheels.shoot(95.0, true)
+                .asProxy())//TODO do velocity lookup table if needed
+            .andThen(shooterArm.setToUpPosition(false)
+                .asProxy())
         );
 
         enableIntakeButton.onTrue(
@@ -244,18 +244,12 @@ public class RobotContainer {
             .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels))
             .onlyIf(() -> intake.hasNote() && !shooterFlywheels.hasNote())
         );
- 
-        ampAlignButton.onTrue(
-            Commands.print("Aligning with amp")
-            .andThen(shooterArm.setToAmpPosition(false))
-            .andThen(shooterFlywheels.spinUpFlywheels(Constants.ShooterConstants.flywheelAmpSetpoint))
-            .onlyIf(shooterFlywheels::hasNote)
-        );
 
         ampScoreButton.onTrue(
             Commands.print("Shooting in amp")
             .andThen(shooterArm.setToAmpPosition(true))
             .andThen(shooterFlywheels.shootIntoAmp())
+            .andThen(shooterArm.setToUpPosition(false))
             .onlyIf(shooterFlywheels::hasNote)
         );
 
@@ -288,18 +282,26 @@ public class RobotContainer {
                 driveController::getRightX)
         );
 
-        autoAimSpeaker.and(() -> shooterArm.getCurrentCommand() == null).onTrue(
+        autoAimSpeaker.and(() -> shooterFlywheels.getCurrentCommand() == null).onTrue(
             shooterFlywheels.spinUpFlywheels(95.0)
-            .andThen(shooterArm.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, () -> swerve.getSpeeds().vxMetersPerSecond, false)
+        );
+
+        autoAimSpeaker.and(() -> shooterArm.getCurrentCommand() == null).onTrue(
+            shooterArm.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, () -> swerve.getSpeeds().vxMetersPerSecond, false)
                 .repeatedly()
-                    .until(() -> !autoAimSpeaker.getAsBoolean()))
+                    .until(() -> !autoAimSpeaker.getAsBoolean())
         );
     }
 
     private Command setAndDisableRumble() {
-        return new InstantCommand(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 1.0))
+        return new InstantCommand(() -> setRumble(1.0))
         .andThen(Commands.waitSeconds(0.5))
-        .finallyDo(() -> driveController.getHID().setRumble(RumbleType.kBothRumble, 0.0));
+        .finallyDo(() -> setRumble(0.0));
+    }
+
+    private void setRumble(double power) {
+        driveController.getHID().setRumble(RumbleType.kBothRumble, power);
+        mechanismController.getHID().setRumble(RumbleType.kBothRumble, power);
     }
 
     /* Only return the auto command here */

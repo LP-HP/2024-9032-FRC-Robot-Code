@@ -175,7 +175,7 @@ public final class Constants {
             distanceToArmPosTable.put(3.972, 127.5);
             distanceToArmPosTable.put(4.27, 127.0);
         }
-        public static final double distanceVelocityCompAmt = 1.0;//TODO test
+        public static final double distanceVelocityCompAmt = 0.0;//TODO test
 
         /* Shooter Flywheels */
         public static final double flywheelVelocityTolerance = 1.0;
@@ -461,10 +461,10 @@ public final class Constants {
         ); 
 
         /* Constants for aiming at the speaker while moving */
-        public static final double kPSpeakerRotation = 0.16;
+        public static final double kPSpeakerRotation = 0.14;
         public static final double kDSpeakerRotation = 0.01;
 
-        public static final double xOffsetVelocityCompAmt = 10.0;//TODO test
+        public static final double xOffsetVelocityCompAmt = 0.0;//TODO test
 
         /* Constants for note alignment */        
         public static final double kPNoteRotation = 0.12;
