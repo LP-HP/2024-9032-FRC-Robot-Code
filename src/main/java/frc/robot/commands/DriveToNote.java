@@ -16,6 +16,7 @@ public class DriveToNote extends Command {
 
     private double lastXOffset;
     private int cycleAmtSinceTargetSeen;
+    private boolean hadTarget = false;
 
     public DriveToNote(Swerve swerve, Photonvision photonvision) {
         this.swerve = swerve;       
@@ -33,12 +34,13 @@ public class DriveToNote extends Command {
         if(photonvision.hasTargets()) {
             lastXOffset = photonvision.getLatestXOffset();
             cycleAmtSinceTargetSeen = 0;
+            hadTarget = true;
         }
 
-        else
+        else if(hadTarget)
             cycleAmtSinceTargetSeen++;
 
-        if(cycleAmtSinceTargetSeen < cycleAmtSinceTargetSeenCutoff) {
+        if(cycleAmtSinceTargetSeen < cycleAmtSinceTargetSeenCutoff && hadTarget) {
             swerve.driveOpenLoop(
                 new Translation2d(noteDrivingSpeed, 0.0),
                 swerveRotController.calculate(lastXOffset), false);
@@ -60,5 +62,6 @@ public class DriveToNote extends Command {
         swerveRotController.reset();
         swerve.driveOpenLoop(new Translation2d(), 0.0, false);
         cycleAmtSinceTargetSeen = 0;
+        hadTarget = false;
     }
 }
