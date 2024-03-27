@@ -188,7 +188,7 @@ public class RobotContainer {
          * 
          * Current mechanism controls:
          * right bumper [must have a note in the shooter] -> score in amp
-         * right trigger [must have a note target] -> drive to note
+         * right trigger (cancelable) [must have a note target] -> drive to note
          * left trigger -> eject note
          * b -> [must not have a note] set intake to ground position and enable intake - when a note is gained, then move the intake to storage
          * a [must have a note in the intake] -> run store note sequence

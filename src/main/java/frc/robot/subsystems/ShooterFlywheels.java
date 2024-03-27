@@ -162,7 +162,8 @@ public class ShooterFlywheels extends SubsystemBase {
            .andThen(enableStorageMotorToFlywheels())
            .andThen(Commands.waitSeconds(speakerShotWaitTime))
            .andThen(disableFlywheels ? disableFlywheels() : Commands.none())
-           .andThen(disableStorageMotor());
+           .andThen(disableStorageMotor())
+           .withName("Shoot");
     }
 
     public Command shootIntoAmp() {
@@ -170,7 +171,8 @@ public class ShooterFlywheels extends SubsystemBase {
             .andThen(enableStorageMotorToAmp())
             .andThen(Commands.waitSeconds(ampShotWaitTime))
             .andThen(disableStorageMotor())
-            .andThen(disableFlywheels());
+            .andThen(disableFlywheels())
+            .withName("Amp score");
     }
 
     public boolean hasNote() {
