@@ -14,7 +14,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "aa1"
+            "pathName": "shootaa1"
           }
         },
         {
@@ -32,7 +32,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "aa1.5"
+            "pathName": "shootaa2"
           }
         },
         {
@@ -44,7 +44,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "aa2"
+            "pathName": "noteaa3"
           }
         },
         {
@@ -56,7 +56,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "aa3"
+            "pathName": "shootaa3"
           }
         },
         {
@@ -68,7 +68,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "aa4"
+            "pathName": "noteaa4"
           }
         },
         {
@@ -80,7 +80,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "aa4.5"
+            "pathName": "shootaa4"
           }
         },
         {
