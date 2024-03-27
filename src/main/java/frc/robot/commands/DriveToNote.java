@@ -33,6 +33,7 @@ public class DriveToNote extends Command {
         /* Find targets - if there is no target, use the last one seen if it has not expired */
         if(photonvision.hasTargets()) {
             lastXOffset = photonvision.getLatestXOffset();
+
             cycleAmtSinceTargetSeen = 0;
             hadTarget = true;
         }
@@ -43,7 +44,9 @@ public class DriveToNote extends Command {
         if(cycleAmtSinceTargetSeen < cycleAmtSinceTargetSeenCutoff && hadTarget) {
             swerve.driveOpenLoop(
                 new Translation2d(noteDrivingSpeed, 0.0),
-                swerveRotController.calculate(lastXOffset), false);
+                swerveRotController.calculate(lastXOffset), 
+                false
+            );
         }
 
         else {
@@ -61,6 +64,7 @@ public class DriveToNote extends Command {
     private void reset() {
         swerveRotController.reset();
         swerve.driveOpenLoop(new Translation2d(), 0.0, false);
+        
         cycleAmtSinceTargetSeen = 0;
         hadTarget = false;
     }

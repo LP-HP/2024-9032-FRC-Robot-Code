@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.limelightutil.LimelightHelpers;
+import frc.lib.limelightutil.LimelightHelpers.LimelightTarget_Fiducial;
 import frc.lib.limelightutil.LimelightHelpers.PoseEstimate;
 
 import static frc.robot.Constants.LimelightConstants.*;
@@ -58,10 +59,13 @@ public class LimelightVision extends SubsystemBase {
         boolean isValid = LimelightHelpers.getTV(limelightName);
 
         if(isValid) {
-            currentTarget.xOffset = LimelightHelpers.getTX(limelightName);
-            currentTarget.yOffset = LimelightHelpers.getTY(limelightName);
-            currentTarget.area = LimelightHelpers.getTA(limelightName);
-            currentTarget.id = LimelightHelpers.getFiducialID(limelightName);
+            LimelightTarget_Fiducial tag = LimelightHelpers.getLatestResults(limelightName).targetingResults.targets_Fiducials[0];
+
+            currentTarget.xOffset = tag.tx;
+            currentTarget.yOffset = tag.ty;
+            currentTarget.area = tag.ta;
+            currentTarget.id = tag.fiducialID;
+            currentTarget.skew = tag.ts;
 
             currentTarget.distance = getDistanceFromYOffset(currentTarget.yOffset);
 
@@ -125,6 +129,7 @@ public class LimelightVision extends SubsystemBase {
         public double area = 0.0;
         public boolean isValid = false;
         public double distance = 0.0;
+        public double skew = 0.0;
 
         public AprilTagTarget() {
             SendableRegistry.add(this, "April Tag Target");
@@ -138,6 +143,10 @@ public class LimelightVision extends SubsystemBase {
             return isValid && (id == 6 || id == 5);
         }
 
+        public boolean isValidStageTag() {
+            return isValid && (id == 2 || id == 3 || id == 4 || id == 7 || id == 8 || id == 9);//TODO put in real ids in pipeline and here
+        }
+
         @Override
         public void initSendable(SendableBuilder builder) {
             builder.addDoubleProperty("X Offset", () -> xOffset, null);
@@ -146,6 +155,7 @@ public class LimelightVision extends SubsystemBase {
             builder.addDoubleProperty("Area", () -> area, null);
             builder.addBooleanProperty("Is Valid", () -> isValid, null);
             builder.addDoubleProperty("Distance", () -> distance, null);
+            builder.addDoubleProperty("Skew", () -> skew, null);
         }
     }
 

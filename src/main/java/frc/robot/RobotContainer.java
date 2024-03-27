@@ -35,6 +35,7 @@ public class RobotContainer {
     private final Trigger underStageButton = driveController.rightBumper().debounce(0.025);
     private final Trigger overrideAutoAim = driveController.leftBumper().debounce(0.025);
     private final Trigger shootButton = driveController.b().debounce(0.025);
+    private final Trigger stageAlignButton = driveController.y().debounce(0.025);
 
     /* Mechanism Controller Buttons */
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
@@ -251,6 +252,10 @@ public class RobotContainer {
             .andThen(shooterFlywheels.shootIntoAmp())
             .andThen(shooterArm.setToUpPosition(false))
             .onlyIf(shooterFlywheels::hasNote)
+        );
+
+        stageAlignButton.whileTrue(
+            new DriveToStage(swerve, limelight)
         );
 
         /* Reset Buttons */
