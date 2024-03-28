@@ -16,7 +16,6 @@ public class StoreNoteSequence extends SequentialCommandGroup {
             shooterFlywheels.receiveNoteFromIntake(),
             /* Make sure to put them back in the storage position and disable when the note arrives in the shooter */
             intake.disableRollers(),
-            intake.setToPassthroughPosition(false),
             shooterArm.setToUpPosition(false),
             /* Spin up flywheels for faster shooting */
             shooterFlywheels.spinUpFlywheels(95.0)//TODO do velocity lookup table if needed

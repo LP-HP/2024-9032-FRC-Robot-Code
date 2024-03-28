@@ -144,7 +144,8 @@ public class LimelightVision extends SubsystemBase {
         }
 
         public boolean isValidStageTag() {
-            return isValid && (id == 2 || id == 3 || id == 4 || id == 7 || id == 8 || id == 9);//TODO put in real ids in pipeline and here
+            /* IDs 11-16 are stage tags */
+            return isValid && id >= 11 && id <= 16;//TODO put in ids in pipeline
         }
 
         @Override
