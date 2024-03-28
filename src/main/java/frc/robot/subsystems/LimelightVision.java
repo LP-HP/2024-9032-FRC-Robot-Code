@@ -21,8 +21,6 @@ public class LimelightVision extends SubsystemBase {
     private PoseEstimate currentPose = new PoseEstimate(new Pose2d(), 0, 0, 0, 0, 0, 0);
     private AprilTagTarget currentTarget = new AprilTagTarget();
     
-    private boolean isLocalizationPipeline = startInLocalization;//Whether we are localizing or tracking a target
-
     private final ShuffleboardTab limelightTab = Shuffleboard.getTab("Limelight");
 
     public LimelightVision() {
@@ -46,7 +44,7 @@ public class LimelightVision extends SubsystemBase {
         targetLayout.addDouble("Distance", () -> currentTarget.distance);
         targetLayout.addDouble("Skew", () -> currentTarget.skew);
 
-        limelightTab.addBoolean("Localization Pipeline", () -> isLocalizationPipeline)
+        limelightTab.addBoolean("Localization Pipeline", this::isLocalizationPipeline)
             .withPosition(8, 3).withSize(2, 1);
 
         /* Add Pipeline Buttons */
@@ -54,6 +52,12 @@ public class LimelightVision extends SubsystemBase {
             .withPosition(0, 4).withSize(2, 1);
         limelightTab.add("To Target", runOnce(this::switchToTargetPipeline))
             .withPosition(2, 4).withSize(2, 1);
+
+        if(startInLocalization)
+            switchToLocalizationPipeline();
+        
+        else
+            switchToTargetPipeline();
     }
 
     public void addCameraToTab(ShuffleboardTab tab, int col, int row, int size) {
@@ -67,7 +71,7 @@ public class LimelightVision extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if(isLocalizationPipeline) 
+        if(isLocalizationPipeline()) 
             currentPose = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
 
         boolean isValid = LimelightHelpers.getTV(limelightName);
@@ -96,8 +100,6 @@ public class LimelightVision extends SubsystemBase {
 
     public void switchToTargetPipeline() {
         LimelightHelpers.setPipelineIndex(limelightName, targetPipelineID);
-
-        isLocalizationPipeline = false;
     }
 
     public void switchToLocalizationPipeline() {
@@ -109,17 +111,19 @@ public class LimelightVision extends SubsystemBase {
             
         else
             LimelightHelpers.setPriorityTagID(limelightName, 7);
-
-        isLocalizationPipeline = true;
     }
 
     public boolean isTargetPipeline() {
-        return !isLocalizationPipeline;
+        return LimelightHelpers.getCurrentPipelineIndex(limelightName) == targetPipelineID;
+    }
+
+    public boolean isLocalizationPipeline() {
+        return LimelightHelpers.getCurrentPipelineIndex(limelightName) == localizationPipelineID;
     }
 
     public Optional<PoseEstimate> getPoseEstimate() {
         /* Do not return an estimate if we are in the wrong pipeline or the estimate is invalid */
-        if(isLocalizationPipeline 
+        if(isLocalizationPipeline() 
             && currentPose != null 
             && currentPose.tagCount != 0 
             && !(currentPose.pose.getX() == 0.0 && currentPose.pose.getY() == 0.0)
