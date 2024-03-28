@@ -88,6 +88,30 @@
           "data": {
             "name": "ShootAA"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "noteaa5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeAA"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shootaa5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootAA"
+          }
         }
       ]
     }
