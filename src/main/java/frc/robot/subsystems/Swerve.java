@@ -19,7 +19,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -69,6 +68,10 @@ public class Swerve extends SubsystemBase {
         resetModulesToAbsolute();//Set integrated encoders to the absolute positions using cancoders
 
         swerveOdometry = new SwerveDrivePoseEstimator(swerveKinematics, getGyroYaw(), getModulePositions(), new Pose2d());
+        /* Set heading deviation high to only use gyro for heading */
+        swerveOdometry.setVisionMeasurementStdDevs(
+            VecBuilder.fill(0.5, 0.5, 999999999)
+        );
 
         /* Sets up pathplanner for auto path following */
         AutoBuilder.configureHolonomic(
@@ -232,25 +235,17 @@ public class Swerve extends SubsystemBase {
     }
 
     private void updateVisionLocalization(PoseEstimate poseEstimate) {
-        double poseDifference = swerveOdometry.getEstimatedPosition().getTranslation().getDistance(poseEstimate.pose.getTranslation());
+        /* Multiple targets detected means a lower standard deviation */
+        if(poseEstimate.tagCount >= 2) {
+            double poseDifference = getPose().getTranslation().getDistance(poseEstimate.pose.getTranslation());
 
-        double xyStandardDeviation;
-        double headingStandardDeviation;
-        /* Multiple targets detected means a lower standard deviation - set heading deviation high to only use gyro for heading */
-        if (poseEstimate.tagCount >= 2 && poseDifference < 1.0) {
-            xyStandardDeviation = 0.5;
-            headingStandardDeviation = 999999999;
-        }
-        else {
-            System.err.println("Discarded pose estimate | tag amt " + poseEstimate.tagCount + " | pose " + poseEstimate.pose);
+            /* Discard any measurements that are too far from previous measurements */
+            if(poseDifference < 1.0) 
+                swerveOdometry.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
 
-            return;
-        }        
-
-        swerveOdometry.setVisionMeasurementStdDevs(
-            VecBuilder.fill(xyStandardDeviation, xyStandardDeviation, Units.degreesToRadians(headingStandardDeviation))
-        );
-        swerveOdometry.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
+            else 
+                System.err.println("Discarded pose estimate | pose " + poseEstimate.pose + " | dif. " + poseDifference);
+        }     
     }
 
     @Override
