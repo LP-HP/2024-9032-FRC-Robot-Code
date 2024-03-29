@@ -83,7 +83,7 @@ public class LimelightVision extends SubsystemBase {
             currentTarget.yOffset = tag.ty;
             currentTarget.area = tag.ta;
             currentTarget.id = tag.fiducialID;
-            currentTarget.skew = tag.ts;
+            currentTarget.skew = tag.getTargetPose_CameraSpace().getRotation().getZ();//TODO enable 3d tracking / delete target pipeline
 
             currentTarget.distance = getDistanceFromYOffset(currentTarget.yOffset);
 

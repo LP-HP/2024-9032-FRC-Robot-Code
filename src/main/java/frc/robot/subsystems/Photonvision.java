@@ -47,10 +47,10 @@ public class Photonvision extends SubsystemBase {
 
             /* Calculate distance */
             distance = PhotonUtils.calculateDistanceToTargetMeters(//TODO fix distance readings
-                    cameraHeight,
-                    targetHeight,
-                    mountingAngle,
-                    Units.degreesToRadians(result.getBestTarget().getPitch())
+                cameraHeight,
+                targetHeight,
+                mountingAngle,
+                Units.degreesToRadians(result.getBestTarget().getPitch())
             );
         }
 
