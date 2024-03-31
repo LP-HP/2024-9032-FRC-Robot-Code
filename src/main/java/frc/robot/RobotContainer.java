@@ -87,12 +87,11 @@ public class RobotContainer {
         configureTriggerBindings();
 
         /* Add auto chooser */
-        autoChooser.setDefaultOption("Aiming", swerve.getVisionLocalizationAuto("Auto Aiming", limelight::getPoseEstimate));
+        autoChooser.setDefaultOption("4 Note Middle", swerve.getVisionLocalizationAuto("Auto Aiming", limelight::getPoseEstimate));
         autoChooser.addOption("Swerve Shakedown", AutoBuilder.buildAuto("Swerve Shakedown"));
-        autoChooser.addOption("Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
-        autoChooser.addOption("Wide", swerve.getVisionLocalizationAuto("Start Right", limelight::getPoseEstimate));
-        autoChooser.addOption("Skinny", swerve.getVisionLocalizationAuto("Start Left", limelight::getPoseEstimate));
-        autoChooser.addOption("Aiming", swerve.getVisionLocalizationAuto("Auto Aiming", limelight::getPoseEstimate));
+        // autoChooser.addOption("Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
+        autoChooser.addOption("3 Note Wide", swerve.getVisionLocalizationAuto("Start Right", limelight::getPoseEstimate));
+        autoChooser.addOption("1 Note Amp Side", swerve.getVisionLocalizationAuto("Start Left", limelight::getPoseEstimate));
 
         /* Add debug tab telemetry */
         debugTab.add(
