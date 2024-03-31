@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Photonvision;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Photonvision.NoteTarget;
+import frc.robot.util.VisionTargetCache;
 
 import static frc.robot.Constants.ClosedLoopConstants.*;
 
@@ -16,9 +17,7 @@ public class DriveToNote extends Command {
     private final PIDController swerveRotController;
     private final PIDController swerveDistanceController;
 
-    private double lastXOffset;
-    private int cycleAmtSinceTargetSeen;
-    private boolean hadTarget = false;
+    private final VisionTargetCache<NoteTarget> visionCache;
 
     public DriveToNote(Swerve swerve, Photonvision photonvision) {
         this.swerve = swerve;       
@@ -30,6 +29,8 @@ public class DriveToNote extends Command {
         swerveDistanceController = new PIDController(kPNoteDistance, 0.0, kDNoteDistance);
         swerveDistanceController.setSetpoint(0.0);
 
+        visionCache = new VisionTargetCache<>(cycleAmtSinceTargetSeenCutoff);
+
         addRequirements(swerve, photonvision);
     }
 
@@ -38,22 +39,17 @@ public class DriveToNote extends Command {
         NoteTarget target = photonvision.getNoteTarget();
 
         /* Find targets - if there is no target, use the last one seen if it has not expired */
-        if(target.isValid) {
-            lastXOffset = target.xOffset;
+        if(target.isValid) 
+            visionCache.updateTarget(target);
 
-            cycleAmtSinceTargetSeen = 0;
-            hadTarget = true;
-        }
+        if(visionCache.targetNotExpired()) {
+            target = visionCache.getAndIncrement();
 
-        else if(hadTarget)
-            cycleAmtSinceTargetSeen++;
-
-        if(cycleAmtSinceTargetSeen < cycleAmtSinceTargetSeenCutoff && hadTarget) {
             double noteDrivingSpeed = Math.min(swerveDistanceController.calculate(target.distance), maxNoteDrivingSpeed);
 
             swerve.driveOpenLoop(
                 new Translation2d(noteDrivingSpeed, 0.0),
-                swerveRotController.calculate(lastXOffset), 
+                swerveRotController.calculate(target.xOffset), 
                 false
             );
         }
@@ -73,8 +69,6 @@ public class DriveToNote extends Command {
     private void reset() {
         swerveRotController.reset();
         swerve.driveOpenLoop(new Translation2d(), 0.0, false);
-        
-        cycleAmtSinceTargetSeen = 0;
-        hadTarget = false;
+        visionCache.reset();
     }
 }

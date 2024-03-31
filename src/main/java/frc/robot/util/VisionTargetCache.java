@@ -10,13 +10,13 @@ public class VisionTargetCache<T> {
         this.expireAfterAmount = expireAfterAmount;
     }
 
-    public void addTarget(T target) {
+    public void updateTarget(T target) {
         lastTarget = target;
         cycleAmtSinceLastUpdate = 0;
     }
 
     public boolean targetNotExpired() {
-        return cycleAmtSinceLastUpdate < expireAfterAmount;
+        return cycleAmtSinceLastUpdate < expireAfterAmount && lastTarget != null;
     }
 
     public void reset() {
