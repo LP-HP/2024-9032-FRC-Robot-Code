@@ -296,11 +296,12 @@ public class RobotContainer {
         );
 
         /* Teleop Triggers */
-        autoAimSpeaker.whileTrue(
+        autoAimSpeaker.onTrue(
             new AimAtSpeakerWhileMoving(swerve, limelight, 
                 () -> -driveController.getLeftY(), 
                 () -> -driveController.getLeftX(),
                 driveController::getRightX)
+                    .until(() -> overrideAutoAim.getAsBoolean())
         );
 
         autoAimSpeaker.and(() -> shooterFlywheels.getCurrentCommand() == null).onTrue(

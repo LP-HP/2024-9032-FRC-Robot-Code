@@ -27,6 +27,8 @@ public class AimAtSpeakerWhileMoving extends Command {
 
     private final VisionTargetCache<AprilTagTarget> visionCache;
 
+    private boolean shouldEnd = false;
+
     public AimAtSpeakerWhileMoving(Swerve swerve, LimelightVision limelight, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {
         this.swerve = swerve;
         this.limelight = limelight;
@@ -76,9 +78,9 @@ public class AimAtSpeakerWhileMoving extends Command {
         }
 
         else {
-            reset();
-
             System.err.println("Speaker tag tracking lost while locking on!");
+
+            shouldEnd = true;
         }
 
         /* Run the open loop drive using speed values  */
@@ -90,6 +92,11 @@ public class AimAtSpeakerWhileMoving extends Command {
     }
 
     @Override
+    public boolean isFinished() {
+        return shouldEnd;
+    }
+
+    @Override
     public void end(boolean interrupted) {
         reset();
     }
@@ -97,6 +104,7 @@ public class AimAtSpeakerWhileMoving extends Command {
     private void reset() {
         swerveRotController.reset();
         visionCache.reset();
+        shouldEnd = false;
     }
 
     private double applyInputCurve(double joystickInput) {
