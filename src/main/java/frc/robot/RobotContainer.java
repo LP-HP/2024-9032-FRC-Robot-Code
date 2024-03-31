@@ -270,6 +270,7 @@ public class RobotContainer {
                     .andThen(shooterArm.setToUpPosition(false))
                 )
             )
+            .onlyIf(() -> limelight.getAprilTagTarget().isValidStageTag())
         );
 
         driveToStageButton.onFalse(Commands.print("Released stage driving"));

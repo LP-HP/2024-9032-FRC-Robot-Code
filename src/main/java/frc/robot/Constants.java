@@ -53,9 +53,9 @@ public final class Constants {
         public static final String cameraName = "IntakeCamera";
 
         /* Distance Constants */
-        public static final double targetHeight = Units.inchesToMeters(1);
-        public static final double cameraHeight = Units.inchesToMeters(10.25);
-        public static final double mountingAngle = Units.degreesToRadians(-10); 
+        public static final double targetHeight = Units.inchesToMeters(1.0);
+        public static final double cameraHeight = Units.inchesToMeters(25.0);
+        public static final double mountingAngle = Units.degreesToRadians(-15.0); 
     }
 
     /* Using CANIds 13-14 - 2 motors */
