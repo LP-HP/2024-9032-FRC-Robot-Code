@@ -149,7 +149,7 @@ public class RobotContainer {
         setRumble(0.0);
     }
 
-    private void registerPathplannerCommands() throws InterruptedException {
+    private void registerPathplannerCommands() {
         NamedCommands.registerCommand("ShootAA", 
             shooterArm.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, () -> 0.0, true)
             .andThen(shooterFlywheels.shoot(shootVelocity, false, led))
@@ -171,7 +171,7 @@ public class RobotContainer {
         );
     }
 
-    private void configureTriggerBindings() throws InterruptedException {
+    private void configureTriggerBindings() {
         /* 
          * Current driver controls: 
          * 

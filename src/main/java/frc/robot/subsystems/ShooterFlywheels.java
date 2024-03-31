@@ -157,7 +157,7 @@ public class ShooterFlywheels extends SubsystemBase {
         return setFlywheelVelocity(velocityRPS, false);
     }
 
-    public Command shoot(double velocityRPS, boolean disableFlywheels, LED led) throws InterruptedException {
+    public Command shoot(double velocityRPS, boolean disableFlywheels, LED led) {
         return setFlywheelVelocity(velocityRPS, true)
            .andThen(enableStorageMotorToFlywheels())
            .andThen(led.shootingLEDPattern())
