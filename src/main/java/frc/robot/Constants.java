@@ -107,6 +107,12 @@ public final class Constants {
 
         /* Sensors */
         public static final int beamBreakPort = 0;
+
+        public static final int ultrasonicPingPort = 2;
+        public static final int ultrasonicEchoPort = 3;
+        public static final int medianFilterSize = 5;
+        /* In Inches */
+        public static final double closeToObstacleDistance = 2.5;
     }
 
     /* Using CANIds 15-19 - 5 motors */

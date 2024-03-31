@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,6 +19,11 @@ public class Intake extends SubsystemBase {
     private final ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
 
     private final DigitalInput beamBreak = new DigitalInput(beamBreakPort);
+
+    private final Ultrasonic ultrasonic = new Ultrasonic(ultrasonicPingPort, ultrasonicEchoPort);
+    private final MedianFilter ultrasonicFilter = new MedianFilter(medianFilterSize);
+
+    private double lastUltrasonicDistance;
 
     public Intake() {
         armMotor = new SparkMaxWrapper(intakeArmConstants);
@@ -36,6 +43,10 @@ public class Intake extends SubsystemBase {
             .withPosition(6, 0).withSize(2, 1);
         intakeTab.addBoolean("At Setpoint", this::armAtSetpoint)
             .withPosition(6, 1).withSize(2, 1);
+        intakeTab.addDouble("Ultrasonic Distance", this::getUltrasonicDistance)
+            .withPosition(6, 2).withSize(2, 1);
+        intakeTab.addBoolean("Close to Obstacle", this::closeToObstable)
+            .withPosition(6, 3).withSize(2, 1);
         intakeTab.add(this)
             .withPosition(0, 4).withSize(2, 1);
 
@@ -50,6 +61,8 @@ public class Intake extends SubsystemBase {
             .withPosition(5, 3).withSize(1, 1);
         intakeTab.add(resetCommand())
             .withPosition(6, 3).withSize(1, 1);
+
+        Ultrasonic.setAutomaticMode(true);
     }
 
     /* Sets the target and if blocking, waits until the setpoint is achieved */
@@ -112,6 +125,14 @@ public class Intake extends SubsystemBase {
         return !beamBreak.get();
     }
 
+    private double getUltrasonicDistance() {
+        return lastUltrasonicDistance;
+    }
+
+    public boolean closeToObstable() {
+        return getUltrasonicDistance() < closeToObstacleDistance;
+    }
+
     public void reset() {
         if(this.getCurrentCommand() != null) 
             this.getCurrentCommand().cancel();
@@ -122,5 +143,10 @@ public class Intake extends SubsystemBase {
 
     public Command resetCommand() {
         return runOnce(this::reset).withName("Reset");
+    }
+
+    @Override
+    public void periodic() {
+        lastUltrasonicDistance = ultrasonicFilter.calculate(ultrasonic.getRangeInches());
     }
 }

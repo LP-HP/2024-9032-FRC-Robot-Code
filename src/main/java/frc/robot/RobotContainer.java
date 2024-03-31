@@ -36,7 +36,8 @@ public class RobotContainer {
     private final Trigger underStageButton = driveController.rightBumper().debounce(0.025);
     private final Trigger overrideAutoAim = driveController.leftBumper().debounce(0.025);
     private final Trigger shootButton = driveController.b().debounce(0.025);
-    private final Trigger driveToStageButton = driveController.y().debounce(0.025);
+    private final Trigger driveToStageButton = driveController.y().debounce(0.025)
+        .and(overrideAutoAim.negate());
 
     /* Mechanism Controller Buttons */
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
