@@ -75,9 +75,9 @@ public class SwerveModule {
          * See: https://github.com/wpilibsuite/allwpilib/pull/5758
          */
         double cosineScalar = desiredState.angle.minus(currentState.angle).getCos();
-        if(cosineScalar < 0.0) {
-            System.err.println("Negative cosine scalar!");
-        }
+        /* Prevent scaling speed too low */
+        cosineScalar = Math.max(cosineScalar, 0.1);
+
         desiredState.speedMetersPerSecond *= cosineScalar;
 
         setAngle(desiredState);
