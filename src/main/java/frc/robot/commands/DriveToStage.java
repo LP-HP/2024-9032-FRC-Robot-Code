@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.LimelightVision;
 import frc.robot.subsystems.Swerve;
+import frc.robot.util.VisionTargetCache;
 import frc.robot.subsystems.LimelightVision.AprilTagTarget;
 
 import static frc.robot.Constants.ClosedLoopConstants.*;
@@ -16,6 +17,8 @@ public class DriveToStage extends Command {
     private final PIDController swerveRotController;
     private final PIDController swerveDistanceController;
     private final PIDController swerveYController;
+
+    private final VisionTargetCache<AprilTagTarget> visionCache;
 
     public DriveToStage(Swerve swerve, LimelightVision limelight) {
         this.swerve = swerve;
@@ -33,6 +36,8 @@ public class DriveToStage extends Command {
         swerveYController.setSetpoint(0.0);
         swerveYController.setTolerance(stageYTolerance);
 
+        visionCache = new VisionTargetCache<>(cycleAmtSinceAprilTagSeenCutoff);
+
         addRequirements(swerve, limelight);
     }
 
@@ -41,6 +46,12 @@ public class DriveToStage extends Command {
         AprilTagTarget target = limelight.getAprilTagTarget();
 
         if(target.isValidStageTag()) {
+            visionCache.updateTarget(target);
+        }
+
+        if(visionCache.targetNotExpired()) {
+            target = visionCache.getAndIncrement();
+
             swerve.driveOpenLoop(
                 new Translation2d(swerveDistanceController.calculate(target.distance), swerveYController.calculate(target.xOffset)),
                 swerveRotController.calculate(target.skew), 
@@ -71,5 +82,7 @@ public class DriveToStage extends Command {
         swerveYController.reset();
 
         swerve.driveOpenLoop(new Translation2d(), 0.0, false);
+
+        visionCache.reset();
     }
 }

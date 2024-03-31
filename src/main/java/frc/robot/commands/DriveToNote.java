@@ -29,7 +29,7 @@ public class DriveToNote extends Command {
         swerveDistanceController = new PIDController(kPNoteDistance, 0.0, kDNoteDistance);
         swerveDistanceController.setSetpoint(0.0);
 
-        visionCache = new VisionTargetCache<>(cycleAmtSinceTargetSeenCutoff);
+        visionCache = new VisionTargetCache<>(cycleAmtSinceNoteSeenCutoff);
 
         addRequirements(swerve, photonvision);
     }

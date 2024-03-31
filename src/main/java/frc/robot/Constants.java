@@ -474,7 +474,7 @@ public final class Constants {
         public static final double kDNoteDistance = 0.01;
         
         public static final double maxNoteDrivingSpeed = 3.0;
-        public static final int cycleAmtSinceTargetSeenCutoff = 3;
+        public static final int cycleAmtSinceNoteSeenCutoff = 3;
 
         /* Constants for stage alignment */
         public static final double kPStageRotation = 0.12;//TODO test
@@ -491,6 +491,9 @@ public final class Constants {
         public static final double stageYTolerance = 1.0;
 
         public static final double shooterUpDistance = 2.5;
+
+        /* April Tag Constants */
+        public static final int cycleAmtSinceAprilTagSeenCutoff = 3;
     }
 
     public static final class AutoConstants { 

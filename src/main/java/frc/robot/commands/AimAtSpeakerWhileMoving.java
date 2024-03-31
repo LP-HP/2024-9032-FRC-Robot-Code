@@ -3,6 +3,7 @@ package frc.robot.commands;
 import frc.robot.subsystems.LimelightVision;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.LimelightVision.AprilTagTarget;
+import frc.robot.util.VisionTargetCache;
 
 import java.util.function.DoubleSupplier;
 
@@ -24,6 +25,8 @@ public class AimAtSpeakerWhileMoving extends Command {
 
     private final PIDController swerveRotController;
 
+    private final VisionTargetCache<AprilTagTarget> visionCache;
+
     public AimAtSpeakerWhileMoving(Swerve swerve, LimelightVision limelight, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {
         this.swerve = swerve;
         this.limelight = limelight;
@@ -33,6 +36,8 @@ public class AimAtSpeakerWhileMoving extends Command {
 
         swerveRotController = new PIDController(kPSpeakerRotation, 0.0, kDSpeakerRotation);
         swerveRotController.setSetpoint(0.0);
+
+        visionCache = new VisionTargetCache<>(cycleAmtSinceAprilTagSeenCutoff);
 
         addRequirements(swerve, limelight);
     }
@@ -56,7 +61,12 @@ public class AimAtSpeakerWhileMoving extends Command {
 
         /* Override rotation to velocity compensated tag x-offset using PID */
         AprilTagTarget aprilTag = limelight.getAprilTagTarget();
-        if(aprilTag.isValidSpeakerTag()) {
+        if(aprilTag.isValidSpeakerTag()) 
+            visionCache.updateTarget(aprilTag);
+
+        if(visionCache.targetNotExpired()) {
+            aprilTag = visionCache.getAndIncrement();
+
             /* Aim slightly further than the tag based on current strafe velocity*/
             double targetOffset = swerve.getSpeeds().vyMetersPerSecond * xOffsetVelocityCompAmt;
 
@@ -66,7 +76,7 @@ public class AimAtSpeakerWhileMoving extends Command {
         }
 
         else {
-            swerveRotController.reset();
+            reset();
 
             System.err.println("Speaker tag tracking lost while locking on!");
         }
@@ -81,7 +91,12 @@ public class AimAtSpeakerWhileMoving extends Command {
 
     @Override
     public void end(boolean interrupted) {
+        reset();
+    }
+
+    private void reset() {
         swerveRotController.reset();
+        visionCache.reset();
     }
 
     private double applyInputCurve(double joystickInput) {
