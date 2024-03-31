@@ -469,8 +469,11 @@ public final class Constants {
         /* Constants for note alignment */        
         public static final double kPNoteRotation = 0.12;
         public static final double kDNoteRotation = 0.01;
+
+        public static final double kPNoteDistance = 0.5;
+        public static final double kDNoteDistance = 0.01;
         
-        public static final double noteDrivingSpeed = 3.0;
+        public static final double maxNoteDrivingSpeed = 3.0;
         public static final int cycleAmtSinceTargetSeenCutoff = 3;
 
         /* Constants for stage alignment */

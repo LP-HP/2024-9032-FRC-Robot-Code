@@ -13,6 +13,7 @@ public class DriveToNote extends Command {
     private final Photonvision photonvision;
 
     private final PIDController swerveRotController;
+    private final PIDController swerveDistanceController;
 
     private double lastXOffset;
     private int cycleAmtSinceTargetSeen;
@@ -24,6 +25,9 @@ public class DriveToNote extends Command {
 
         swerveRotController = new PIDController(kPNoteRotation, 0.0, kDNoteRotation);
         swerveRotController.setSetpoint(0.0);
+
+        swerveDistanceController = new PIDController(kPNoteDistance, 0.0, kDNoteDistance);
+        swerveDistanceController.setSetpoint(0.0);
 
         addRequirements(swerve, photonvision);
     }
@@ -42,6 +46,8 @@ public class DriveToNote extends Command {
             cycleAmtSinceTargetSeen++;
 
         if(cycleAmtSinceTargetSeen < cycleAmtSinceTargetSeenCutoff && hadTarget) {
+            double noteDrivingSpeed = Math.min(swerveDistanceController.calculate(photonvision.getLatestDistance()), maxNoteDrivingSpeed);
+
             swerve.driveOpenLoop(
                 new Translation2d(noteDrivingSpeed, 0.0),
                 swerveRotController.calculate(lastXOffset), 
