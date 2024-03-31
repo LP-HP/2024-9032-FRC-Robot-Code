@@ -55,6 +55,7 @@ public class RobotContainer {
     private final ShooterArm shooterArm = new ShooterArm();
     private final Climbers climbers = new Climbers();
     private final UltrasonicSensor sensor = new UltrasonicSensor(5, 6); //TODO: Change DIO ports when installed on robot.
+    private final LED led = new LED(9, 67); //TODO: Change PWM port and check LED count when installed on robot.
 
     /* Shuffleboard */
     private final ShuffleboardTab debugTab = Shuffleboard.getTab("Debug");
