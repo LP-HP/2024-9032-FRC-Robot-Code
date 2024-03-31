@@ -235,7 +235,7 @@ public class RobotContainer {
         driveToNoteButton.and(() -> !intake.hasNote()).whileTrue(
             Commands.print("Driving to note")
             .andThen(new DriveToNote(swerve, photonvision))
-            .onlyIf(photonvision::hasTargets)
+            .onlyIf(() -> photonvision.getNoteTarget().isValid)
         );
         
         driveToNoteButton.onFalse(

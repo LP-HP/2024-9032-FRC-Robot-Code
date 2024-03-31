@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Photonvision;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Photonvision.NoteTarget;
 
 import static frc.robot.Constants.ClosedLoopConstants.*;
 
@@ -34,9 +35,11 @@ public class DriveToNote extends Command {
 
     @Override
     public void execute() {
+        NoteTarget target = photonvision.getNoteTarget();
+
         /* Find targets - if there is no target, use the last one seen if it has not expired */
-        if(photonvision.hasTargets()) {
-            lastXOffset = photonvision.getLatestXOffset();
+        if(target.isValid) {
+            lastXOffset = target.xOffset;
 
             cycleAmtSinceTargetSeen = 0;
             hadTarget = true;
@@ -46,7 +49,7 @@ public class DriveToNote extends Command {
             cycleAmtSinceTargetSeen++;
 
         if(cycleAmtSinceTargetSeen < cycleAmtSinceTargetSeenCutoff && hadTarget) {
-            double noteDrivingSpeed = Math.min(swerveDistanceController.calculate(photonvision.getLatestDistance()), maxNoteDrivingSpeed);
+            double noteDrivingSpeed = Math.min(swerveDistanceController.calculate(target.distance), maxNoteDrivingSpeed);
 
             swerve.driveOpenLoop(
                 new Translation2d(noteDrivingSpeed, 0.0),

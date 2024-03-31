@@ -16,14 +16,12 @@ public class Photonvision extends SubsystemBase {
 
     private final PhotonCamera camera = new PhotonCamera(cameraName);
 
-    private double distance;
-    private double xOffset;
-    private boolean hasTargets = false;
+    private NoteTarget currentTarget = new NoteTarget();
 
     public Photonvision () {
-        photonvisionTab.addDouble("Distance", () -> distance)
+        photonvisionTab.addDouble("Distance", () -> currentTarget.distance)
             .withPosition(0, 0).withSize(2, 1);
-        photonvisionTab.addDouble("X Offset", () -> xOffset)
+        photonvisionTab.addDouble("X Offset", () -> currentTarget.xOffset)
             .withPosition(2, 0).withSize(2, 1);
     }
 
@@ -40,33 +38,28 @@ public class Photonvision extends SubsystemBase {
     public void periodic() {
         PhotonPipelineResult result = camera.getLatestResult();
 
-        if (result.hasTargets()) {
-            hasTargets = true;
+        currentTarget.isValid = result.hasTargets();
 
-            xOffset = result.getBestTarget().getYaw();
+        if(currentTarget.isValid) {
+            currentTarget.xOffset = result.getBestTarget().getYaw();
 
             /* Calculate distance */
-            distance = PhotonUtils.calculateDistanceToTargetMeters(//TODO fix distance readings
+            currentTarget.distance = PhotonUtils.calculateDistanceToTargetMeters(//TODO fix distance readings
                 cameraHeight,
                 targetHeight,
                 mountingAngle,
                 Units.degreesToRadians(result.getBestTarget().getPitch())
             );
         }
-
-        else 
-            hasTargets = false;
     }
     
-    public double getLatestDistance() {
-        return distance;
+    public static final class NoteTarget {
+        public double distance = 0.0;
+        public double xOffset = 0.0;
+        public boolean isValid = false;
     }
 
-    public double getLatestXOffset() {
-        return xOffset;
-    }
-
-    public boolean hasTargets() {
-        return hasTargets;
+    public NoteTarget getNoteTarget() {
+        return currentTarget;
     }
 }
