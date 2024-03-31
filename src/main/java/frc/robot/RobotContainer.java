@@ -54,6 +54,7 @@ public class RobotContainer {
     private final ShooterFlywheels shooterFlywheels = new ShooterFlywheels();
     private final ShooterArm shooterArm = new ShooterArm();
     private final Climbers climbers = new Climbers();
+    private final UltrasonicSensor sensor = new UltrasonicSensor(5, 6); //TODO: Change DIO ports when installed on robot.
 
     /* Shuffleboard */
     private final ShuffleboardTab debugTab = Shuffleboard.getTab("Debug");
@@ -163,7 +164,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("IntakeAA", 
             shooterArm.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround()
-                .deadlineWith(new DriveToNote(swerve, photonvision)))
+                .deadlineWith(new DriveToNote(swerve, photonvision, sensor)))
             .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels))
             .withTimeout(notePickupTimeout)
         );
@@ -227,7 +228,7 @@ public class RobotContainer {
 
         driveToNoteButton.and(() -> !intake.hasNote()).whileTrue(
             Commands.print("Driving to note")
-            .andThen(new DriveToNote(swerve, photonvision))
+            .andThen(new DriveToNote(swerve, photonvision, sensor))
             .onlyIf(photonvision::hasTargets)
         );
         
