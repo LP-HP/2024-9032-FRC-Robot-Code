@@ -25,7 +25,7 @@ public class LimelightVision extends SubsystemBase {
     public LimelightVision() {
         /* Add Telemetry */
         ShuffleboardLayout poseLayout = limelightTab.getLayout("Pose", BuiltInLayouts.kList)
-            .withPosition(8, 0).withSize(2, 2);
+            .withPosition(8, 0).withSize(2, 4);
         poseLayout.addDouble("Pose X", () -> currentPose.pose.getX());
         poseLayout.addDouble("Pose Y", () -> currentPose.pose.getY());
         poseLayout.addDouble("Pose Heading", () -> currentPose.pose.getRotation().getDegrees());
@@ -34,7 +34,7 @@ public class LimelightVision extends SubsystemBase {
         poseLayout.addDouble("Timestamp", () -> currentPose.timestampSeconds);
 
         ShuffleboardLayout targetLayout = limelightTab.getLayout("Target", BuiltInLayouts.kList)
-            .withPosition(6, 0).withSize(2, 2);
+            .withPosition(6, 0).withSize(2, 4);
         targetLayout.addDouble("X Offset", () -> currentTarget.xOffset);
         targetLayout.addDouble("Y Offset", () -> currentTarget.yOffset);
         targetLayout.addDouble("ID", () -> currentTarget.id);

@@ -116,9 +116,9 @@ public class RobotContainer {
         driverTab.addDouble("Match Time", () -> DriverStation.getMatchTime())
             .withPosition(6, 0).withSize(2, 1);
         driverTab.add(
-                shooterArm.setToAutoPosition(140.0, true)
+                shooterArm.setToAutoPosition(148.0, true)
                 .andThen(shooterFlywheels.shoot(95.0, true))
-                .withName("Shoot 140"))
+                .withName("Shoot Subwoofer"))
             .withPosition(8, 0).withSize(1, 1);
         driverTab.add(shooterFlywheels.shoot(95.0, true))
             .withPosition(9, 0).withSize(1, 1);
