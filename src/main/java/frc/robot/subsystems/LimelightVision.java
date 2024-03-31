@@ -77,13 +77,11 @@ public class LimelightVision extends SubsystemBase {
         boolean isValid = LimelightHelpers.getTV(limelightName);
 
         if(isValid) {
-            LimelightTarget_Fiducial tag = LimelightHelpers.getLatestResults(limelightName).targetingResults.targets_Fiducials[0];
-
-            currentTarget.xOffset = tag.tx;
-            currentTarget.yOffset = tag.ty;
-            currentTarget.area = tag.ta;
-            currentTarget.id = tag.fiducialID;
-            currentTarget.skew = tag.getTargetPose_CameraSpace().getRotation().getZ();//TODO enable 3d tracking / delete target pipeline
+            currentTarget.xOffset = LimelightHelpers.getTX(limelightName);
+            currentTarget.yOffset = LimelightHelpers.getTY(limelightName);
+            currentTarget.area = LimelightHelpers.getTA(limelightName);
+            currentTarget.id = LimelightHelpers.getFiducialID(limelightName);
+            currentTarget.skew = LimelightHelpers.getTargetPose3d_CameraSpace(limelightName).getRotation().getZ();//TODO enable 3d tracking / delete target pipeline
 
             currentTarget.distance = getDistanceFromYOffset(currentTarget.yOffset);
 

@@ -20,8 +20,8 @@ public class Intake extends SubsystemBase {
 
     private final DigitalInput beamBreak = new DigitalInput(beamBreakPort);
 
-    private final Ultrasonic ultrasonic = new Ultrasonic(ultrasonicPingPort, ultrasonicEchoPort);
-    private final MedianFilter ultrasonicFilter = new MedianFilter(medianFilterSize);
+    // private final Ultrasonic ultrasonic = new Ultrasonic(ultrasonicPingPort, ultrasonicEchoPort);
+    // private final MedianFilter ultrasonicFilter = new MedianFilter(medianFilterSize);
 
     private double lastUltrasonicDistance;
 
@@ -62,7 +62,7 @@ public class Intake extends SubsystemBase {
         intakeTab.add(resetCommand())
             .withPosition(6, 3).withSize(1, 1);
 
-        Ultrasonic.setAutomaticMode(true);
+        // Ultrasonic.setAutomaticMode(true);
     }
 
     /* Sets the target and if blocking, waits until the setpoint is achieved */
@@ -130,7 +130,7 @@ public class Intake extends SubsystemBase {
     }
 
     public boolean closeToObstable() {
-        return getUltrasonicDistance() < closeToObstacleDistance;
+        return false;//etUltrasonicDistance() < closeToObstacleDistance;
     }
 
     public void reset() {
@@ -147,6 +147,6 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
-        lastUltrasonicDistance = ultrasonicFilter.calculate(ultrasonic.getRangeInches());
+        // lastUltrasonicDistance = ultrasonicFilter.calculate(ultrasonic.getRangeInches());
     }
 }
