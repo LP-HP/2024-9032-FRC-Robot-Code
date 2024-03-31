@@ -57,4 +57,15 @@ public class LED extends SubsystemBase{
     public Command setColor(int r, int g, int b) {
         return runOnce(setLedColor(r, b, g)).withName("set LED color");
     }
+    public Runnable shootingLEDPattern() throws InterruptedException {
+        for (var i = 0; i< ledBuffer.getLength(); i++) {
+            ledBuffer.setRGB(i, 255, 95, 31);
+            Thread.sleep(25);
+            led.setData(ledBuffer);
+        }
+        return null;
+    }
+    public Command shootingLED() throws InterruptedException {
+        return runOnce(shootingLEDPattern());
+    }
 }

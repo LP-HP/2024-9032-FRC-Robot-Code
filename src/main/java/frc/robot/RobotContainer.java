@@ -67,7 +67,7 @@ public class RobotContainer {
         new Trigger(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && shooterFlywheels.hasNote() && limelight.isTargetPipeline())
             .and(overrideAutoAim.negate()).and(underStageButton.negate());
 
-    public RobotContainer() {
+    public RobotContainer() throws InterruptedException {
         /* Will run the following command when there is no other command set, such as during teleop */
         swerve.setDefaultCommand(
             new TeleopSwerve(
@@ -117,10 +117,10 @@ public class RobotContainer {
             .withPosition(6, 0).withSize(2, 1);
         driverTab.add(
                 shooterArm.setToAutoPosition(140.0, true)
-                .andThen(shooterFlywheels.shoot(95.0, true))
+                .andThen(shooterFlywheels.shoot(95.0, true, led))
                 .withName("Shoot 140"))
             .withPosition(8, 0).withSize(1, 1);
-        driverTab.add(shooterFlywheels.shoot(95.0, true))
+        driverTab.add(shooterFlywheels.shoot(95.0, true, led))
             .withPosition(9, 0).withSize(1, 1);
         limelight.addCameraToTab(driverTab, 0, 1, 4);
         photonvision.addCameraToTab(driverTab, 5, 1, 4);
@@ -149,10 +149,10 @@ public class RobotContainer {
         setRumble(0.0);
     }
 
-    private void registerPathplannerCommands() {
+    private void registerPathplannerCommands() throws InterruptedException {
         NamedCommands.registerCommand("ShootAA", 
             shooterArm.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, () -> 0.0, true)
-            .andThen(shooterFlywheels.shoot(shootVelocity, false))
+            .andThen(shooterFlywheels.shoot(shootVelocity, false, led))
         );
 
         NamedCommands.registerCommand("Intake", 
@@ -171,7 +171,7 @@ public class RobotContainer {
         );
     }
 
-    private void configureTriggerBindings() {
+    private void configureTriggerBindings() throws InterruptedException {
         /* 
          * Current driver controls: 
          * 
@@ -213,7 +213,7 @@ public class RobotContainer {
         /* Mechanism Controls */
         shootButton.and(autoAimSpeaker).onTrue(
             Commands.print("Shooting")
-            .andThen(shooterFlywheels.shoot(95.0, true)
+            .andThen(shooterFlywheels.shoot(95.0, true, led)
                 .asProxy())//TODO do velocity lookup table if needed
             .andThen(shooterArm.setToUpPosition(false)
                 .asProxy())
