@@ -66,7 +66,7 @@ public class RobotContainer {
     /* Teleop Triggers */
     private final Trigger autoAimSpeaker = 
         new Trigger(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && shooterFlywheels.hasNote() && limelight.isTargetPipeline())
-            .and(overrideAutoAim.negate()).and(underStageButton.negate());
+            .and(overrideAutoAim.negate()).and(underStageButton.negate()).debounce(0.025);
 
     public RobotContainer() {
         /* Will run the following command when there is no other command set, such as during teleop */
@@ -311,7 +311,7 @@ public class RobotContainer {
         autoAimSpeaker.and(() -> shooterArm.getCurrentCommand() == null).onTrue(
             shooterArm.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, () -> swerve.getSpeeds().vxMetersPerSecond, false)
                 .repeatedly()
-                    .until(() -> !autoAimSpeaker.getAsBoolean())
+                    .until(() -> !autoAimSpeaker.getAsBoolean() || underStageButton.getAsBoolean())
         );
     }
 

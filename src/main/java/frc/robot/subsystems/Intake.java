@@ -139,6 +139,8 @@ public class Intake extends SubsystemBase {
 
         rollerMotor.set(0.0);
         armMotor.setClosedLoopTarget(armMotor.relativeEncoder.getPosition());
+    
+        lastUltrasonicDistance = 0;
     }
 
     public Command resetCommand() {
