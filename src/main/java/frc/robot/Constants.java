@@ -22,12 +22,14 @@ import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
 public final class Constants {
     public static final int driveControllerPort = 0;
     public static final int mechanismControllerPort = 1;
-    
-    public static final int ledPWMPort = 0;
-    public static final int ledStripLength = 140;
 
     public static final boolean burnFlash = false;
     public static final boolean configMotors = false;
+
+    public static final class LEDConstants {
+        public static final int ledPWMPort = 0;
+        public static final int ledStripLength = 140;
+    }
 
     public static final class TeleopConstants {
         public static final double stickDeadband = 0.02;
