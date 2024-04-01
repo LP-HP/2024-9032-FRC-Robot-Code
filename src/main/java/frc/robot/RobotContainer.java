@@ -3,6 +3,8 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -27,6 +29,11 @@ import static frc.robot.Constants.AutoConstants.*;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+    /* LEDs */
+    // private final AddressableLED ledStrip;
+    // private final AddressableLEDBuffer ledBuffer;
+    // private int rainbowFirstPixelHue;
+
     /* Controllers */
     private final CommandXboxController driveController = new CommandXboxController(Constants.driveControllerPort);
     private final CommandXboxController mechanismController = new CommandXboxController(Constants.mechanismControllerPort);
@@ -126,6 +133,18 @@ public class RobotContainer {
         photonvision.addCameraToTab(driverTab, 5, 1, 4);
         
         Shuffleboard.selectTab(driverTab.getTitle());
+
+        // ledStrip = new AddressableLED(Constants.ledPWMPort);
+        // ledBuffer = new AddressableLEDBuffer(Constants.ledStripLength);
+
+        // ledStrip.setLength(ledBuffer.getLength());
+        // ledStrip.setData(ledBuffer);
+        // ledStrip.start();
+    }
+
+    /* Don't run any commands here */
+    public void robotPeriodic() {
+        // rainbowLEDs();
     }
 
     /* Only reset variables - don't run any commands here */
@@ -330,4 +349,18 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
     }
+
+    // private void rainbowLEDs() {
+        // for(int i = 0; i < ledBuffer.getLength(); i++) {
+        //   int hue = (rainbowFirstPixelHue + (i * 180 / ledBuffer.getLength())) % 180;
+
+        //   ledBuffer.setHSV(i, hue, 255, 128);
+        // }
+
+        // rainbowFirstPixelHue += 3;
+        // // Check bounds
+        // rainbowFirstPixelHue %= 180;
+
+        // ledStrip.setData(ledBuffer);
+    //   }
 }
