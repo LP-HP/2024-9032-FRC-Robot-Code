@@ -160,7 +160,7 @@ public class ShooterFlywheels extends SubsystemBase {
     public Command shoot(double velocityRPS, boolean disableFlywheels, LED led) {
         return setFlywheelVelocity(velocityRPS, true)
            .andThen(enableStorageMotorToFlywheels())
-           .andThen(led.shootingLEDPattern())
+           .andThen(led.shootingLED())
            .andThen(Commands.waitSeconds(speakerShotWaitTime))
            .andThen(disableFlywheels ? disableFlywheels() : Commands.none())
            .andThen(disableStorageMotor());

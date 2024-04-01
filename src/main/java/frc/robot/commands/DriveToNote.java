@@ -32,7 +32,7 @@ public class DriveToNote extends Command {
         if (photonvision.hasTargets()) {
             swerve.driveOpenLoop(
                     new Translation2d(
-                            (sensor.getDistanceInMM() / 1000) < 1.13 ? noteDrivingSpeed - 1.3 : noteDrivingSpeed, 0.0),
+                            (sensor.getDistanceInMM() / 1000) < 1.13 ? 2.0 : noteDrivingSpeed, 0.0),
                     swerveRotController.calculate(photonvision.getLatestXOffset()), false);
         }
 

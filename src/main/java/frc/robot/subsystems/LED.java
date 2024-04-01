@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LED extends SubsystemBase{
@@ -10,6 +11,8 @@ public class LED extends SubsystemBase{
     AddressableLEDBuffer ledBuffer;
     int m_rainbowFirstPixelHue;
     int r;
+
+    private int lastLEDIndex;
     //private final ShuffleboardTab LEDtab = Shuffleboard.getTab("LED tab");
 
     public LED(int PWMPort, int LEDLength) {
@@ -48,21 +51,17 @@ public class LED extends SubsystemBase{
     public Command setColor(int r, int g, int b) {
         return runOnce(setLedColor(r, b, g)).withName("set LED color");
     }
-    public Runnable shootingLEDPattern() {
-        for (var i = 0; i< ledBuffer.getLength(); i++) {
-            ledBuffer.setRGB(i, 255, 95, 31);
-            try {
-                Thread.sleep(25);
-            } catch (InterruptedException e) {
-                System.out.println("LED's interrupted");
-            }
-            led.setData(ledBuffer);
-            ledBuffer.setRGB(i, 0, 0, 0);
-            led.setData(ledBuffer);
+    public void shootingLEDPattern() {
+        for (var i = 0; i < ledBuffer.getLength(); i++) {
+            ledBuffer.setHSV(i, 0, 0, 0);
         }
-        return null;
+
+        ledBuffer.setHSV(lastLEDIndex, 30, 100, 100);
+
+        lastLEDIndex++;
+        lastLEDIndex %= ledBuffer.getLength();
     }
     public Command shootingLED() {
-        return runOnce(shootingLEDPattern());
+        return runOnce(this::shootingLEDPattern).andThen(Commands.waitSeconds(0.25)).repeatedly();
     }
 }
