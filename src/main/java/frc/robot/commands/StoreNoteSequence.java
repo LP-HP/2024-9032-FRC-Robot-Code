@@ -1,6 +1,8 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.ShooterArm;
 import frc.robot.subsystems.ShooterFlywheels;
@@ -13,7 +15,13 @@ public class StoreNoteSequence extends SequentialCommandGroup {
                 .alongWith(shooterArm.setToPassthroughPosition(true)),
             /* Move the note into the shooter once they have reached the passthrough position */
             intake.enableTransferToShooter(),
-            shooterFlywheels.receiveNoteFromIntake(),
+            shooterFlywheels.receiveNoteFromIntake()
+                /* If the beam break doesn't see a note in time, recover from a failed passthrough by reintaking the note */
+                .deadlineWith(
+                    Commands.waitSeconds(Constants.passthroughRecoveryWait)
+                    .andThen(intake.getNoteFromGround()))
+                    .andThen(intake.setToPassthroughPosition(true))
+                    .andThen(intake.enableTransferToShooter()),
             /* Make sure to put them back in the storage position and disable when the note arrives in the shooter */
             intake.disableRollers(),
             shooterArm.setToUpPosition(false),
