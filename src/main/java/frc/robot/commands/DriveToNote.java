@@ -48,7 +48,7 @@ public class DriveToNote extends Command {
             double noteDrivingSpeed = Math.min(swerveDistanceController.calculate(target.distance), maxNoteDrivingSpeed);
 
             swerve.driveOpenLoop(
-                new Translation2d(noteDrivingSpeed, 0.0),
+                new Translation2d(-noteDrivingSpeed, 0.0),
                 swerveRotController.calculate(target.xOffset), 
                 false
             );

@@ -59,7 +59,7 @@ public final class Constants {
         /* Distance Constants */
         public static final double targetHeight = Units.inchesToMeters(1.0);
         public static final double cameraHeight = Units.inchesToMeters(25.0);
-        public static final double mountingAngle = Units.degreesToRadians(-15.0); 
+        public static final double mountingAngle = Units.degreesToRadians(-18.0); 
     }
 
     /* Using CANIds 13-14 - 2 motors */
@@ -480,7 +480,7 @@ public final class Constants {
         public static final double kPNoteRotation = 0.12;
         public static final double kDNoteRotation = 0.01;
 
-        public static final double kPNoteDistance = 0.5;
+        public static final double kPNoteDistance = 1.75;
         public static final double kDNoteDistance = 0.01;
         
         public static final double maxNoteDrivingSpeed = 3.0;
