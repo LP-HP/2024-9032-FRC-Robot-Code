@@ -9,10 +9,11 @@ public class UltrasonicSensor extends SubsystemBase {
     private final Ultrasonic sensor;
     private final ShuffleboardTab UltrasonicTab = Shuffleboard.getTab("UltrasonicTab");
     private Double sensorDistance;
+    private boolean autoSensorPinging = false;
 
     public UltrasonicSensor(int ping, int echo) {
         sensor = new Ultrasonic(ping, echo);
-        sensor.setAutomaticMode(true);
+        Ultrasonic.setAutomaticMode(true);
         UltrasonicTab.addDouble("Distance", () -> sensorDistance)
                 .withPosition(1, 1).withSize(2, 1);
     }
@@ -20,7 +21,10 @@ public class UltrasonicSensor extends SubsystemBase {
     @Override
     public void periodic() {
         sensorDistance = sensor.getRangeMM();
-        //System.out.println(sensorDistance);
+    }
+
+    public void toggleSensorPing() {
+        Ultrasonic.setAutomaticMode(autoSensorPinging == true ? false : true);
     }
 
     public double getDistanceInMM() {
