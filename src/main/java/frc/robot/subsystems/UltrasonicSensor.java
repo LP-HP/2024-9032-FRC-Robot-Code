@@ -27,6 +27,11 @@ public class UltrasonicSensor extends SubsystemBase {
         Ultrasonic.setAutomaticMode(autoSensorPinging == true ? false : true);
     }
 
+    public double pingOnceAndRecieve() {
+        sensor.ping();
+        return sensor.getRangeMM();
+    }
+
     public double getDistanceInMM() {
         return sensorDistance;
     }
