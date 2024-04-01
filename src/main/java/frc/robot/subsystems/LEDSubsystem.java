@@ -2,18 +2,20 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.LEDConstants.*;
 
 public class LEDSubsystem extends SubsystemBase {
-    public static enum LEDState { RAINBOW };
+    public static enum LEDState { RAINBOW, BLUE_GRADIENT };
     private LEDState currentState;
 
     private final AddressableLED ledStrip;
     private final AddressableLEDBuffer ledBuffer;
 
     private int previousFirstLEDHue;
+    private int previousFirstLEDValue;
 
     public LEDSubsystem() {
         ledStrip = new AddressableLED(ledPWMPort);
@@ -24,15 +26,33 @@ public class LEDSubsystem extends SubsystemBase {
         ledStrip.start();
     }
 
+    public Command setState(LEDState state) {
+        return runOnce(() -> {
+            currentState = state;
+
+            resetLEDs();
+        });
+    }
+
     @Override
     public void periodic() {
         switch (currentState) {
             case RAINBOW:
                 rainbow();
                 break;
+            case BLUE_GRADIENT:
+                blueGradient();
             default:
                 break;
         }
+    }
+
+    private void resetLEDs() {
+        for(int i = 0; i < ledBuffer.getLength(); i++) 
+            ledBuffer.setHSV(i, 0, 0, 0);
+
+        previousFirstLEDHue = 0;
+        previousFirstLEDValue = 0;
     }
 
     private void rainbow() {
@@ -42,9 +62,23 @@ public class LEDSubsystem extends SubsystemBase {
             ledBuffer.setHSV(i, hue, 255, 128);
         }
 
-        /* Increment the starting color to create a smooth rainbow and prevent overflowing */
+        /* Increment the previous color to create a smooth rainbow and prevent overflowing */
         previousFirstLEDHue += 3;
         previousFirstLEDHue %= 180;
+
+        ledStrip.setData(ledBuffer);
+    }
+
+    private void blueGradient() {
+        for(int i = 0; i < ledBuffer.getLength(); i++) {
+            int value = (previousFirstLEDValue + (i * 255 / ledBuffer.getLength())) % 255; 
+
+            ledBuffer.setHSV(i, 238, 91, value);
+        }
+
+        /* Increment the previous value to create a smooth gradient and prevent overflowing */
+        previousFirstLEDValue += 5;
+        previousFirstLEDValue %= 255;
 
         ledStrip.setData(ledBuffer);
     }
