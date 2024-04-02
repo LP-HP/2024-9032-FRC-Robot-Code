@@ -41,7 +41,7 @@ public class RobotContainer {
 
     /* Mechanism Controller Buttons */
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
-    private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
+    // private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
     private final Trigger ampScoreButton = mechanismController.rightBumper().debounce(0.025);
     private final Trigger driveToNoteButton = mechanismController.rightTrigger(0.25).debounce(0.025)
         .and(overrideAutoAim.negate());
@@ -231,14 +231,16 @@ public class RobotContainer {
             Commands.print("Enabling intake")
             .andThen(shooterArm.setToPassthroughPosition(false))
             .andThen(intake.getNoteFromGround())
-            .andThen(setAndDisableRumble())
+            .andThen(Commands.print("Transfering note"))
+            .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels)
+                .alongWith(setAndDisableRumble()))
             .onlyIf(() -> !intake.hasNote() && !shooterFlywheels.hasNote())
         );
 
         driveToNoteButton.and(() -> !intake.hasNote()).whileTrue(
             Commands.print("Driving to note")
             .andThen(new DriveToNote(swerve, photonvision))
-            .onlyIf(() -> photonvision.getNoteTarget().isValid)
+            .onlyIf(() -> photonvision.getNoteTarget().isValid && !shooterFlywheels.hasNote())
         );
         
         driveToNoteButton.onFalse(
@@ -249,11 +251,11 @@ public class RobotContainer {
             .onlyIf(() -> !intake.hasNote())
         );   
 
-        storeNoteButton.and(underStageButton.negate()).onTrue(
-            Commands.print("Transfering note")
-            .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels))
-            .onlyIf(() -> intake.hasNote() && !shooterFlywheels.hasNote())
-        );
+        // storeNoteButton.and(underStageButton.negate()).onTrue(
+        //     Commands.print("Transfering note")
+        //     .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels))
+        //     .onlyIf(() -> intake.hasNote() && !shooterFlywheels.hasNote())
+        // );
 
         ampScoreButton.onTrue(
             Commands.print("Shooting in amp")
@@ -304,7 +306,7 @@ public class RobotContainer {
                 () -> -driveController.getLeftY(), 
                 () -> -driveController.getLeftX(),
                 driveController::getRightX)
-                    .until(() -> overrideAutoAim.getAsBoolean())
+                    .until(() -> overrideAutoAim.getAsBoolean() || underStageButton.getAsBoolean() || !shooterFlywheels.hasNote())
         );
 
         autoAimSpeaker.and(() -> shooterFlywheels.getCurrentCommand() == null).onTrue(
