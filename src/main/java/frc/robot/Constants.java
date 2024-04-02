@@ -26,7 +26,7 @@ public final class Constants {
     public static final boolean burnFlash = false;
     public static final boolean configMotors = false;
 
-    public static final double passthroughRecoveryWait = 2.0;
+    public static final double passthroughRecoveryWait = 3.0;
 
     public static final class LEDConstants {
         public static final int ledPWMPort = 0;

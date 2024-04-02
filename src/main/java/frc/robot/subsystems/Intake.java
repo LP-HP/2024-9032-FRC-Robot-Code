@@ -108,7 +108,7 @@ public class Intake extends SubsystemBase {
     }
 
     public Command getNoteFromGround() {
-        return setTargetPosition(armPositionGround, false)
+        return setToGroundPosition(false)
             .andThen(setRollerPower(intakePower))
             .andThen(Commands.waitUntil(this::hasNote))
             .andThen(disableRollers())

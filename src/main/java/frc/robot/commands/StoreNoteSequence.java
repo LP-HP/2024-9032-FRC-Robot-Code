@@ -19,9 +19,12 @@ public class StoreNoteSequence extends SequentialCommandGroup {
                 /* If the beam break doesn't see a note in time, recover from a failed passthrough by reintaking the note */
                 .deadlineWith(
                     Commands.waitSeconds(Constants.passthroughRecoveryWait)
-                    .andThen(intake.getNoteFromGround()))
+                    .andThen(Commands.print("Transfer timed out!"))
+                    .andThen(intake.getNoteFromGround())
                     .andThen(intake.setToPassthroughPosition(true))
-                    .andThen(intake.enableTransferToShooter()),
+                    .andThen(Commands.waitSeconds(0.5))
+                    .andThen(intake.enableTransferToShooter())
+                    .andThen(Commands.print("Recovered transfer"))),
             /* Make sure to put them back in the storage position and disable when the note arrives in the shooter */
             intake.disableRollers(),
             shooterArm.setToUpPosition(false),
