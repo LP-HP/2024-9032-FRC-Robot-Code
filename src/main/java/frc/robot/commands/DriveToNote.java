@@ -24,7 +24,7 @@ public class DriveToNote extends Command {
         this.photonvision = photonvision;
 
         swerveRotController = new PIDController(kPNoteRotation, 0.0, kDNoteRotation);
-        swerveRotController.setSetpoint(0.0);
+        swerveRotController.setSetpoint(noteXSetpoint);
 
         swerveDistanceController = new PIDController(kPNoteDistance, 0.0, kDNoteDistance);
         swerveDistanceController.setSetpoint(0.0);

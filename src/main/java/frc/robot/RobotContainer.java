@@ -42,7 +42,7 @@ public class RobotContainer {
 
     /* Mechanism Controller Buttons */
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
-    // private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
+    private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
     private final Trigger ampScoreButton = mechanismController.rightBumper().debounce(0.025);
     private final Trigger driveToNoteButton = mechanismController.rightTrigger(0.25).debounce(0.025)
         .and(overrideAutoAim.negate());
@@ -58,7 +58,7 @@ public class RobotContainer {
     private final ShooterFlywheels shooterFlywheels = new ShooterFlywheels();
     private final ShooterArm shooterArm = new ShooterArm();
     private final Climbers climbers = new Climbers();
-    private final LEDSubsystem leds = new LEDSubsystem();
+    // private final LEDSubsystem leds = new LEDSubsystem();
 
     /* Shuffleboard */
     private final ShuffleboardTab debugTab = Shuffleboard.getTab("Debug");
@@ -127,7 +127,7 @@ public class RobotContainer {
         limelight.addCameraToTab(driverTab, 0, 1, 4);
         photonvision.addCameraToTab(driverTab, 5, 1, 4);
         
-        leds.setState(LEDState.BLUE_GRADIENT);
+        // leds.setState(LEDState.BLUE_GRADIENT);
 
         Shuffleboard.selectTab(driverTab.getTitle());
     }
@@ -170,7 +170,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("Intake", 
             shooterArm.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround())
-            .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels))
+            .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels, false))
             .andThen(intake.setToGroundPosition(false))
             .withTimeout(notePickupTimeout)
         );
@@ -179,7 +179,8 @@ public class RobotContainer {
             shooterArm.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround()
                 .deadlineWith(new DriveToNote(swerve, photonvision)))
-            .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels))
+            .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels, false))
+            .andThen(intake.setToGroundPosition(false))
             .withTimeout(notePickupTimeout)
         );
     }
@@ -241,9 +242,9 @@ public class RobotContainer {
             Commands.print("Enabling intake")
             .andThen(shooterArm.setToPassthroughPosition(false))
             .andThen(intake.getNoteFromGround())
-            .andThen(Commands.print("Transfering note"))
-            .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels)
-                .alongWith(setAndDisableRumble()))
+            // .andThen(Commands.print("Transfering note"))
+            // .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels, true)
+            //     .alongWith(setAndDisableRumble()))
             .onlyIf(() -> !intake.hasNote() && !shooterFlywheels.hasNote())
         );
 
@@ -261,11 +262,11 @@ public class RobotContainer {
             .onlyIf(() -> !intake.hasNote())
         );   
 
-        // storeNoteButton.and(underStageButton.negate()).onTrue(
-        //     Commands.print("Transfering note")
-        //     .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels))
-        //     .onlyIf(() -> intake.hasNote() && !shooterFlywheels.hasNote())
-        // );
+        storeNoteButton.and(underStageButton.negate()).onTrue(
+            Commands.print("Transfering note")
+            .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels, true))
+            .onlyIf(() -> intake.hasNote() && !shooterFlywheels.hasNote())
+        );
 
         ampScoreButton.onTrue(
             Commands.print("Shooting in amp")

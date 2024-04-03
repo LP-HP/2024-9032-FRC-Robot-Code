@@ -8,7 +8,7 @@ import frc.robot.subsystems.ShooterArm;
 import frc.robot.subsystems.ShooterFlywheels;
 
 public class StoreNoteSequence extends SequentialCommandGroup {
-    public StoreNoteSequence(Intake intake, ShooterArm shooterArm, ShooterFlywheels shooterFlywheels) {
+    public StoreNoteSequence(Intake intake, ShooterArm shooterArm, ShooterFlywheels shooterFlywheels, boolean resetShooter) {
         addCommands(
             /* Move the intake and shooter to the passthrough position to align them */
             intake.setToPassthroughPosition(true)
@@ -27,9 +27,11 @@ public class StoreNoteSequence extends SequentialCommandGroup {
                     .andThen(Commands.print("Recovered transfer"))),
             /* Make sure to put them back in the storage position and disable when the note arrives in the shooter */
             intake.disableRollers(),
-            shooterArm.setToUpPosition(false),
             /* Spin up flywheels for faster shooting */
             shooterFlywheels.spinUpFlywheels(95.0)//TODO do velocity lookup table if needed
         );
+
+        if(resetShooter)
+            addCommands(shooterArm.setToUpPosition(false));
     }
 }
