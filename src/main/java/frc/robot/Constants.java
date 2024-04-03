@@ -512,7 +512,7 @@ public final class Constants {
 
     public static final class AutoConstants { 
         /* Seconds */
-        public static final double notePickupTimeout = 10.0;
+        public static final double notePickupTimeout = 5.0;
 
         public static final double shootVelocity = 95.0;
     }
