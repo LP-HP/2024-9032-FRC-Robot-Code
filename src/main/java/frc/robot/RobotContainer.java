@@ -153,6 +153,11 @@ public class RobotContainer {
     }
 
     private void registerPathplannerCommands() {
+        NamedCommands.registerCommand("AutoInit", 
+            shooterFlywheels.spinUpFlywheels(95.0)
+            .andThen(intake.setToGroundPosition(false))
+        );
+
         NamedCommands.registerCommand("ShootAA", 
             shooterArm.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, () -> 0.0, true)
             .andThen(shooterFlywheels.shoot(shootVelocity, false))
@@ -162,6 +167,7 @@ public class RobotContainer {
             shooterArm.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround())
             .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels))
+            .andThen(intake.setToGroundPosition(false))
             .withTimeout(notePickupTimeout)
         );
 
