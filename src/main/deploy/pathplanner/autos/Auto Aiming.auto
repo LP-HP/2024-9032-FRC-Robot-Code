@@ -36,9 +36,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "shootaa2"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "shootaa2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Passthrough"
+                }
+              }
+            ]
           }
         },
         {
@@ -60,9 +73,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "shootaa3"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "shootaa3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Passthrough"
+                }
+              }
+            ]
           }
         },
         {
@@ -84,9 +110,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "shootaa4"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "shootaa4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Passthrough"
+                }
+              }
+            ]
           }
         },
         {
@@ -108,9 +147,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "shootaa5"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "shootaa5"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Passthrough"
+                }
+              }
+            ]
           }
         },
         {
