@@ -17,13 +17,15 @@ public class LEDSubsystem extends SubsystemBase {
     private int previousFirstLEDHue;
     private int previousFirstLEDValue;
 
-    public LEDSubsystem() {
+    public LEDSubsystem(LEDState startingState) {
         ledStrip = new AddressableLED(ledPWMPort);
         ledBuffer = new AddressableLEDBuffer(ledStripLength);
 
         ledStrip.setLength(ledBuffer.getLength());
         ledStrip.setData(ledBuffer);
         ledStrip.start();
+
+        currentState = startingState;
     }
 
     public Command setState(LEDState state) {

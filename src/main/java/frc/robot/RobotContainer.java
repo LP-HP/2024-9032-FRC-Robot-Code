@@ -58,7 +58,7 @@ public class RobotContainer {
     private final ShooterFlywheels shooterFlywheels = new ShooterFlywheels();
     private final ShooterArm shooterArm = new ShooterArm();
     private final Climbers climbers = new Climbers();
-    // private final LEDSubsystem leds = new LEDSubsystem();
+    // private final LEDSubsystem leds = new LEDSubsystem(LEDState.BLUE_GRADIENT);
 
     /* Shuffleboard */
     private final ShuffleboardTab debugTab = Shuffleboard.getTab("Debug");
@@ -127,8 +127,6 @@ public class RobotContainer {
         limelight.addCameraToTab(driverTab, 0, 1, 4);
         photonvision.addCameraToTab(driverTab, 5, 1, 4);
         
-        // leds.setState(LEDState.BLUE_GRADIENT);
-
         Shuffleboard.selectTab(driverTab.getTitle());
     }
 

@@ -69,8 +69,10 @@ public class AimAtSpeakerWhileMoving extends Command {
         if(visionCache.targetNotExpired()) {
             aprilTag = visionCache.getAndIncrement();
 
-            /* Aim slightly further than the tag based on current strafe velocity*/
+            /* Aim slightly further than the tag based on current strafe velocity and target skew */
             double targetOffset = swerve.getSpeeds().vyMetersPerSecond * xOffsetVelocityCompAmt;
+            if(Math.abs(aprilTag.skew) > skewCompAmtCutoff) 
+                targetOffset += aprilTag.skew * skewCompAmt;
 
             swerveRotController.setSetpoint(targetOffset);
 

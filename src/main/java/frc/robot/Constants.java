@@ -479,6 +479,8 @@ public final class Constants {
         public static final double kDSpeakerRotation = 0.01;
 
         public static final double xOffsetVelocityCompAmt = 0.0;//TODO test
+        public static final double skewCompAmtCutoff = 0.0;//TODO test
+        public static final double skewCompAmt = 0.0;//TODO test
 
         /* Constants for note alignment */        
         public static final double kPNoteRotation = 0.12;
@@ -489,7 +491,7 @@ public final class Constants {
         
         public static final double maxNoteDrivingSpeed = 3.0;
         public static final int cycleAmtSinceNoteSeenCutoff = 3;
-        public static final double noteXSetpoint = 0.0;
+        public static final double noteXSetpoint = 0.58;
 
         /* Constants for stage alignment */
         public static final double kPStageRotation = 0.12;//TODO test
