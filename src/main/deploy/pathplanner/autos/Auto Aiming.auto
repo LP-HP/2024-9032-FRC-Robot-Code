@@ -18,12 +18,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "shootaa1"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "ShootAA"
