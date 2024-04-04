@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.1084093474600265,
-        "y": 4.231395066115549
+        "x": 2.7226441151219607,
+        "y": 5.5768617000416905
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0109117652914654,
-        "y": 5.693858798643963
+        "x": 3.5123745306873047,
+        "y": 6.308093566305898
       },
       "isLocked": false,
       "linkedName": "saa4e"
@@ -36,8 +36,8 @@
         "y": 5.771856864378813
       },
       "prevControl": {
-        "x": 5.891315535600193,
-        "y": 5.742607589728245
+        "x": 6.544549336129553,
+        "y": 5.762107106161956
       },
       "nextControl": null,
       "isLocked": false,
@@ -61,7 +61,7 @@
   "reversed": false,
   "folder": "Auto Aiming",
   "previewStartingState": {
-    "rotation": -17.474774256255614,
+    "rotation": 0.0,
     "velocity": 0
   },
   "useDefaultConstraints": true

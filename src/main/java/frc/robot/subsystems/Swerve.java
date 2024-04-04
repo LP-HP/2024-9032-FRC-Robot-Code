@@ -6,7 +6,6 @@ import java.util.function.Supplier;
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.VecBuilder;
@@ -93,15 +92,15 @@ public class Swerve extends SubsystemBase {
         swerveTab.add("Field", field)
             .withPosition(0, 0).withSize(8, 3);
 
-        /* Send pathplanner target pose to field view */
-        PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
-            field.getObject("target pose").setPose(pose);
-        });
+        // /* Send pathplanner target pose to field view */
+        // PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
+        //     field.getObject("target pose").setPose(pose);
+        // });
 
-        /* Send pathplanner path to field view */
-        PathPlannerLogging.setLogActivePathCallback((poses) -> {
-            field.getObject("path").setPoses(poses);
-        });
+        // /* Send pathplanner path to field view */
+        // PathPlannerLogging.setLogActivePathCallback((poses) -> {
+        //     field.getObject("path").setPoses(poses);
+        // });
 
         /* Add Telemetry */
         swerveTab.addDouble("Pose X", () -> getPose().getX())

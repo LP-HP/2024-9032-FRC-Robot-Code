@@ -54,7 +54,7 @@ public final class Constants {
         public static final double mountingAngle = Units.degreesToRadians(30.0);
 
         /* Cutoff for target validity */
-        public static final double distanceCutoff = 4.27;
+        public static final double distanceCutoff = 6.0;
     }
 
     public static final class PhotonvisionConstants {
@@ -130,8 +130,8 @@ public final class Constants {
         public static final double minArmSetpoint = 95.0;
         public static final double maxArmSetpoint = 180.0;
         public static final SparkMaxPIDConstants shooterArmPID = new SparkMaxPIDConstants(
-            0.04, 
-            0.00001, 
+            0.05, 
+            0.0, 
             0.01, 
             0.0,
             -0.4,
@@ -179,7 +179,7 @@ public final class Constants {
             distanceToArmPosTable.put(1.636, 145.0);
             distanceToArmPosTable.put(1.97, 140.5);
             distanceToArmPosTable.put(2.12, 139.0);
-            distanceToArmPosTable.put(2.291, 137.0);
+            distanceToArmPosTable.put(2.291, 136.5);
             distanceToArmPosTable.put(2.577, 135.5);
             distanceToArmPosTable.put(2.77, 135.0);
             distanceToArmPosTable.put(2.942, 132.0);
@@ -188,6 +188,7 @@ public final class Constants {
             distanceToArmPosTable.put(3.638, 128.0);
             distanceToArmPosTable.put(3.972, 127.5);
             distanceToArmPosTable.put(4.27, 127.0);
+            distanceToArmPosTable.put(4.72, 124.55);
         }
         public static final double distanceVelocityCompAmt = 0.0;//TODO test
 
@@ -301,7 +302,7 @@ public final class Constants {
 
         /* Swerve Current Limiting */
         public static final int angleContinuousCurrentLimit = 20;
-        public static final int driveContinuousCurrentLimit = 60;
+        public static final int driveContinuousCurrentLimit = 80;
 
         /* Angle Motor PID Values */
         public static final SparkMaxPIDConstants anglePIDConstants = new SparkMaxPIDConstants(
@@ -464,12 +465,12 @@ public final class Constants {
     public static final class ClosedLoopConstants { 
         /* PID Constants for Path Following */
         public static final PIDConstants translationPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            5.0, 
+            6.0, 
             0.0, 
             0.0
         ); 
         public static final PIDConstants headingPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            5.0, 
+            6.0, 
             0.0, 
             0.0
         ); 
@@ -479,8 +480,8 @@ public final class Constants {
         public static final double kDSpeakerRotation = 0.01;
 
         public static final double xOffsetVelocityCompAmt = 0.0;//TODO test
-        public static final double skewCompAmtCutoff = 0.0;//TODO test
-        public static final double skewCompAmt = 0.0;//TODO test
+        public static final double skewCompAmtCutoff = 0.15;
+        public static final double skewCompAmt = -5.0;
 
         /* Constants for note alignment */        
         public static final double kPNoteRotation = 0.12;

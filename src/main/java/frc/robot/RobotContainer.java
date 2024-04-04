@@ -2,7 +2,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -16,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ClosedLoopConstants;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.LEDSubsystem.LEDState;
 import frc.robot.util.SparkMaxWrapper;
 
 import static frc.robot.Constants.AutoConstants.*;
@@ -245,14 +243,14 @@ public class RobotContainer {
             .andThen(intake.getNoteFromGround())
             // .andThen(Commands.print("Transfering note"))
             // .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels, true)
-            //     .alongWith(setAndDisableRumble()))
+            .andThen(setAndDisableRumble())
             .onlyIf(() -> !intake.hasNote() && !shooterFlywheels.hasNote())
         );
 
         driveToNoteButton.and(() -> !intake.hasNote()).whileTrue(
             Commands.print("Driving to note")
             .andThen(new DriveToNote(swerve, photonvision))
-            .onlyIf(() -> photonvision.getNoteTarget().isValid && !shooterFlywheels.hasNote())
+            .onlyIf(() -> !shooterFlywheels.hasNote())
         );
         
         driveToNoteButton.onFalse(
