@@ -53,8 +53,8 @@ public class DriveToStage extends Command {
             target = visionCache.getAndIncrement();
 
             swerve.driveOpenLoop(
-                new Translation2d(swerveDistanceController.calculate(target.distance), swerveYController.calculate(target.xOffset)),
-                swerveRotController.calculate(target.skew), 
+                new Translation2d(swerveDistanceController.calculate(target.distance), -swerveYController.calculate(target.xOffset)),
+                -swerveRotController.calculate(target.skew), 
                 false
             );
         }

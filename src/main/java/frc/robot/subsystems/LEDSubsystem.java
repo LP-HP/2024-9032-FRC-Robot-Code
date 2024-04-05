@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.LEDConstants.*;
 
 public class LEDSubsystem extends SubsystemBase {
-    public static enum LEDState { RAINBOW, BLUE_GRADIENT };
+    public static enum LEDState { RAINBOW, BLUE_GRADIENT, GREEN_GRADIENT };
     private LEDState currentState;
 
     private final AddressableLED ledStrip;
@@ -43,7 +43,9 @@ public class LEDSubsystem extends SubsystemBase {
                 rainbow();
                 break;
             case BLUE_GRADIENT:
-                blueGradient();
+                gradient(238);
+            case GREEN_GRADIENT:
+                gradient(119);
             default:
                 break;
         }
@@ -71,11 +73,11 @@ public class LEDSubsystem extends SubsystemBase {
         ledStrip.setData(ledBuffer);
     }
 
-    private void blueGradient() {
+    private void gradient(int hue) {
         for(int i = 0; i < ledBuffer.getLength(); i++) {
             int value = (previousFirstLEDValue + (i * 255 / ledBuffer.getLength())) % 255; 
 
-            ledBuffer.setHSV(i, 238, 91, value);
+            ledBuffer.setHSV(i, hue, 255, value);
         }
 
         /* Increment the previous value to create a smooth gradient and prevent overflowing */

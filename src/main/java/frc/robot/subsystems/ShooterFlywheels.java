@@ -178,6 +178,15 @@ public class ShooterFlywheels extends SubsystemBase {
             .withName("Amp score");
     }
 
+    public Command shootIntoTrap() {
+        return setFlywheelVelocity(flywheelTrapSetpoint, true)
+            .andThen(enableStorageMotorToAmp())
+            .andThen(Commands.waitSeconds(speakerShotWaitTime))
+            .andThen(disableStorageMotor())
+            .andThen(disableFlywheels())
+            .withName("Trap score");
+    }
+
     public boolean hasNote() {
         return !beamBreak.get();
     }

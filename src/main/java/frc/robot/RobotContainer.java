@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.ClosedLoopConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.SparkMaxWrapper;
@@ -35,7 +35,7 @@ public class RobotContainer {
     private final Trigger underStageButton = driveController.rightBumper().debounce(0.025);
     private final Trigger overrideAutoAim = driveController.leftBumper().debounce(0.025);
     private final Trigger shootButton = driveController.b().debounce(0.025);
-    private final Trigger driveToStageButton = driveController.y().debounce(0.025)
+    private final Trigger trapButton = driveController.y().debounce(0.025)
         .and(overrideAutoAim.negate());
 
     /* Mechanism Controller Buttons */
@@ -275,19 +275,20 @@ public class RobotContainer {
             .onlyIf(shooterFlywheels::hasNote)
         );
 
-        driveToStageButton.whileTrue(
-            Commands.print("Driving to stage")
-            .andThen(shooterArm.setToUnderStagePosition(false))
-            .andThen(new DriveToStage(swerve, limelight)
-                .alongWith(
-                    Commands.waitUntil(() -> limelight.getAprilTagTarget().distance <= ClosedLoopConstants.shooterUpDistance)
-                    .andThen(shooterArm.setToUpPosition(false))
-                )
-            )
-            .onlyIf(() -> limelight.getAprilTagTarget().isValidStageTag())
+        trapButton.whileTrue(
+            Commands.print("Driving to trap")
+            .andThen(shooterFlywheels.spinUpFlywheels(ShooterConstants.flywheelTrapSetpoint))
+            .andThen(shooterArm.setToTrapPosition(false))
+            .andThen(new DriveToStage(swerve, limelight))
+            .andThen(shooterFlywheels.shootIntoTrap())
+            .andThen(shooterArm.setToUpPosition(false))
+            .onlyIf(() -> limelight.getAprilTagTarget().isValidStageTag() && shooterFlywheels.hasNote())
         );
 
-        driveToStageButton.onFalse(Commands.print("Released stage driving"));
+        trapButton.onFalse(
+            Commands.print("Canceled trap")
+            .andThen(shooterArm.setToUpPosition(false))
+        );
 
         /* Reset Buttons */
         ejectButton.onTrue(
