@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.LEDSubsystem.LEDState;
 import frc.robot.util.SparkMaxWrapper;
 
 import static frc.robot.Constants.AutoConstants.*;
@@ -32,6 +33,8 @@ public class RobotContainer {
 
     /* Drive Controller Buttons */
     private final Trigger zeroGyroButton = driveController.a().debounce(0.025);
+    private final Trigger climberDownButton = driveController.leftTrigger(0.25).debounce(0.025);
+    private final Trigger shuttleButton = driveController.x().debounce(0.025);
     private final Trigger underStageButton = driveController.rightBumper().debounce(0.025);
     private final Trigger overrideAutoAim = driveController.leftBumper().debounce(0.025);
     private final Trigger shootButton = driveController.b().debounce(0.025);
@@ -56,7 +59,7 @@ public class RobotContainer {
     private final ShooterFlywheels shooterFlywheels = new ShooterFlywheels();
     private final ShooterArm shooterArm = new ShooterArm();
     private final Climbers climbers = new Climbers();
-    // private final LEDSubsystem leds = new LEDSubsystem(LEDState.BLUE_GRADIENT);
+    private final LEDSubsystem leds = new LEDSubsystem(LEDState.BLUE_GRADIENT);
 
     /* Shuffleboard */
     private final ShuffleboardTab debugTab = Shuffleboard.getTab("Debug");
@@ -218,6 +221,11 @@ public class RobotContainer {
             )
         );
 
+        climberDownButton.onTrue(
+            Commands.print("Climbers going down")
+            .andThen(leds.setState(LEDState.RAINBOW))
+        );
+
         underStageButton.onTrue(
             Commands.print("Going under stage")
             .andThen(shooterArm.setToUnderStagePosition(false))
@@ -234,6 +242,8 @@ public class RobotContainer {
             .andThen(shooterFlywheels.shoot(95.0, true)
                 .asProxy())//TODO do velocity lookup table if needed
             .andThen(shooterArm.setToUpPosition(false)
+                .asProxy())
+            .andThen(leds.setState(LEDState.BLUE_GRADIENT)
                 .asProxy())
         );
 
@@ -264,6 +274,7 @@ public class RobotContainer {
         storeNoteButton.and(underStageButton.negate()).onTrue(
             Commands.print("Transfering note")
             .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels, true))
+            .andThen(leds.setState(LEDState.GREEN_GRADIENT))
             .onlyIf(() -> intake.hasNote() && !shooterFlywheels.hasNote())
         );
 
@@ -272,6 +283,7 @@ public class RobotContainer {
             .andThen(shooterArm.setToAmpPosition(true))
             .andThen(shooterFlywheels.shootIntoAmp())
             .andThen(shooterArm.setToUpPosition(false))
+            .andThen(leds.setState(LEDState.BLUE_GRADIENT))
             .onlyIf(shooterFlywheels::hasNote)
         );
 
@@ -280,9 +292,19 @@ public class RobotContainer {
             .andThen(shooterFlywheels.spinUpFlywheels(ShooterConstants.flywheelTrapSetpoint))
             .andThen(shooterArm.setToTrapPosition(false))
             .andThen(new DriveToStage(swerve, limelight))
+            .andThen(Commands.waitSeconds(0.5))
             .andThen(shooterFlywheels.shootIntoTrap())
             .andThen(shooterArm.setToUpPosition(false))
+            .andThen(leds.setState(LEDState.BLUE_GRADIENT))
             .onlyIf(() -> limelight.getAprilTagTarget().isValidStageTag() && shooterFlywheels.hasNote())
+        );
+
+        shuttleButton.onTrue(
+            Commands.print("Shuttling note")
+            .andThen(shooterArm.setToShuttlePosition(true))
+            .andThen(shooterFlywheels.shoot(95.0, true))
+            .andThen(leds.setState(LEDState.BLUE_GRADIENT))
+            .onlyIf(shooterFlywheels::hasNote)
         );
 
         trapButton.onFalse(
@@ -309,6 +331,7 @@ public class RobotContainer {
             .andThen(intake.resetCommand())
             .andThen(shooterArm.resetCommand())
             .andThen(shooterFlywheels.resetCommand())
+            .andThen(leds.setState(LEDState.BLUE_GRADIENT))
         );
 
         /* Teleop Triggers */

@@ -95,6 +95,10 @@ public class ShooterArm extends SubsystemBase {
         return setTargetPosition(armPositionTrap, waitUntilAchieved).withName("To trap"); 
     }
 
+    public Command setToShuttlePosition(boolean waitUntilAchieved) {
+        return setTargetPosition(armPositionShuttle, waitUntilAchieved).withName("To shuttle"); 
+    }
+
     public Command setToAutoPosition(double position, boolean waitUntilAchieved) {
         return setTargetPosition(position, waitUntilAchieved).withName("To auto pos");
     }

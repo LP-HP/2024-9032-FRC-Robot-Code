@@ -43,9 +43,11 @@ public class LEDSubsystem extends SubsystemBase {
                 rainbow();
                 break;
             case BLUE_GRADIENT:
-                gradient(238);
-            case GREEN_GRADIENT:
                 gradient(119);
+                break;
+            case GREEN_GRADIENT:
+                gradient(238);
+                break;
             default:
                 break;
         }

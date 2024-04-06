@@ -30,7 +30,7 @@ public final class Constants {
 
     public static final class LEDConstants {
         public static final int ledPWMPort = 0;
-        public static final int ledStripLength = 140;
+        public static final int ledStripLength = 61;
     }
 
     public static final class TeleopConstants {
@@ -170,6 +170,7 @@ public final class Constants {
         public static final double armPositionUp = 160.0;
         public static final double armPositionAmp = 142.0;
         public static final double armPositionTrap = 147.0;
+        public static final double armPositionShuttle = 130.0;
 
         /* Auto Arm Aiming */
         /* Key - Distance : Value - Arm Position */
