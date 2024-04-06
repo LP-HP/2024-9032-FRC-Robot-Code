@@ -90,7 +90,7 @@ public class RobotContainer {
         configureTriggerBindings();
 
         /* Add auto chooser */
-        autoChooser.setDefaultOption("4 Note Middle", swerve.getVisionLocalizationAuto("Auto Aiming", limelight::getPoseEstimate));
+        autoChooser.setDefaultOption("5 Note Middle", swerve.getVisionLocalizationAuto("Auto Aiming", limelight::getPoseEstimate));
         autoChooser.addOption("Swerve Shakedown", AutoBuilder.buildAuto("Swerve Shakedown"));
         // autoChooser.addOption("Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
         autoChooser.addOption("3 Note Wide", swerve.getVisionLocalizationAuto("Start Right", limelight::getPoseEstimate));
@@ -292,7 +292,7 @@ public class RobotContainer {
             .andThen(shooterFlywheels.spinUpFlywheels(ShooterConstants.flywheelTrapSetpoint))
             .andThen(shooterArm.setToTrapPosition(false))
             .andThen(new DriveToStage(swerve, limelight))
-            .andThen(Commands.waitSeconds(0.5))
+            .andThen(Commands.waitSeconds(1.0))
             .andThen(shooterFlywheels.shootIntoTrap())
             .andThen(shooterArm.setToUpPosition(false))
             .andThen(leds.setState(LEDState.BLUE_GRADIENT))

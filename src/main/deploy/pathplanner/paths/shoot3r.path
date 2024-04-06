@@ -45,19 +45,7 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [
-    {
-      "name": "New Constraints Zone",
-      "minWaypointRelativePos": 1.8,
-      "maxWaypointRelativePos": 2.0,
-      "constraints": {
-        "maxVelocity": 3.0,
-        "maxAcceleration": 32.0,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 900.0
-      }
-    }
-  ],
+  "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,

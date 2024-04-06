@@ -42,9 +42,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "shoot3r"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "shoot3r"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Passthrough"
+                }
+              }
+            ]
           }
         },
         {
@@ -66,9 +79,28 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "shoot5r"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "shoot5r"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Passthrough"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootAA"
           }
         }
       ]

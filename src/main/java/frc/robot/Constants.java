@@ -170,7 +170,7 @@ public final class Constants {
         public static final double armPositionUp = 160.0;
         public static final double armPositionAmp = 142.0;
         public static final double armPositionTrap = 147.0;
-        public static final double armPositionShuttle = 130.0;
+        public static final double armPositionShuttle = 140.0;
 
         /* Auto Arm Aiming */
         /* Key - Distance : Value - Arm Position */
