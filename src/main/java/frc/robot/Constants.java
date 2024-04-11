@@ -189,8 +189,8 @@ public final class Constants {
             distanceToArmPosTable.put(3.202, 130.0);
             distanceToArmPosTable.put(3.427, 129.0);
             distanceToArmPosTable.put(3.638, 128.0);
-            distanceToArmPosTable.put(3.972, 127.0);
-            distanceToArmPosTable.put(4.27, 126.0);
+            distanceToArmPosTable.put(3.972, 127.5);
+            distanceToArmPosTable.put(4.27, 127.0);
             distanceToArmPosTable.put(4.72, 124.55);
         }
         public static final double distanceVelocityCompAmt = 0.0;//TODO test
@@ -214,7 +214,7 @@ public final class Constants {
         public static final double ampShotWaitTime = 1.0;
         public static final double minFlywheelSetpoint = 0.0;
         public static final double maxFlywheelSetpoint = 100.0;
-        public static final double flywheelAmpSetpoint = 20.0;
+        public static final double flywheelAmpSetpoint = 13.0;
         public static final double flywheelTrapSetpoint = 35.0;
 
         /* Storage Motor */
