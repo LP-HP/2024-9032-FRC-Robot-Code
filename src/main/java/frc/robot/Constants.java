@@ -271,7 +271,7 @@ public final class Constants {
     /* Using CANIds 1-12 - 8 motors and 4 cancoders */
     public static final class SwerveConstants {
         public static final boolean invertGyro = true;
-        public static final Port gyroPort = Port.kUSB;
+        public static final Port gyroPort = Port.kMXP;
 
         /* Drivetrain Constants */
         public static final double trackWidth = Units.inchesToMeters(24.5); 
