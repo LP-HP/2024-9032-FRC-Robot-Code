@@ -22,8 +22,16 @@ import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
 public final class Constants {
     public static final int driveControllerPort = 0;
     public static final int mechanismControllerPort = 1;
+
     public static final boolean burnFlash = false;
     public static final boolean configMotors = false;
+
+    public static final double passthroughRecoveryWait = 3.0;
+
+    public static final class LEDConstants {
+        public static final int ledPWMPort = 0;
+        public static final int ledStripLength = 61;
+    }
 
     public static final class TeleopConstants {
         public static final double stickDeadband = 0.02;
@@ -32,8 +40,6 @@ public final class Constants {
         public static final double joystickToSpeedConversionFactor = SwerveConstants.maxSpeed;
         /* Radians per Second */
         public static final double joystickToAngularVelocityConversionFactor = 2 * Math.PI;
-        /* Meters per Second Squared */
-        public static final double accelerationLimit = 49.0;
     }
 
     public static final class LimelightConstants {
@@ -48,16 +54,16 @@ public final class Constants {
         public static final double mountingAngle = Units.degreesToRadians(30.0);
 
         /* Cutoff for target validity */
-        public static final double distanceCutoff = 5.0;
+        public static final double distanceCutoff = 6.0;
     }
 
     public static final class PhotonvisionConstants {
         public static final String cameraName = "IntakeCamera";
 
         /* Distance Constants */
-        public static final double targetHeight = Units.inchesToMeters(1);
-        public static final double cameraHeight = Units.inchesToMeters(10.25);
-        public static final double mountingAngle = Units.degreesToRadians(-10); 
+        public static final double targetHeight = Units.inchesToMeters(1.0);
+        public static final double cameraHeight = Units.inchesToMeters(25.0);
+        public static final double mountingAngle = Units.degreesToRadians(-18.0); 
     }
 
     /* Using CANIds 13-14 - 2 motors */
@@ -87,7 +93,6 @@ public final class Constants {
         public static final double armPositionStarting = 229.0;
         public static final double armPositionGround = 26.5;
         public static final double armPositionPassthrough = 227.0;
-        public static final double armPositionAmp = 150.0;
         public static final double armPositionEject = 100.0;
 
         /* Intake Flywheel */
@@ -103,14 +108,19 @@ public final class Constants {
             1.0
         );
         public static final double shotWaitTime = 0.25;
-        public static final double ampWaitTime = 1.0;
         /* Flyhweel Powers */
-        public static final double intakePower = -0.6;
-        public static final double outtakeAmpPower = 0.5;
+        public static final double intakePower = -1.0;
+        public static final double ejectPower = 0.5;
         public static final double transferToShooterPower = 0.4;
 
         /* Sensors */
         public static final int beamBreakPort = 0;
+
+        public static final int ultrasonicPingPort = 2;
+        public static final int ultrasonicEchoPort = 3;
+        public static final int medianFilterSize = 5;
+        /* In Inches */
+        public static final double closeToObstacleDistance = 2.5;
     }
 
     /* Using CANIds 15-19 - 5 motors */
@@ -120,8 +130,8 @@ public final class Constants {
         public static final double minArmSetpoint = 95.0;
         public static final double maxArmSetpoint = 180.0;
         public static final SparkMaxPIDConstants shooterArmPID = new SparkMaxPIDConstants(
-            0.04, 
-            0.00001, 
+            0.05, 
+            0.0, 
             0.01, 
             0.0,
             -0.4,
@@ -158,6 +168,11 @@ public final class Constants {
         public static final double armPositionPassthrough = 133.0;
         public static final double armPositionUnderStage = 120.0;
         public static final double armPositionUp = 160.0;
+        public static final double armPositionAmp = 145.0;
+        public static final double armPositionTrap = 147.0;
+        public static final double armPositionShuttle = 140.0;
+
+        /* Auto Arm Aiming */
         /* Key - Distance : Value - Arm Position */
         public static final InterpolatingDoubleTreeMap distanceToArmPosTable = new InterpolatingDoubleTreeMap();
         static {
@@ -167,7 +182,7 @@ public final class Constants {
             distanceToArmPosTable.put(1.636, 145.0);
             distanceToArmPosTable.put(1.97, 140.5);
             distanceToArmPosTable.put(2.12, 139.0);
-            distanceToArmPosTable.put(2.291, 137.0);
+            distanceToArmPosTable.put(2.291, 136.5);
             distanceToArmPosTable.put(2.577, 135.5);
             distanceToArmPosTable.put(2.77, 135.0);
             distanceToArmPosTable.put(2.942, 132.0);
@@ -176,7 +191,9 @@ public final class Constants {
             distanceToArmPosTable.put(3.638, 128.0);
             distanceToArmPosTable.put(3.972, 127.5);
             distanceToArmPosTable.put(4.27, 127.0);
+            distanceToArmPosTable.put(4.72, 124.55);
         }
+        public static final double distanceVelocityCompAmt = 0.0;//TODO test
 
         /* Shooter Flywheels */
         public static final double flywheelVelocityTolerance = 1.0;
@@ -193,9 +210,12 @@ public final class Constants {
         public static final int rightFlywheelMotorID = 18;
         public static final InvertedValue rightFlywheelInvert = InvertedValue.CounterClockwise_Positive;
 
-        public static final double shotWaitTime = 0.5;
+        public static final double speakerShotWaitTime = 0.5;
+        public static final double ampShotWaitTime = 1.0;
         public static final double minFlywheelSetpoint = 0.0;
         public static final double maxFlywheelSetpoint = 100.0;
+        public static final double flywheelAmpSetpoint = 13.0;
+        public static final double flywheelTrapSetpoint = 35.0;
 
         /* Storage Motor */
         public static final SparkMaxConstants shooterStorageConstants = new SparkMaxConstants(
@@ -211,6 +231,7 @@ public final class Constants {
         );
         public static final double storageMotorPowerReceiving = 0.2;
         public static final double storageMotorPowerToFlywheels = 0.75;
+        public static final double storageMotorPowerToAmp = 0.3;
 
         /* Sensors */
         public static final int beamBreakPort = 2;
@@ -250,7 +271,7 @@ public final class Constants {
     /* Using CANIds 1-12 - 8 motors and 4 cancoders */
     public static final class SwerveConstants {
         public static final boolean invertGyro = true;
-        public static final Port gyroPort = Port.kUSB;
+        public static final Port gyroPort = Port.kMXP;
 
         /* Drivetrain Constants */
         public static final double trackWidth = Units.inchesToMeters(24.5); 
@@ -448,34 +469,57 @@ public final class Constants {
     public static final class ClosedLoopConstants { 
         /* PID Constants for Path Following */
         public static final PIDConstants translationPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            5.0, 
+            6.0, 
             0.0, 
             0.0
         ); 
         public static final PIDConstants headingPID = new PIDConstants(// TODO: TUNE for auto pathplanner
-            5.0, 
+            6.0, 
             0.0, 
             0.0
         ); 
 
-        /* PID Constants for rotation and movement to a vision target while moving */
-        public static final double kPRotationTargetWhileMoving = 0.14;
-        public static final double kDRotationTargetWhileMoving = 0.01;
+        /* Constants for aiming at the speaker while moving */
+        public static final double kPSpeakerRotation = 0.14;
+        public static final double kDSpeakerRotation = 0.01;
 
-        /* For alignment without moving */
-        public static final double kPTranslationTarget = 2.4;        
+        public static final double xOffsetVelocityCompAmt = 0.0;//TODO test
+        public static final double skewCompAmtCutoff = 0.15;
+        public static final double skewCompAmt = -5.0;
+
+        /* Constants for note alignment */        
+        public static final double kPNoteRotation = 0.12;
+        public static final double kDNoteRotation = 0.01;
+
+        public static final double kPNoteDistance = 1.75;
+        public static final double kDNoteDistance = 0.01;
         
-        public static final double kPRotationTarget = 0.12;
-        public static final double kDRotationTarget = 0.01;
-        
-        /* Setpoint tolerances */
-        public static final double rotationSetpointTolerance = 1.0;
-        public static final double translationSetpointTolerance = 0.5;
+        public static final double maxNoteDrivingSpeed = 3.0;
+        public static final int cycleAmtSinceNoteSeenCutoff = 5;
+        public static final double noteXSetpoint = 0.58;
+
+        /* Constants for stage alignment */
+        public static final double kPStageRotation = 8.0;
+        public static final double kDStageRotation = 0.01;
+        public static final double stageRotationTolerance = 0.015;
+
+        public static final double kPStageDistance = 2.0;
+        public static final double kDStageDistance = 0.01;
+        public static final double stageDistanceTolerance = Units.inchesToMeters(1.0);
+        public static final double stageDistanceSetpoint = 0.93;
+
+        public static final double kPStageY = 0.13;
+        public static final double kDStageY = 0.02;
+        public static final double stageYTolerance = 1.0;
+
+        /* April Tag Constants */
+        public static final int cycleAmtSinceAprilTagSeenCutoff = 5;
     }
 
     public static final class AutoConstants { 
         /* Seconds */
-        public static final double notePickupTimeout = 10.0;
+        public static final double notePickupTimeout = 5.0;
+
         public static final double shootVelocity = 95.0;
     }
 }

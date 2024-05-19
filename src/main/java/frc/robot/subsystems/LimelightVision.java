@@ -4,12 +4,11 @@ import java.util.Optional;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.limelightutil.LimelightHelpers;
@@ -18,20 +17,33 @@ import frc.lib.limelightutil.LimelightHelpers.PoseEstimate;
 import static frc.robot.Constants.LimelightConstants.*;
 
 public class LimelightVision extends SubsystemBase {
-    private LimelightPoseEstimate currentPose = new LimelightPoseEstimate();
+    private PoseEstimate currentPose = new PoseEstimate(new Pose2d(), 0, 0, 0, 0, 0, 0);
     private AprilTagTarget currentTarget = new AprilTagTarget();
     
-    private boolean isLocalizationPipeline = startInLocalization;//Whether we are localizing or tracking a target
-
     private final ShuffleboardTab limelightTab = Shuffleboard.getTab("Limelight");
 
     public LimelightVision() {
         /* Add Telemetry */
-        limelightTab.add(currentTarget)
-            .withPosition(6, 0).withSize(2, 2);
-        limelightTab.add(currentPose)
-            .withPosition(8, 0).withSize(2, 2);
-        limelightTab.addBoolean("Localization Pipeline", () -> isLocalizationPipeline)
+        ShuffleboardLayout poseLayout = limelightTab.getLayout("Pose", BuiltInLayouts.kList)
+            .withPosition(8, 0).withSize(2, 4);
+        poseLayout.addDouble("Pose X", () -> currentPose.pose.getX());
+        poseLayout.addDouble("Pose Y", () -> currentPose.pose.getY());
+        poseLayout.addDouble("Pose Heading", () -> currentPose.pose.getRotation().getDegrees());
+        poseLayout.addDouble("Tag Count", () -> currentPose.tagCount);
+        poseLayout.addDouble("Tag Area", () -> currentPose.avgTagArea);
+        poseLayout.addDouble("Timestamp", () -> currentPose.timestampSeconds);
+
+        ShuffleboardLayout targetLayout = limelightTab.getLayout("Target", BuiltInLayouts.kList)
+            .withPosition(6, 0).withSize(2, 4);
+        targetLayout.addDouble("X Offset", () -> currentTarget.xOffset);
+        targetLayout.addDouble("Y Offset", () -> currentTarget.yOffset);
+        targetLayout.addDouble("ID", () -> currentTarget.id);
+        targetLayout.addDouble("Area", () -> currentTarget.area);
+        targetLayout.addBoolean("Is Valid", () -> currentTarget.isValid);
+        targetLayout.addDouble("Distance", () -> currentTarget.distance);
+        targetLayout.addDouble("Skew", () -> currentTarget.skew);
+
+        limelightTab.addBoolean("Localization Pipeline", this::isLocalizationPipeline)
             .withPosition(8, 3).withSize(2, 1);
 
         /* Add Pipeline Buttons */
@@ -39,6 +51,12 @@ public class LimelightVision extends SubsystemBase {
             .withPosition(0, 4).withSize(2, 1);
         limelightTab.add("To Target", runOnce(this::switchToTargetPipeline))
             .withPosition(2, 4).withSize(2, 1);
+
+        if(startInLocalization)
+            switchToLocalizationPipeline();
+        
+        else
+            switchToTargetPipeline();
     }
 
     public void addCameraToTab(ShuffleboardTab tab, int col, int row, int size) {
@@ -52,8 +70,8 @@ public class LimelightVision extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if(isLocalizationPipeline) 
-            currentPose.poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
+        if(isLocalizationPipeline()) 
+            currentPose = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
 
         boolean isValid = LimelightHelpers.getTV(limelightName);
 
@@ -62,6 +80,7 @@ public class LimelightVision extends SubsystemBase {
             currentTarget.yOffset = LimelightHelpers.getTY(limelightName);
             currentTarget.area = LimelightHelpers.getTA(limelightName);
             currentTarget.id = LimelightHelpers.getFiducialID(limelightName);
+            currentTarget.skew = LimelightHelpers.getTargetPose3d_CameraSpace(limelightName).getRotation().getZ();//TODO enable 3d tracking / delete target pipeline
 
             currentTarget.distance = getDistanceFromYOffset(currentTarget.yOffset);
 
@@ -78,8 +97,6 @@ public class LimelightVision extends SubsystemBase {
 
     public void switchToTargetPipeline() {
         LimelightHelpers.setPipelineIndex(limelightName, targetPipelineID);
-
-        isLocalizationPipeline = false;
     }
 
     public void switchToLocalizationPipeline() {
@@ -91,23 +108,24 @@ public class LimelightVision extends SubsystemBase {
             
         else
             LimelightHelpers.setPriorityTagID(limelightName, 7);
-
-        isLocalizationPipeline = true;
     }
 
     public boolean isTargetPipeline() {
-        return !isLocalizationPipeline;
+        return LimelightHelpers.getCurrentPipelineIndex(limelightName) == targetPipelineID;
+    }
+
+    public boolean isLocalizationPipeline() {
+        return LimelightHelpers.getCurrentPipelineIndex(limelightName) == localizationPipelineID;
     }
 
     public Optional<PoseEstimate> getPoseEstimate() {
-        PoseEstimate currentReading = currentPose.poseEstimate;
         /* Do not return an estimate if we are in the wrong pipeline or the estimate is invalid */
-        if(isLocalizationPipeline 
-            && currentReading != null 
-            && currentReading.tagCount != 0 
-            && !(currentReading.pose.getX() == 0.0 && currentReading.pose.getY() == 0.0)
+        if(isLocalizationPipeline() 
+            && currentPose != null 
+            && currentPose.tagCount != 0 
+            && !(currentPose.pose.getX() == 0.0 && currentPose.pose.getY() == 0.0)
         ) {
-            return Optional.of(currentReading);
+            return Optional.of(currentPose);
         }
 
         else
@@ -118,17 +136,14 @@ public class LimelightVision extends SubsystemBase {
         return currentTarget;
     }
 
-    public static final class AprilTagTarget implements Sendable {
+    public static final class AprilTagTarget {
         public double xOffset = 0.0;
         public double yOffset = 0.0;
         public double id = 0.0;
         public double area = 0.0;
         public boolean isValid = false;
         public double distance = 0.0;
-
-        public AprilTagTarget() {
-            SendableRegistry.add(this, "April Tag Target");
-        }
+        public double skew = 0.0;
 
         public boolean isValidSpeakerTag() {
             return isValid && (id == 4 || id == 7);
@@ -138,32 +153,9 @@ public class LimelightVision extends SubsystemBase {
             return isValid && (id == 6 || id == 5);
         }
 
-        @Override
-        public void initSendable(SendableBuilder builder) {
-            builder.addDoubleProperty("X Offset", () -> xOffset, null);
-            builder.addDoubleProperty("Y Offset", () -> yOffset, null);
-            builder.addDoubleProperty("ID", () -> id, null);
-            builder.addDoubleProperty("Area", () -> area, null);
-            builder.addBooleanProperty("Is Valid", () -> isValid, null);
-            builder.addDoubleProperty("Distance", () -> distance, null);
-        }
-    }
-
-    public static final class LimelightPoseEstimate implements Sendable {
-        public PoseEstimate poseEstimate = new PoseEstimate(new Pose2d(), 0, 0, 0, 0, 0, 0);
-
-        public LimelightPoseEstimate() {
-            SendableRegistry.add(this, "Limelight Pose Estimate");
-        }
-
-        @Override
-        public void initSendable(SendableBuilder builder) {
-            builder.addDoubleProperty("Pose X", () -> poseEstimate.pose.getX(), null);
-            builder.addDoubleProperty("Pose Y", () -> poseEstimate.pose.getY(), null);
-            builder.addDoubleProperty("Pose Heading", () -> poseEstimate.pose.getRotation().getDegrees(), null);
-            builder.addDoubleProperty("Tag Count", () -> poseEstimate.tagCount, null);
-            builder.addDoubleProperty("Tag Area", () -> poseEstimate.avgTagArea, null);
-            builder.addDoubleProperty("Timestamp", () -> poseEstimate.timestampSeconds, null);
+        public boolean isValidStageTag() {
+            /* IDs 11-16 are stage tags */
+            return isValid && id >= 11 && id <= 16;//TODO put in ids in pipeline
         }
     }
 }   

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.7226441151219607,
-        "y": 5.586611458258547
+        "x": 8.114260409043384,
+        "y": 5.840105171896805
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.44965088504999,
-        "y": 5.498863634306841
+        "x": 5.8523165027327675,
+        "y": 7.039325432570104
       },
       "isLocked": false,
-      "linkedName": "aa3end"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.9231639413397603,
-        "y": 4.689633702307785
+        "x": 3.6098721128558653,
+        "y": 5.723108073294532
       },
       "prevControl": {
-        "x": 1.3771774811958186,
-        "y": 5.030875239897749
+        "x": 4.204607364084083,
+        "y": 6.278844291655329
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,32 +32,43 @@
   "constraintZones": [
     {
       "name": "New Constraints Zone",
-      "minWaypointRelativePos": 0.7,
+      "minWaypointRelativePos": 0.95,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.0,
         "maxAcceleration": 16.0,
         "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0
+        "maxAngularAcceleration": 900.0
+      }
+    },
+    {
+      "name": "New Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.6,
+      "constraints": {
+        "maxVelocity": 3.5,
+        "maxAcceleration": 16.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 900.0
       }
     }
   ],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
+    "maxVelocity": 3.0,
     "maxAcceleration": 16.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0
+    "maxAngularAcceleration": 900.0
   },
   "goalEndState": {
-    "velocity": 1.0,
-    "rotation": -32.66091272167373,
+    "velocity": 0,
+    "rotation": 2.121096396661477,
     "rotateFast": true
   },
   "reversed": false,
   "folder": "Auto Aiming",
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": -36.41637851988621,
     "velocity": 0
   },
   "useDefaultConstraints": true

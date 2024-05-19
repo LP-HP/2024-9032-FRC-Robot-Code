@@ -12,9 +12,9 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "aa1"
+            "name": "AutoInit"
           }
         },
         {
@@ -30,9 +30,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "aa1.5"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "shootaa2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Passthrough"
+                }
+              }
+            ]
           }
         },
         {
@@ -44,7 +57,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "aa2"
+            "pathName": "noteaa3"
           }
         },
         {
@@ -54,9 +67,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "aa3"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "shootaa3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Passthrough"
+                }
+              }
+            ]
           }
         },
         {
@@ -68,7 +94,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "aa4"
+            "pathName": "noteaa4"
           }
         },
         {
@@ -78,9 +104,59 @@
           }
         },
         {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "shootaa4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Passthrough"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootAA"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "aa4.5"
+            "pathName": "noteaa5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeAA"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "shootaa5"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Passthrough"
+                }
+              }
+            ]
           }
         },
         {

@@ -6,7 +6,6 @@ import java.util.function.Supplier;
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.VecBuilder;
@@ -19,7 +18,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -69,13 +67,17 @@ public class Swerve extends SubsystemBase {
         resetModulesToAbsolute();//Set integrated encoders to the absolute positions using cancoders
 
         swerveOdometry = new SwerveDrivePoseEstimator(swerveKinematics, getGyroYaw(), getModulePositions(), new Pose2d());
+        /* Set heading deviation high to only use gyro for heading */
+        swerveOdometry.setVisionMeasurementStdDevs(
+            VecBuilder.fill(0.5, 0.5, 999999999)
+        );
 
         /* Sets up pathplanner for auto path following */
         AutoBuilder.configureHolonomic(
                 this::getPose,
                 this::resetOdometry,
                 this::getSpeeds, 
-                this::driveClosedLoopFromSpeeds,
+                this::driveOpenLoopFromSpeeds,
                 new HolonomicPathFollowerConfig(
                     Constants.ClosedLoopConstants.translationPID,
                     Constants.ClosedLoopConstants.headingPID, 
@@ -90,15 +92,15 @@ public class Swerve extends SubsystemBase {
         swerveTab.add("Field", field)
             .withPosition(0, 0).withSize(8, 3);
 
-        /* Send pathplanner target pose to field view */
-        PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
-            field.getObject("target pose").setPose(pose);
-        });
+        // /* Send pathplanner target pose to field view */
+        // PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
+        //     field.getObject("target pose").setPose(pose);
+        // });
 
-        /* Send pathplanner path to field view */
-        PathPlannerLogging.setLogActivePathCallback((poses) -> {
-            field.getObject("path").setPoses(poses);
-        });
+        // /* Send pathplanner path to field view */
+        // PathPlannerLogging.setLogActivePathCallback((poses) -> {
+        //     field.getObject("path").setPoses(poses);
+        // });
 
         /* Add Telemetry */
         swerveTab.addDouble("Pose X", () -> getPose().getX())
@@ -151,6 +153,16 @@ public class Swerve extends SubsystemBase {
 
     public void driveClosedLoop(Translation2d translation, double rotation) {
         driveClosedLoopFromSpeeds(new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
+    }
+
+    public void driveOpenLoopFromSpeeds(ChassisSpeeds speeds) {
+        SwerveModuleState[] desiredStates = swerveKinematics.toSwerveModuleStates(speeds);
+
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxSpeed);
+
+        for(SwerveModule mod : swerveMods){
+            mod.setDesiredState(desiredStates[mod.getNumber()], true);
+        }
     }
 
     public void driveOpenLoop(Translation2d translation, double rotation, boolean fieldCentric) {
@@ -232,25 +244,17 @@ public class Swerve extends SubsystemBase {
     }
 
     private void updateVisionLocalization(PoseEstimate poseEstimate) {
-        double poseDifference = swerveOdometry.getEstimatedPosition().getTranslation().getDistance(poseEstimate.pose.getTranslation());
+        /* Multiple targets detected means a lower standard deviation */
+        if(poseEstimate.tagCount >= 2) {
+            double poseDifference = getPose().getTranslation().getDistance(poseEstimate.pose.getTranslation());
 
-        double xyStandardDeviation;
-        double headingStandardDeviation;
-        /* Multiple targets detected means a lower standard deviation - set heading deviation high to only use gyro for heading */
-        if (poseEstimate.tagCount >= 2 && poseDifference < 1.0) {
-            xyStandardDeviation = 0.5;
-            headingStandardDeviation = 999999999;
-        }
-        else {
-            System.err.println("Discarded pose estimate | tag amt " + poseEstimate.tagCount + " | pose " + poseEstimate.pose);
+            /* Discard any measurements that are too far from previous measurements */
+            if(poseDifference < 1.0) 
+                swerveOdometry.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
 
-            return;
-        }        
-
-        swerveOdometry.setVisionMeasurementStdDevs(
-            VecBuilder.fill(xyStandardDeviation, xyStandardDeviation, Units.degreesToRadians(headingStandardDeviation))
-        );
-        swerveOdometry.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
+            else 
+                System.err.println("Discarded pose estimate | pose " + poseEstimate.pose + " | dif. " + poseDifference);
+        }     
     }
 
     @Override
