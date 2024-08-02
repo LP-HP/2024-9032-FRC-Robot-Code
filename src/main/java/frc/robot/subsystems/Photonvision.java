@@ -44,7 +44,7 @@ public class Photonvision extends SubsystemBase {
             currentTarget.xOffset = result.getBestTarget().getYaw();
 
             /* Calculate distance */
-            currentTarget.distance = PhotonUtils.calculateDistanceToTargetMeters(//TODO fix distance readings
+            currentTarget.distance = PhotonUtils.calculateDistanceToTargetMeters(
                 cameraHeight,
                 targetHeight,
                 mountingAngle,

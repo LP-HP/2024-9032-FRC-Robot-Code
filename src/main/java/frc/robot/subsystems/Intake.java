@@ -1,8 +1,6 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;

@@ -64,7 +64,7 @@ public class RobotContainer {
     /* Shuffleboard */
     private final ShuffleboardTab debugTab = Shuffleboard.getTab("Debug");
     private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
-    SendableChooser<Command> autoChooser = new SendableChooser<>();
+    private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     /* Teleop Triggers */
     private final Trigger autoAimSpeaker = 
@@ -240,7 +240,7 @@ public class RobotContainer {
         shootButton.and(autoAimSpeaker).onTrue(
             Commands.print("Shooting")
             .andThen(shooterFlywheels.shoot(95.0, true)
-                .asProxy())//TODO do velocity lookup table if needed
+                .asProxy())
             .andThen(shooterArm.setToUpPosition(false)
                 .asProxy())
             .andThen(leds.setState(LEDState.BLUE_GRADIENT)

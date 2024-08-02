@@ -80,7 +80,7 @@ public class LimelightVision extends SubsystemBase {
             currentTarget.yOffset = LimelightHelpers.getTY(limelightName);
             currentTarget.area = LimelightHelpers.getTA(limelightName);
             currentTarget.id = LimelightHelpers.getFiducialID(limelightName);
-            currentTarget.skew = LimelightHelpers.getTargetPose3d_CameraSpace(limelightName).getRotation().getZ();//TODO enable 3d tracking / delete target pipeline
+            currentTarget.skew = LimelightHelpers.getTargetPose3d_CameraSpace(limelightName).getRotation().getZ();
 
             currentTarget.distance = getDistanceFromYOffset(currentTarget.yOffset);
 
@@ -155,7 +155,7 @@ public class LimelightVision extends SubsystemBase {
 
         public boolean isValidStageTag() {
             /* IDs 11-16 are stage tags */
-            return isValid && id >= 11 && id <= 16;//TODO put in ids in pipeline
+            return isValid && id >= 11 && id <= 16;
         }
     }
 }   
