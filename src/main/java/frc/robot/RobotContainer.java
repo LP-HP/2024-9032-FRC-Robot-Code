@@ -92,7 +92,6 @@ public class RobotContainer {
         /* Add auto chooser */
         autoChooser.setDefaultOption("5 Note Middle", swerve.getVisionLocalizationAuto("Auto Aiming", limelight::getPoseEstimate));
         autoChooser.addOption("Swerve Shakedown", AutoBuilder.buildAuto("Swerve Shakedown"));
-        // autoChooser.addOption("Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
         autoChooser.addOption("3 Note Wide", swerve.getVisionLocalizationAuto("Start Right", limelight::getPoseEstimate));
         autoChooser.addOption("1 Note Amp Side", swerve.getVisionLocalizationAuto("Start Left", limelight::getPoseEstimate));
 
@@ -251,8 +250,6 @@ public class RobotContainer {
             Commands.print("Enabling intake")
             .andThen(shooterArm.setToPassthroughPosition(false))
             .andThen(intake.getNoteFromGround())
-            // .andThen(Commands.print("Transfering note"))
-            // .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels, true)
             .andThen(setAndDisableRumble())
             .onlyIf(() -> !intake.hasNote() && !shooterFlywheels.hasNote())
         );
