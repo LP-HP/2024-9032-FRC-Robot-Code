@@ -1,5 +1,9 @@
 package frc.robot;
 
+import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.SteerRequestType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -13,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.krakenSwerveConstants;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.LEDSubsystem.LEDState;
@@ -65,6 +70,13 @@ public class RobotContainer {
     private final ShuffleboardTab debugTab = Shuffleboard.getTab("Debug");
     private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
     SendableChooser<Command> autoChooser = new SendableChooser<>();
+
+    /* Swerve */
+    private final SwerveDrivetrain m_drivetrain = krakenSwerveConstants.DriveTrain;
+    private final SwerveRequest.FieldCentric m_driveRequest = new SwerveRequest.FieldCentric()
+        .withDeadband(krakenSwerveConstants.maxSpeed * 0.1).withRotationalDeadband(krakenSwerveConstants.maxAngularRate * 0.1) // Add a 10% deadband
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+        .withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
     /* Teleop Triggers */
     private final Trigger autoAimSpeaker = 

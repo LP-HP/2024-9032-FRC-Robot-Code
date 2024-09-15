@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.util.SparkMaxWrapper;
 import frc.robot.util.SwerveModuleConstants;
+import frc.robot.util.SwerveModuleConstantsOld;
 import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -32,22 +33,22 @@ public class SwerveModule {
 
     private final ShuffleboardTab swerveModuleTab;
 
-    public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants) {
+    public SwerveModule(int moduleNumber, SwerveModuleConstantsOld constants) {
         this.moduleNumber = moduleNumber;
-        this.angleOffset = moduleConstants.angleOffset();
+        this.angleOffset = constants.angleOffset();
         
         /* Angle Encoder Config */
-        angleEncoder = new CANcoder(moduleConstants.canCoderID());
+        angleEncoder = new CANcoder(constants.canCoderID());
         configAngleEncoder();
 
         /* Angle Motor Config */
-        angleMotor = new SparkMaxWrapper(moduleConstants.angleMotorConstants());
+        angleMotor = new SparkMaxWrapper(constants.angleMotorConstants());
         /* Wrap in the range (-180, 180] */
         angleMotor.configPIDWrapping(-180.0, 180.0);
         angleMotor.config();
 
         /* Drive Motor Config */
-        driveMotor = new SparkMaxWrapper(moduleConstants.driveMotorConstants());
+        driveMotor = new SparkMaxWrapper(constants.driveMotorConstants());
         driveMotor.relativeEncoder.setPosition(0.0);
         driveMotor.config();
 
@@ -62,6 +63,7 @@ public class SwerveModule {
         swerveModuleTab.add(driveMotor)
             .withPosition(4, 1).withSize(2, 2);
     }
+
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
         SwerveModuleState currentState = getState();

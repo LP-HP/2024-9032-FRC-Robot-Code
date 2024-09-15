@@ -1,5 +1,12 @@
 package frc.robot;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.ClosedLoopOutputType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants.SteerFeedbackType;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.util.PIDConstants;
@@ -12,7 +19,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import frc.robot.util.SparkMaxConstants;
-import frc.robot.util.SwerveModuleConstants;
+import frc.robot.util.SwerveModuleConstantsOld;
 import frc.robot.util.SparkMaxConstants.ControlMode;
 import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
 
@@ -33,6 +40,41 @@ public final class Constants {
         public static final int ledStripLength = 61;
     }
 
+    public static final class krakenSwerveConstants {
+        private static final Slot0Configs steerConfig = new Slot0Configs()
+            .withKP(0).withKI(0).withKD(0); //TODO Tune
+        private static final Slot0Configs driveConfig = new Slot0Configs()
+            .withKP(0).withKI(0).withKD(0); //TODO Tune
+
+        private static final ClosedLoopOutputType steerClosedLoopOutput = ClosedLoopOutputType.Voltage;
+        private static final ClosedLoopOutputType driveClosedLoopOutput = ClosedLoopOutputType.TorqueCurrentFOC;
+
+        public static final double kSpeedAt12VoltsMps = 0; //TODO Change
+
+        public static final SwerveDrivetrainConstants DrivetrainConstants = new SwerveDrivetrainConstants()
+            .withCANbusName("rio");
+        public static final SwerveModuleConstantsFactory constantFactory = new SwerveModuleConstantsFactory()
+            .withDriveMotorGearRatio(6.12)
+            .withSteerMotorGearRatio(150/7)
+            .withWheelRadius(2)
+            .withSteerMotorGains(steerConfig)
+            .withDriveMotorGains(driveConfig)
+            .withSteerMotorClosedLoopOutput(steerClosedLoopOutput)
+            .withDriveMotorClosedLoopOutput(driveClosedLoopOutput)
+            .withSpeedAt12VoltsMps(kSpeedAt12VoltsMps)
+            .withFeedbackSource(SteerFeedbackType.RemoteCANcoder);
+
+        private static final SwerveModuleConstants frontLeft = constantFactory.createModuleConstants(0,0,0,0,0,0,false);
+        private static final SwerveModuleConstants frontRight = constantFactory.createModuleConstants(0,0,0,0,0,0,false);
+        private static final SwerveModuleConstants backLeft = constantFactory.createModuleConstants(0,0,0,0,0,0,false);
+        private static final SwerveModuleConstants backRight = constantFactory.createModuleConstants(0,0,0,0,0,0,false);
+        //TODO Set ID's and module positions/offsets once chassis is built!
+        public static final SwerveDrivetrain DriveTrain = new SwerveDrivetrain(DrivetrainConstants, frontLeft, frontRight, backLeft, backRight);
+        private static double wheelCircumference = 2*Math.PI;
+        public static double maxSpeed = (6000 / 60.0) * (1.0 / 6.12) * wheelCircumference;
+        public static double maxAngularRate = 0; //TODO Change
+    }
+    
     public static final class TeleopConstants {
         public static final double stickDeadband = 0.02;
         public static final boolean isFieldCentric = true;
@@ -371,8 +413,8 @@ public final class Constants {
             );
             public static final int canCoderID = 9;
             public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-94.482);
-            public static final SwerveModuleConstants constants = 
-                new SwerveModuleConstants(driveMotorConstants, angleMotorConstants, canCoderID, angleOffset);
+            public static final SwerveModuleConstantsOld constants = 
+                new SwerveModuleConstantsOld(driveMotorConstants, angleMotorConstants, canCoderID, angleOffset);
         }
 
         /* Front Right Module - Module 1 */
@@ -401,8 +443,8 @@ public final class Constants {
             );
             public static final int canCoderID = 10;
             public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-40.430);
-            public static final SwerveModuleConstants constants = 
-                new SwerveModuleConstants(driveMotorConstants, angleMotorConstants, canCoderID, angleOffset);
+            public static final SwerveModuleConstantsOld constants = 
+                new SwerveModuleConstantsOld(driveMotorConstants, angleMotorConstants, canCoderID, angleOffset);
         }
         
         /* Back Left Module - Module 2 */
@@ -431,8 +473,8 @@ public final class Constants {
             );
             public static final int canCoderID = 11;
             public static final Rotation2d angleOffset = Rotation2d.fromDegrees(57.920);
-            public static final SwerveModuleConstants constants = 
-                new SwerveModuleConstants(driveMotorConstants, angleMotorConstants, canCoderID, angleOffset);
+            public static final SwerveModuleConstantsOld constants = 
+                new SwerveModuleConstantsOld(driveMotorConstants, angleMotorConstants, canCoderID, angleOffset);
         }
 
         /* Back Right Module - Module 3 */
@@ -461,8 +503,8 @@ public final class Constants {
             );
             public static final int canCoderID = 12;
             public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-106.700);
-            public static final SwerveModuleConstants constants = 
-                new SwerveModuleConstants(driveMotorConstants, angleMotorConstants, canCoderID, angleOffset);
+            public static final SwerveModuleConstantsOld constants = 
+                new SwerveModuleConstantsOld(driveMotorConstants, angleMotorConstants, canCoderID, angleOffset);
         }
     }
 

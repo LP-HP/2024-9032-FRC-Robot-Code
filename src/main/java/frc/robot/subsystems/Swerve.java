@@ -33,6 +33,7 @@ import frc.robot.Constants.SwerveConstants.Mod1;
 import frc.robot.Constants.SwerveConstants.Mod2;
 import frc.robot.Constants.SwerveConstants.Mod3;
 import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
+import frc.robot.subsystems.SwerveModule;
 
 import static frc.robot.Constants.SwerveConstants.*;
 
