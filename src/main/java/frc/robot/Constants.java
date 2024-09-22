@@ -3,9 +3,11 @@ package frc.robot;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.ClosedLoopOutputType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants.SteerFeedbackType;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -64,15 +66,20 @@ public final class Constants {
             .withSpeedAt12VoltsMps(kSpeedAt12VoltsMps)
             .withFeedbackSource(SteerFeedbackType.RemoteCANcoder);
 
-        private static final SwerveModuleConstants frontLeft = constantFactory.createModuleConstants(0,0,0,0,0,0,false);
-        private static final SwerveModuleConstants frontRight = constantFactory.createModuleConstants(0,0,0,0,0,0,false);
-        private static final SwerveModuleConstants backLeft = constantFactory.createModuleConstants(0,0,0,0,0,0,false);
-        private static final SwerveModuleConstants backRight = constantFactory.createModuleConstants(0,0,0,0,0,0,false);
+        public static final SwerveModuleConstants frontLeft = constantFactory.createModuleConstants(0,0,0,0,0,0,false);
+        public static final SwerveModuleConstants frontRight = constantFactory.createModuleConstants(0,0,0,0,0,0,false);
+        public static final SwerveModuleConstants backLeft = constantFactory.createModuleConstants(0,0,0,0,0,0,false);
+        public static final SwerveModuleConstants backRight = constantFactory.createModuleConstants(0,0,0,0,0,0,false);
         //TODO Set ID's and module positions/offsets once chassis is built!
-        public static final SwerveDrivetrain DriveTrain = new SwerveDrivetrain(DrivetrainConstants, frontLeft, frontRight, backLeft, backRight);
+        
         private static double wheelCircumference = 2*Math.PI;
         public static double maxSpeed = (6000 / 60.0) * (1.0 / 6.12) * wheelCircumference;
         public static double maxAngularRate = 0; //TODO Change
+
+        public final static SwerveRequest.FieldCentric m_driveRequest = new SwerveRequest.FieldCentric()
+            .withDeadband(maxSpeed * 0.1).withRotationalDeadband(maxAngularRate * 0.1) // Add a 10% deadband
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+            .withSteerRequestType(SteerRequestType.MotionMagicExpo);
     }
     
     public static final class TeleopConstants {
