@@ -64,7 +64,7 @@ public class RobotContainer {
     /* Shuffleboard */
     private final ShuffleboardTab debugTab = Shuffleboard.getTab("Debug");
     private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
-    SendableChooser<Command> autoChooser = new SendableChooser<>();
+    private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     /* Teleop Triggers */
     private final Trigger autoAimSpeaker = 
@@ -92,7 +92,6 @@ public class RobotContainer {
         /* Add auto chooser */
         autoChooser.setDefaultOption("5 Note Middle", swerve.getVisionLocalizationAuto("Auto Aiming", limelight::getPoseEstimate));
         autoChooser.addOption("Swerve Shakedown", AutoBuilder.buildAuto("Swerve Shakedown"));
-        // autoChooser.addOption("Middle", swerve.getVisionLocalizationAuto("Start Middle", limelight::getPoseEstimate));
         autoChooser.addOption("3 Note Wide", swerve.getVisionLocalizationAuto("Start Right", limelight::getPoseEstimate));
         autoChooser.addOption("1 Note Amp Side", swerve.getVisionLocalizationAuto("Start Left", limelight::getPoseEstimate));
 
@@ -240,7 +239,7 @@ public class RobotContainer {
         shootButton.and(autoAimSpeaker).onTrue(
             Commands.print("Shooting")
             .andThen(shooterFlywheels.shoot(95.0, true)
-                .asProxy())//TODO do velocity lookup table if needed
+                .asProxy())
             .andThen(shooterArm.setToUpPosition(false)
                 .asProxy())
             .andThen(leds.setState(LEDState.BLUE_GRADIENT)
@@ -251,8 +250,6 @@ public class RobotContainer {
             Commands.print("Enabling intake")
             .andThen(shooterArm.setToPassthroughPosition(false))
             .andThen(intake.getNoteFromGround())
-            // .andThen(Commands.print("Transfering note"))
-            // .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels, true)
             .andThen(setAndDisableRumble())
             .onlyIf(() -> !intake.hasNote() && !shooterFlywheels.hasNote())
         );

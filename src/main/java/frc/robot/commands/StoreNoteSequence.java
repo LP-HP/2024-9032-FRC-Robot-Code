@@ -28,7 +28,7 @@ public class StoreNoteSequence extends SequentialCommandGroup {
             /* Make sure to put them back in the storage position and disable when the note arrives in the shooter */
             intake.disableRollers(),
             /* Spin up flywheels for faster shooting */
-            shooterFlywheels.spinUpFlywheels(95.0)//TODO do velocity lookup table if needed
+            shooterFlywheels.spinUpFlywheels(95.0)
         );
 
         if(resetShooter)

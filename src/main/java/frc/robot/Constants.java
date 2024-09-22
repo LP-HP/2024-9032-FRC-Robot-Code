@@ -264,7 +264,7 @@ public final class Constants {
             1.0
         );
 
-        public static final double maxHeight = 61.0;//TODO set this
+        public static final double maxHeight = 61.0;
         public static final double minHeight = -1.0;
     }
 
@@ -319,7 +319,7 @@ public final class Constants {
         );
 
         /* Drive Motor PID Values */
-        public static final SparkMaxPIDConstants drivePIDConstants = new SparkMaxPIDConstants( //TODO: This must be tuned to specific robot - needed for closed loop
+        public static final SparkMaxPIDConstants drivePIDConstants = new SparkMaxPIDConstants( 
             0.75, 
             0.0, 
             0.0, 
@@ -329,7 +329,7 @@ public final class Constants {
         );
 
         /* Drive Motor Characterization Values */
-        public static final double driveKS = 0.0; //TODO: This must be tuned to specific robot - needed for auto
+        public static final double driveKS = 0.0; 
         public static final double driveKV = 3.0;
         public static final double driveKA = 0.0;
 
@@ -468,12 +468,12 @@ public final class Constants {
 
     public static final class ClosedLoopConstants { 
         /* PID Constants for Path Following */
-        public static final PIDConstants translationPID = new PIDConstants(// TODO: TUNE for auto pathplanner
+        public static final PIDConstants translationPID = new PIDConstants(
             6.0, 
             0.0, 
             0.0
         ); 
-        public static final PIDConstants headingPID = new PIDConstants(// TODO: TUNE for auto pathplanner
+        public static final PIDConstants headingPID = new PIDConstants(
             6.0, 
             0.0, 
             0.0

@@ -77,7 +77,7 @@ public class Swerve extends SubsystemBase {
                 this::getPose,
                 this::resetOdometry,
                 this::getSpeeds, 
-                this::driveOpenLoopFromSpeeds,
+                this::driveOpenLoopFromSpeeds,//TODO This should be closed loop
                 new HolonomicPathFollowerConfig(
                     Constants.ClosedLoopConstants.translationPID,
                     Constants.ClosedLoopConstants.headingPID, 
@@ -146,7 +146,7 @@ public class Swerve extends SubsystemBase {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxSpeed);
 
-        for(SwerveModule mod : swerveMods){
+        for(SwerveModule mod : swerveMods) {
             mod.setDesiredState(desiredStates[mod.getNumber()], false);
         }
     }
@@ -160,7 +160,7 @@ public class Swerve extends SubsystemBase {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxSpeed);
 
-        for(SwerveModule mod : swerveMods){
+        for(SwerveModule mod : swerveMods) {
             mod.setDesiredState(desiredStates[mod.getNumber()], true);
         }
     }
@@ -205,7 +205,7 @@ public class Swerve extends SubsystemBase {
 
     private SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
-        for(SwerveModule mod : swerveMods){
+        for(SwerveModule mod : swerveMods) {
             states[mod.getNumber()] = mod.getState();
         }
 
@@ -214,7 +214,7 @@ public class Swerve extends SubsystemBase {
 
     private SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
-        for(SwerveModule mod : swerveMods){
+        for(SwerveModule mod : swerveMods) {
             positions[mod.getNumber()] = mod.getPosition();
         }
 
