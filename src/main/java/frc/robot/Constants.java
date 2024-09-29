@@ -42,6 +42,11 @@ public final class Constants {
         public static final double joystickToAngularVelocityConversionFactor = 2 * Math.PI;
     }
 
+    public static final class AmpMechanismConstants {
+        public static final double ampMechanismUp = 0; //TODO Change
+        public static final int ampServoPort = 0; //TODO Change to pwm port
+    }
+
     public static final class LimelightConstants {
         public static final String limelightName = "limelight";
         public static final int targetPipelineID = 0;
