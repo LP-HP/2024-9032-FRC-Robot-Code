@@ -42,21 +42,25 @@ public final class Constants {
         public static final int ledStripLength = 61;
     }
 
-    public static final class krakenSwerveConstants {
+    public static final class KrakenSwerveConstants {
         private static final Slot0Configs steerConfig = new Slot0Configs()
-            .withKP(0).withKI(0).withKD(0); //TODO Tune
+            .withKP(0).withKI(0).withKD(0)
+            .withKV(0).withKA(0).withKS(0); //TODO Tune
         private static final Slot0Configs driveConfig = new Slot0Configs()
-            .withKP(0).withKI(0).withKD(0); //TODO Tune
+            .withKP(0).withKI(0).withKD(0)
+            .withKV(0).withKA(0).withKS(0); //TODO Tune
 
         private static final ClosedLoopOutputType steerClosedLoopOutput = ClosedLoopOutputType.Voltage;
-        private static final ClosedLoopOutputType driveClosedLoopOutput = ClosedLoopOutputType.TorqueCurrentFOC;
+        private static final ClosedLoopOutputType driveClosedLoopOutput = ClosedLoopOutputType.Voltage;
 
         public static final double kSpeedAt12VoltsMps = 0; //TODO Change
 
         public static final SwerveDrivetrainConstants DrivetrainConstants = new SwerveDrivetrainConstants()
-            .withCANbusName("rio");
+            .withCANbusName("rio")
+            .withPigeon2Id(0); //TODO change
+
         public static final SwerveModuleConstantsFactory constantFactory = new SwerveModuleConstantsFactory()
-            .withDriveMotorGearRatio(6.12)
+            .withDriveMotorGearRatio(6.75)
             .withSteerMotorGearRatio(150/7)
             .withWheelRadius(2)
             .withSteerMotorGains(steerConfig)
@@ -64,20 +68,19 @@ public final class Constants {
             .withSteerMotorClosedLoopOutput(steerClosedLoopOutput)
             .withDriveMotorClosedLoopOutput(driveClosedLoopOutput)
             .withSpeedAt12VoltsMps(kSpeedAt12VoltsMps)
-            .withFeedbackSource(SteerFeedbackType.RemoteCANcoder);
+            .withFeedbackSource(SteerFeedbackType.RemoteCANcoder)
+            .withCouplingGearRatio(0) //TODO change
+            .withSlipCurrent(90) //TODO tune
+            .withSteerMotorInverted(true);
 
         public static final SwerveModuleConstants frontLeft = constantFactory.createModuleConstants(0,0,0,0,0,0,false);
         public static final SwerveModuleConstants frontRight = constantFactory.createModuleConstants(0,0,0,0,0,0,false);
         public static final SwerveModuleConstants backLeft = constantFactory.createModuleConstants(0,0,0,0,0,0,false);
         public static final SwerveModuleConstants backRight = constantFactory.createModuleConstants(0,0,0,0,0,0,false);
         //TODO Set ID's and module positions/offsets once chassis is built!
-        
-        private static double wheelCircumference = 2*Math.PI;
-        public static double maxSpeed = (6000 / 60.0) * (1.0 / 6.12) * wheelCircumference;
-        public static double maxAngularRate = 0; //TODO Change
 
         public final static SwerveRequest.FieldCentric m_driveRequest = new SwerveRequest.FieldCentric()
-            .withDeadband(maxSpeed * 0.1).withRotationalDeadband(maxAngularRate * 0.1) // Add a 10% deadband
+            .withDeadband(0.1) //TODO tune
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
             .withSteerRequestType(SteerRequestType.MotionMagicExpo);
     }

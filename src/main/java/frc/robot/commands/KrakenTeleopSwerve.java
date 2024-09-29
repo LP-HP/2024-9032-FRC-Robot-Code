@@ -3,7 +3,7 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.krakenSwerveConstants;
+import frc.robot.Constants.KrakenSwerveConstants;
 import frc.robot.subsystems.KrakenSwerve;
 
 public class KrakenTeleopSwerve extends Command {
@@ -26,7 +26,7 @@ public class KrakenTeleopSwerve extends Command {
     @Override
     public void execute() {
         swerve.driveTrain.setControl(
-            krakenSwerveConstants.m_driveRequest.withVelocityX(transSup.getAsDouble())
+            KrakenSwerveConstants.m_driveRequest.withVelocityX(transSup.getAsDouble())
             .withVelocityY(strafeSup.getAsDouble())
             .withRotationalRate(rotSup.getAsDouble())
         );
