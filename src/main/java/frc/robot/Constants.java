@@ -5,16 +5,25 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkBase.IdleMode;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import frc.robot.util.SparkMaxConstants;
-import frc.robot.util.SwerveModuleConstants;
 import frc.robot.util.SparkMaxConstants.ControlMode;
 import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
+import frc.robot.util.SwerveModuleConstants;
 
 /* 
  * ...
@@ -65,7 +74,39 @@ public final class Constants {
         public static final double cameraHeight = Units.inchesToMeters(25.0);
         public static final double mountingAngle = Units.degreesToRadians(-18.0); 
     }
+    public static final class LocalizationPhotonVisionConstants{
+        public static final int nCameras = 4; /*!!!manually add ncameras cameras!!!*/
+        public static final String[] cameraNames = new String[nCameras]; //manually add ncameras cameras
+        //0 to n-1
+        public static final Transform3d[] robotToCam = new Transform3d[nCameras];
+        static {
+            cameraNames[0] = "camera0";
+            cameraNames[1] = "camera1";
+            cameraNames[2] = "camera2";
+            cameraNames[3] = "camera3";
+            
+            robotToCam[0] = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
+            robotToCam[1] = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
+            robotToCam[2] = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
+            robotToCam[3] = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
+        }
+        public static final double APRILTAG_AMBIGUITY_THRESHOLD = 0.2;
+        public static final double POSE_AMBIGUITY_SHIFTER = 0.2;
+        public static final double POSE_AMBIGUITY_MULTIPLIER = 4;
+        public static final double NOISY_DISTANCE_METERS = 2.5;
+        public static final double DISTANCE_WEIGHT = 7;
+        public static final int TAG_PRESENCE_WEIGHT = 10;
+        
+        public static final Matrix<N3, N1> VISION_MEASUREMENT_STANDARD_DEVIATIONS = Matrix.mat(Nat.N3(),Nat.N1()).fill(
+            1, //x
+            1, //y
+            1 * Math.PI //theta
+            //nums can't be < 1
+        );
 
+
+        public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+    }
     /* Using CANIds 13-14 - 2 motors */
     public static final class IntakeConstants {
         /* Intake Arm */

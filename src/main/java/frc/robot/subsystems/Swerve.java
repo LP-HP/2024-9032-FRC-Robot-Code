@@ -48,6 +48,9 @@ public class Swerve extends SubsystemBase {
 
     private SimpleMotorFeedforward velocityFeedforward = new SimpleMotorFeedforward(driveKS, driveKV, driveKA);
     private SparkMaxPIDConstants velocityPID = drivePIDConstants;
+    private Localization localization;
+    
+
 
     public Swerve() {
         gyro = new AHRS(gyroPort);//Automatically calibrates
@@ -71,7 +74,7 @@ public class Swerve extends SubsystemBase {
         swerveOdometry.setVisionMeasurementStdDevs(
             VecBuilder.fill(0.5, 0.5, 999999999)
         );
-
+        localization = new Localization(swerveOdometry);
         /* Sets up pathplanner for auto path following */
         AutoBuilder.configureHolonomic(
                 this::getPose,
@@ -192,7 +195,7 @@ public class Swerve extends SubsystemBase {
     }     
 
     public Pose2d getPose() {
-        return swerveOdometry.getEstimatedPosition();
+        return localization.getRobotPose(getGyroYaw(), getModulePositions());
     }
 
     public Command resetOdometryCommand(Supplier<Pose2d> poseSup) {
@@ -200,7 +203,7 @@ public class Swerve extends SubsystemBase {
     }
 
     private void resetOdometry(Pose2d pose) {
-        swerveOdometry.resetPosition(getGyroYaw(), getModulePositions(), pose);
+        localization.resetPosition(getGyroYaw(), getModulePositions(), pose);
     }
 
     private SwerveModuleState[] getModuleStates() {
@@ -243,28 +246,12 @@ public class Swerve extends SubsystemBase {
         return runOnce(() -> visionSup = poseSupplier);
     }
 
-    private void updateVisionLocalization(PoseEstimate poseEstimate) {
-        /* Multiple targets detected means a lower standard deviation */
-        if(poseEstimate.tagCount >= 2) {
-            double poseDifference = getPose().getTranslation().getDistance(poseEstimate.pose.getTranslation());
-
-            /* Discard any measurements that are too far from previous measurements */
-            if(poseDifference < 1.0) 
-                swerveOdometry.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
-
-            else 
-                System.err.println("Discarded pose estimate | pose " + poseEstimate.pose + " | dif. " + poseDifference);
-        }     
-    }
 
     @Override
     public void periodic() {
-        swerveOdometry.update(getGyroYaw(), getModulePositions());  
-
+       
+        localization.update(getGyroYaw(),getModulePositions());
         /* Only update vision if an update is provided */
-        if(!visionSup.get().isEmpty()) 
-            updateVisionLocalization(visionSup.get().get());
-        
         field.setRobotPose(getPose());//Update field view
     }
 }
