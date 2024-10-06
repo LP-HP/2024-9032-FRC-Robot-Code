@@ -269,7 +269,7 @@ public final class Constants {
 
     /* Using CANIds 1-12 - 8 motors and 4 cancoders */
     public static final class SwerveConstants {
-        public static final int gyroID = 0; //TODO change
+        public static final int gyroID = 31; 
 
         /* Drivetrain Constants */
         public static final double trackWidth = Units.inchesToMeters(24.5); 
