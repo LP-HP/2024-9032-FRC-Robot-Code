@@ -3,7 +3,7 @@ package frc.robot.subsystems;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import com.kauailabs.navx.frc.AHRS;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -39,7 +39,7 @@ import static frc.robot.Constants.SwerveConstants.*;
 public class Swerve extends SubsystemBase {
     private final SwerveDrivePoseEstimator swerveOdometry;
     private final SwerveModule[] swerveMods;
-    private final AHRS gyro;
+    private final Pigeon2 gyro;
 
     private final Field2d field = new Field2d();
     private final ShuffleboardTab swerveTab = Shuffleboard.getTab("Swerve");
@@ -50,7 +50,7 @@ public class Swerve extends SubsystemBase {
     private SparkMaxPIDConstants velocityPID = drivePIDConstants;
 
     public Swerve() {
-        gyro = new AHRS(gyroPort);//Automatically calibrates
+        gyro = new Pigeon2(gyroID);//Automatically calibrates
 
         swerveMods = new SwerveModule[] {
             new SwerveModule(0, Mod0.constants),
@@ -226,11 +226,11 @@ public class Swerve extends SubsystemBase {
     }
 
     public void zeroGyro() {
-        gyro.zeroYaw();
+        gyro.reset();
     }
 
     private Rotation2d getGyroYaw() {
-        return invertGyro ? Rotation2d.fromDegrees(-gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
+        return Rotation2d.fromDegrees(gyro.getYaw().getValue());
     }
 
     public void resetModulesToAbsolute() {
