@@ -90,6 +90,7 @@ public final class Constants {
             robotToCam[2] = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
             robotToCam[3] = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
         }
+        /*6 under may need to be tuned */
         public static final double APRILTAG_AMBIGUITY_THRESHOLD = 0.2;
         public static final double POSE_AMBIGUITY_SHIFTER = 0.2;
         public static final double POSE_AMBIGUITY_MULTIPLIER = 4;

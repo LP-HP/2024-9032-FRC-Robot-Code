@@ -14,7 +14,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 import static frc.robot.Constants.LocalizationPhotonVisionConstants.*;
 
@@ -26,7 +26,8 @@ public class Localization{
     
     private final PhotonPoseEstimator[] photonPoseEstimators = new PhotonPoseEstimator[nCameras];
     private SwerveDrivePoseEstimator poseEstimator;
-
+    
+    private final Field2d[] fields = new Field2d[nCameras];
     public Localization(SwerveDrivePoseEstimator Estimator) {  
         for(int i = 0; i < nCameras; i++){
             cameras[i] = new PhotonCamera(cameraNames[i]);
@@ -36,7 +37,9 @@ public class Localization{
         for(int i = 0; i < nCameras; i++){
             photonPoseEstimators[i] = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, cameras[i], robotToCam[i]);
         }
-
+        for(int i = 0; i < nCameras; i++){
+            fields[i] = new Field2d();
+        }
         localizationTab = Shuffleboard.getTab("Localization");
         
         poseEstimator = Estimator;
@@ -46,11 +49,16 @@ public class Localization{
         /*telemetry*/
         try {
             /*change*/
-            /*tab.addCamera("PhotonVision View", cameraName, "http://photonvision.local:1182/stream.mjpg").withPosition(col, row).withSize(size, size);*/
+            for(int i = 0; i < nCameras; i++){
+                localizationTab.add("Field", fields[i]).withPosition(0, i*4).withSize(8, 3);
+            }
+            
+            /*localizationTab.addCamera("PhotonVision View", cameraName, "http://photonvision.local:1182/stream.mjpg").withPosition(col, row).withSize(size, size);*/
         } catch (Exception e) {
             System.err.println("Cameras already added!");
         }
     }
+    
     private Matrix<N3, N1> confidenceCalculator(EstimatedRobotPose estimation) {
         double smallestDistance = Double.POSITIVE_INFINITY;
         for (var target : estimation.targetsUsed) {
@@ -86,9 +94,11 @@ public class Localization{
             if (optionalEstimatedPose.isPresent()) {
                 final EstimatedRobotPose estimatedPose = optionalEstimatedPose.get();          
                 poseEstimator.addVisionMeasurement(estimatedPose.estimatedPose.toPose2d(), estimatedPose.timestampSeconds,confidenceCalculator(optionalEstimatedPose.get()));
+                fields[i].setRobotPose(estimatedPose.estimatedPose.toPose2d());
             }
         }
         poseEstimator.update(GyroYaw, ModulePositions); 
+        
     }
     public void resetPosition(Rotation2d gyroYaw, SwerveModulePosition[] ModulePositions, Pose2d givenPose){
         poseEstimator.resetPosition(gyroYaw, ModulePositions, givenPose);
