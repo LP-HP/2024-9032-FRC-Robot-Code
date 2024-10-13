@@ -1,7 +1,39 @@
 {
   "NTProvider": {
     "types": {
-      "/FMSInfo": "FMSInfo"
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Debug/Add pose sup": "Command",
+      "/Shuffleboard/Driver/Choose Auto": "String Chooser",
+      "/Shuffleboard/Driver/Shoot": "Command",
+      "/Shuffleboard/Driver/Shoot Subwoofer": "Command",
+      "/Shuffleboard/Flywheels/Override Velocity": "Command",
+      "/Shuffleboard/Flywheels/Receive Note": "Command",
+      "/Shuffleboard/Flywheels/Reset Flywheels": "Command",
+      "/Shuffleboard/Flywheels/ShooterFlywheels": "Subsystem",
+      "/Shuffleboard/Flywheels/Storage flywheels": "Command",
+      "/Shuffleboard/Flywheels/Storage receive": "Command",
+      "/Shuffleboard/Flywheels/Talon FX (v6) [17]": "Motor Controller",
+      "/Shuffleboard/Flywheels/Talon FX (v6) [18]": "Motor Controller",
+      "/Shuffleboard/Intake/Get note": "Command",
+      "/Shuffleboard/Intake/Intake": "Subsystem",
+      "/Shuffleboard/Intake/Reset": "Command",
+      "/Shuffleboard/Intake/To ground": "Command",
+      "/Shuffleboard/Intake/To passthrough": "Command",
+      "/Shuffleboard/Intake/Transfer": "Command",
+      "/Shuffleboard/Limelight/To Localization": "Command",
+      "/Shuffleboard/Limelight/To Target": "Command",
+      "/Shuffleboard/Shooter Arm/Override Arm": "Command",
+      "/Shuffleboard/Shooter Arm/Reset Arm": "Command",
+      "/Shuffleboard/Shooter Arm/ShooterArm": "Subsystem",
+      "/Shuffleboard/Shooter Arm/To amp": "Command",
+      "/Shuffleboard/Shooter Arm/To passthrough": "Command",
+      "/Shuffleboard/Shooter Arm/To understage": "Command",
+      "/Shuffleboard/Shooter Arm/To up": "Command",
+      "/Shuffleboard/Swerve/Field": "Field2d",
+      "/Shuffleboard/Swerve/Update Constants": "Command"
     }
+  },
+  "NetworkTables Info": {
+    "visible": true
   }
 }
