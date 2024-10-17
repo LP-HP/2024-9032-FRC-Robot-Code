@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.*;
@@ -59,12 +60,16 @@ public class RobotContainer {
     private final ShooterFlywheels shooterFlywheels = new ShooterFlywheels();
     private final ShooterArm shooterArm = new ShooterArm();
     private final Climbers climbers = new Climbers();
-    private final LEDSubsystem leds = new LEDSubsystem(LEDState.BLUE_GRADIENT);
+    private final LEDSubsystem leds = new LEDSubsystem(LEDState.SLOW_BLUE_GRADIENT);
 
     /* Shuffleboard */
     private final ShuffleboardTab debugTab = Shuffleboard.getTab("Debug");
     private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
     private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+
+    /* Robot Mode Triggers */
+    private final Trigger disabledTrigger = RobotModeTriggers.disabled();
+    private final Trigger teleopTrigger = RobotModeTriggers.teleop();
 
     /* Teleop Triggers */
     private final Trigger autoAimSpeaker = 
@@ -242,7 +247,7 @@ public class RobotContainer {
                 .asProxy())
             .andThen(shooterArm.setToUpPosition(false)
                 .asProxy())
-            .andThen(leds.setState(LEDState.BLUE_GRADIENT)
+            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT)
                 .asProxy())
         );
 
@@ -280,7 +285,7 @@ public class RobotContainer {
             .andThen(shooterArm.setToAmpPosition(true))
             .andThen(shooterFlywheels.shootIntoAmp())
             .andThen(shooterArm.setToUpPosition(false))
-            .andThen(leds.setState(LEDState.BLUE_GRADIENT))
+            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
             .onlyIf(shooterFlywheels::hasNote)
         );
 
@@ -292,7 +297,7 @@ public class RobotContainer {
             .andThen(Commands.waitSeconds(1.0))
             .andThen(shooterFlywheels.shootIntoTrap())
             .andThen(shooterArm.setToUpPosition(false))
-            .andThen(leds.setState(LEDState.BLUE_GRADIENT))
+            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
             .onlyIf(() -> limelight.getAprilTagTarget().isValidStageTag() && shooterFlywheels.hasNote())
         );
 
@@ -300,7 +305,7 @@ public class RobotContainer {
             Commands.print("Shuttling note")
             .andThen(shooterArm.setToShuttlePosition(true))
             .andThen(shooterFlywheels.shoot(95.0, true))
-            .andThen(leds.setState(LEDState.BLUE_GRADIENT))
+            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
             .onlyIf(shooterFlywheels::hasNote)
         );
 
@@ -328,7 +333,7 @@ public class RobotContainer {
             .andThen(intake.resetCommand())
             .andThen(shooterArm.resetCommand())
             .andThen(shooterFlywheels.resetCommand())
-            .andThen(leds.setState(LEDState.BLUE_GRADIENT))
+            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
         );
 
         /* Teleop Triggers */
@@ -349,6 +354,10 @@ public class RobotContainer {
                 .repeatedly()
                     .until(() -> !autoAimSpeaker.getAsBoolean() || underStageButton.getAsBoolean())
         );
+
+        /* Robot Mode Triggers */
+        disabledTrigger.onTrue(leds.setState(LEDState.SLOW_BLUE_GRADIENT));  
+        teleopTrigger.onTrue(leds.setState(LEDState.FAST_BLUE_GRADIENT));
     }
 
     private Command setAndDisableRumble() {
