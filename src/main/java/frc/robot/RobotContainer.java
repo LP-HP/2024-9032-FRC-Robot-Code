@@ -256,11 +256,13 @@ public class RobotContainer {
             .andThen(shooterArm.setToPassthroughPosition(false))
             .andThen(intake.getNoteFromGround())
             .andThen(setAndDisableRumble())
+            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
             .onlyIf(() -> !intake.hasNote() && !shooterFlywheels.hasNote())
         );
 
         driveToNoteButton.and(() -> !intake.hasNote()).whileTrue(
             Commands.print("Driving to note")
+            .andThen(leds.setState(LEDState.ORANGE_GRADIENT))
             .andThen(new DriveToNote(swerve, photonvision))
             .onlyIf(() -> !shooterFlywheels.hasNote())
         );
@@ -270,6 +272,7 @@ public class RobotContainer {
             .andThen(intake.disableRollers())
             .andThen(intake.setToPassthroughPosition(false))
             .andThen(shooterArm.setToUpPosition(false))
+            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
             .onlyIf(() -> !intake.hasNote())
         );   
 
@@ -318,6 +321,7 @@ public class RobotContainer {
         ejectButton.onTrue(
             Commands.print("Ejecting note")
             .andThen(intake.ejectNote())
+            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
         );
 
         resetIntakeAndShooterButton.or(overrideAutoAim).onTrue(
