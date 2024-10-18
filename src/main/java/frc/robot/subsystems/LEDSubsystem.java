@@ -33,7 +33,8 @@ public class LEDSubsystem extends SubsystemBase {
             currentState = state;
 
             resetLEDs();
-        });
+        })
+        .ignoringDisable(true);
     }
 
     @Override
@@ -43,16 +44,16 @@ public class LEDSubsystem extends SubsystemBase {
                 rainbow();
                 break;
             case FAST_BLUE_GRADIENT:
-                gradient(119, 5);
+                gradient(100, 10);
                 break;
             case GREEN_GRADIENT:
                 gradient(238, 5);
                 break;
             case SLOW_BLUE_GRADIENT:
-                gradient(238, 1);
+                gradient(119, 5);
                 break;
             case ORANGE_GRADIENT:
-                gradient(24, 10);
+                gradient(24, 15);
             default:
                 break;
         }

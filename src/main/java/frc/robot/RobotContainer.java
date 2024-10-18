@@ -163,18 +163,22 @@ public class RobotContainer {
         NamedCommands.registerCommand("AutoInit", 
             shooterFlywheels.spinUpFlywheels(95.0)
             .andThen(intake.setToGroundPosition(false))
+            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
         );
 
         NamedCommands.registerCommand("Passthrough", 
             new StoreNoteSequence(intake, shooterArm, shooterFlywheels, false)
             .andThen(intake.setToGroundPosition(false))
+            .andThen(leds.setState(LEDState.GREEN_GRADIENT))
         );
 
         NamedCommands.registerCommand("ShootAA", 
             shooterArm.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, () -> 0.0, true)
             .andThen(shooterFlywheels.shoot(shootVelocity, false))
+            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
         );
 
+        /* UNUSED */
         NamedCommands.registerCommand("Intake", 
             shooterArm.setToPassthroughPosition(false)
             .andThen(intake.getNoteFromGround())
@@ -185,6 +189,7 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("IntakeAA", 
             shooterArm.setToPassthroughPosition(false)
+            .andThen(leds.setState(LEDState.ORANGE_GRADIENT))
             .andThen(intake.getNoteFromGround()
                 .deadlineWith(new DriveToNote(swerve, photonvision)))
             .withTimeout(notePickupTimeout)
