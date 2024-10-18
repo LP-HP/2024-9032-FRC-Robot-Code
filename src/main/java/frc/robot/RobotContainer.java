@@ -163,19 +163,16 @@ public class RobotContainer {
         NamedCommands.registerCommand("AutoInit", 
             shooterFlywheels.spinUpFlywheels(95.0)
             .andThen(intake.setToGroundPosition(false))
-            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
         );
 
         NamedCommands.registerCommand("Passthrough", 
             new StoreNoteSequence(intake, shooterArm, shooterFlywheels, false)
             .andThen(intake.setToGroundPosition(false))
-            .andThen(leds.setState(LEDState.GREEN_GRADIENT))
         );
 
         NamedCommands.registerCommand("ShootAA", 
             shooterArm.setToTargetPositionFromDistance(() -> limelight.getAprilTagTarget().distance, () -> 0.0, true)
             .andThen(shooterFlywheels.shoot(shootVelocity, false))
-            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
         );
 
         /* UNUSED */
@@ -189,7 +186,6 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("IntakeAA", 
             shooterArm.setToPassthroughPosition(false)
-            .andThen(leds.setState(LEDState.ORANGE_GRADIENT))
             .andThen(intake.getNoteFromGround()
                 .deadlineWith(new DriveToNote(swerve, photonvision)))
             .withTimeout(notePickupTimeout)
@@ -252,8 +248,6 @@ public class RobotContainer {
                 .asProxy())
             .andThen(shooterArm.setToUpPosition(false)
                 .asProxy())
-            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT)
-                .asProxy())
         );
 
         enableIntakeButton.onTrue(
@@ -261,13 +255,11 @@ public class RobotContainer {
             .andThen(shooterArm.setToPassthroughPosition(false))
             .andThen(intake.getNoteFromGround())
             .andThen(setAndDisableRumble())
-            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
             .onlyIf(() -> !intake.hasNote() && !shooterFlywheels.hasNote())
         );
 
         driveToNoteButton.and(() -> !intake.hasNote()).whileTrue(
             Commands.print("Driving to note")
-            .andThen(leds.setState(LEDState.ORANGE_GRADIENT))
             .andThen(new DriveToNote(swerve, photonvision))
             .onlyIf(() -> !shooterFlywheels.hasNote())
         );
@@ -277,14 +269,12 @@ public class RobotContainer {
             .andThen(intake.disableRollers())
             .andThen(intake.setToPassthroughPosition(false))
             .andThen(shooterArm.setToUpPosition(false))
-            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
             .onlyIf(() -> !intake.hasNote())
         );   
 
         storeNoteButton.and(underStageButton.negate()).onTrue(
             Commands.print("Transfering note")
             .andThen(new StoreNoteSequence(intake, shooterArm, shooterFlywheels, true))
-            .andThen(leds.setState(LEDState.GREEN_GRADIENT))
             .onlyIf(() -> intake.hasNote() && !shooterFlywheels.hasNote())
         );
 
@@ -293,7 +283,6 @@ public class RobotContainer {
             .andThen(shooterArm.setToAmpPosition(true))
             .andThen(shooterFlywheels.shootIntoAmp())
             .andThen(shooterArm.setToUpPosition(false))
-            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
             .onlyIf(shooterFlywheels::hasNote)
         );
 
@@ -305,7 +294,6 @@ public class RobotContainer {
             .andThen(Commands.waitSeconds(1.0))
             .andThen(shooterFlywheels.shootIntoTrap())
             .andThen(shooterArm.setToUpPosition(false))
-            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
             .onlyIf(() -> limelight.getAprilTagTarget().isValidStageTag() && shooterFlywheels.hasNote())
         );
 
@@ -313,7 +301,6 @@ public class RobotContainer {
             Commands.print("Shuttling note")
             .andThen(shooterArm.setToShuttlePosition(true))
             .andThen(shooterFlywheels.shoot(95.0, true))
-            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
             .onlyIf(shooterFlywheels::hasNote)
         );
 
@@ -326,7 +313,6 @@ public class RobotContainer {
         ejectButton.onTrue(
             Commands.print("Ejecting note")
             .andThen(intake.ejectNote())
-            .andThen(leds.setState(LEDState.FAST_BLUE_GRADIENT))
         );
 
         resetIntakeAndShooterButton.or(overrideAutoAim).onTrue(
