@@ -69,12 +69,16 @@ public class RobotContainer {
 
     /* Robot Mode Triggers */
     private final Trigger disabledTrigger = RobotModeTriggers.disabled();
-    private final Trigger teleopTrigger = RobotModeTriggers.teleop();
+    private final Trigger enabledTrigger = RobotModeTriggers.teleop().or(RobotModeTriggers.autonomous());
 
     /* Teleop Triggers */
     private final Trigger autoAimSpeaker = 
         new Trigger(() -> limelight.getAprilTagTarget().isValidSpeakerTag() && shooterFlywheels.hasNote() && limelight.isTargetPipeline())
             .and(overrideAutoAim.negate()).and(underStageButton.negate()).debounce(0.025);
+    
+    /* State Triggers */
+    private final Trigger intakeHasNoteTrigger = new Trigger(intake::hasNote);
+    private final Trigger shooterHasNoteTrigger = new Trigger(shooterFlywheels::hasNote);
 
     public RobotContainer() {
         /* Will run the following command when there is no other command set, such as during teleop */
@@ -352,7 +356,14 @@ public class RobotContainer {
 
         /* Robot Mode Triggers */
         disabledTrigger.onTrue(leds.setState(LEDState.SLOW_BLUE_GRADIENT));  
-        teleopTrigger.onTrue(leds.setState(LEDState.FAST_BLUE_GRADIENT));
+        enabledTrigger.onTrue(leds.setState(LEDState.FAST_BLUE_GRADIENT));
+
+        /* State Triggers */
+        intakeHasNoteTrigger.onTrue(leds.setState(LEDState.ORANGE_GRADIENT));
+        intakeHasNoteTrigger.onFalse(leds.setState(LEDState.FAST_BLUE_GRADIENT));
+
+        shooterHasNoteTrigger.onTrue(leds.setState(LEDState.GREEN_GRADIENT));
+        shooterHasNoteTrigger.onFalse(leds.setState(LEDState.FAST_BLUE_GRADIENT));
     }
 
     private Command setAndDisableRumble() {
