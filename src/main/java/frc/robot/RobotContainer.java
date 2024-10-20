@@ -45,6 +45,7 @@ public class RobotContainer {
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
     private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
     private final Trigger ampScoreButton = mechanismController.rightBumper().debounce(0.025);
+    private final Trigger servoButton = mechanismController.leftBumper().debounce(0.025);
     private final Trigger driveToNoteButton = mechanismController.rightTrigger(0.25).debounce(0.025)
         .and(overrideAutoAim.negate());
     private final Trigger resetIntakeAndShooterButton = mechanismController.x().debounce(0.025);
@@ -60,6 +61,7 @@ public class RobotContainer {
     private final ShooterArm shooterArm = new ShooterArm();
     private final Climbers climbers = new Climbers();
     private final LEDSubsystem leds = new LEDSubsystem(LEDState.BLUE_GRADIENT);
+    private final ServoSub servo = new ServoSub(0);
 
     /* Shuffleboard */
     private final ShuffleboardTab debugTab = Shuffleboard.getTab("Debug");
@@ -349,6 +351,8 @@ public class RobotContainer {
                 .repeatedly()
                     .until(() -> !autoAimSpeaker.getAsBoolean() || underStageButton.getAsBoolean())
         );
+
+        servoButton.whileTrue(servo.setPos(50));
     }
 
     private Command setAndDisableRumble() {
