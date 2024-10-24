@@ -354,6 +354,9 @@ public class RobotContainer {
                     .until(() -> !autoAimSpeaker.getAsBoolean() || underStageButton.getAsBoolean())
         );
 
+        autoAimSpeaker.onTrue(leds.setState(LEDState.RED_GRADIENT));
+        autoAimSpeaker.onFalse(leds.setState(LEDState.GREEN_GRADIENT));
+
         /* Robot Mode Triggers */
         disabledTrigger.onTrue(leds.setState(LEDState.SLOW_BLUE_GRADIENT));  
         enabledTrigger.onTrue(leds.setState(LEDState.FAST_BLUE_GRADIENT));

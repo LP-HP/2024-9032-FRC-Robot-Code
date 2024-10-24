@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.LEDConstants.*;
 
 public class LEDSubsystem extends SubsystemBase {
-    public static enum LEDState { RAINBOW, FAST_BLUE_GRADIENT, GREEN_GRADIENT, ORANGE_GRADIENT, SLOW_BLUE_GRADIENT };
+    public static enum LEDState { RAINBOW, FAST_BLUE_GRADIENT, GREEN_GRADIENT, ORANGE_GRADIENT, SLOW_BLUE_GRADIENT, RED_GRADIENT };
     private LEDState currentState;
 
     private final AddressableLED ledStrip;
@@ -54,6 +54,10 @@ public class LEDSubsystem extends SubsystemBase {
                 break;
             case ORANGE_GRADIENT:
                 gradient(24, 15);
+                break;
+            case RED_GRADIENT:
+                gradient(354, 3);
+                break;
             default:
                 break;
         }
