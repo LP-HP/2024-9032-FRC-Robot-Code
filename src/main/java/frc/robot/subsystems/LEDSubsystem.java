@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.LEDConstants.*;
 
 public class LEDSubsystem extends SubsystemBase {
-    public static enum LEDState { RAINBOW, BLUE_GRADIENT, GREEN_GRADIENT };
+    public static enum LEDState { RAINBOW, FAST_BLUE_GRADIENT, GREEN_GRADIENT, ORANGE_GRADIENT, SLOW_BLUE_GRADIENT, RED_GRADIENT };
     private LEDState currentState;
 
     private final AddressableLED ledStrip;
@@ -33,7 +33,8 @@ public class LEDSubsystem extends SubsystemBase {
             currentState = state;
 
             resetLEDs();
-        });
+        })
+        .ignoringDisable(true);
     }
 
     @Override
@@ -42,11 +43,20 @@ public class LEDSubsystem extends SubsystemBase {
             case RAINBOW:
                 rainbow();
                 break;
-            case BLUE_GRADIENT:
-                gradient(119);
+            case FAST_BLUE_GRADIENT:
+                gradient(100, 10);
                 break;
             case GREEN_GRADIENT:
-                gradient(238);
+                gradient(238, 5);
+                break;
+            case SLOW_BLUE_GRADIENT:
+                gradient(119, 5);
+                break;
+            case ORANGE_GRADIENT:
+                gradient(24, 15);
+                break;
+            case RED_GRADIENT:
+                gradient(354, 3);
                 break;
             default:
                 break;
@@ -75,7 +85,7 @@ public class LEDSubsystem extends SubsystemBase {
         ledStrip.setData(ledBuffer);
     }
 
-    private void gradient(int hue) {
+    private void gradient(int hue, int increment) {
         for(int i = 0; i < ledBuffer.getLength(); i++) {
             int value = (previousFirstLEDValue + (i * 255 / ledBuffer.getLength())) % 255; 
 
@@ -83,7 +93,7 @@ public class LEDSubsystem extends SubsystemBase {
         }
 
         /* Increment the previous value to create a smooth gradient and prevent overflowing */
-        previousFirstLEDValue += 5;
+        previousFirstLEDValue += increment;
         previousFirstLEDValue %= 255;
 
         ledStrip.setData(ledBuffer);
