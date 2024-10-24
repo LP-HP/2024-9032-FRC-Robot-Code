@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -14,6 +15,10 @@ public class AmpMechanism extends SubsystemBase {
     public AmpMechanism() {
         ampServoLeft = new Servo(leftServoPort);
         ampServoRight = new Servo(rightServoPort);
+
+        var tab = Shuffleboard.getTab("Debug");
+        tab.add(ampServoLeft);
+        tab.add(ampServoRight);
     }
 
     private Command setPos(double position) {

@@ -43,7 +43,7 @@ public final class Constants {
 
     public static final class AmpMechanismConstants {
         public static final double upPosition = 0;
-        public static final double downPosition = 0.2;  //TODO Change
+        public static final double downPosition = 0.1;  //TODO Change
 
         public static final double ampScoreWait = 0.5;
 
