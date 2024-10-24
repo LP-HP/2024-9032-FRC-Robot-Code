@@ -44,11 +44,12 @@ public final class Constants {
 
     public static final class AmpMechanismConstants {
         public static final double upPosition = 0;
-        public static final double downPosition = 0;  //TODO Change
+        public static final double downPosition = 0.2;  //TODO Change
 
         public static final double ampScoreWait = 0.5;
 
-        public static final int servoPort = 0; //TODO Change to pwm port
+        public static final int leftServoPort = 7; //TODO Change to pwm port
+        public static final int rightServoPort = 8; //TODO Change to pwm port
     }
 
     public static final class LimelightConstants {

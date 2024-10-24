@@ -8,14 +8,19 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.AmpMechanismConstants.*;
 
 public class AmpMechanism extends SubsystemBase {
-    private final Servo ampServo;
+    private final Servo ampServoLeft;
+    private final Servo ampServoRight;
 
     public AmpMechanism() {
-        ampServo = new Servo(servoPort);
+        ampServoLeft = new Servo(leftServoPort);
+        ampServoRight = new Servo(rightServoPort);
     }
 
     private Command setPos(double position) {
-        return runOnce(() -> ampServo.set(position));
+        return runOnce(() -> {
+            ampServoLeft.set(position);
+            ampServoRight.set(Math.abs(1.0 - position));
+        });
     }
 
     public Command guideNote() {
