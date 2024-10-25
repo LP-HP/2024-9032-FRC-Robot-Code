@@ -19,6 +19,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -51,6 +52,11 @@ public class Swerve extends SubsystemBase {
 
     public Swerve() {
         gyro = new Pigeon2(gyroID);//Automatically calibrates
+        
+
+        DataLogManager.start();
+        DriverStation.startDataLog(DataLogManager.getLog());
+        
 
         swerveMods = new SwerveModule[] {
             new SwerveModule(0, Mod0.constants),
@@ -109,6 +115,7 @@ public class Swerve extends SubsystemBase {
             .withPosition(1,4).withSize(1, 1);
         swerveTab.addDouble("Pose Heading", () -> getPose().getRotation().getDegrees())
             .withPosition(2, 4).withSize(1, 1);
+        
 
         /* Add Constants */
         GenericEntry kS = swerveTab.add("kS", velocityFeedforward.ks)
@@ -260,11 +267,13 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {
         swerveOdometry.update(getGyroYaw(), getModulePositions());  
-
+        Translation2d robotPosition = new Translation2d(getPose().getX(),getPose().getY());
+        Pose2d robotPose = new Pose2d(robotPosition, getGyroYaw());
+        
         /* Only update vision if an update is provided */
         if(!visionSup.get().isEmpty()) 
             updateVisionLocalization(visionSup.get().get());
         
-        field.setRobotPose(getPose());//Update field view
+        field.setRobotPose(robotPose);//Update field view
     }
 }
