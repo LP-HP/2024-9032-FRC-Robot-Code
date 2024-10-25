@@ -60,6 +60,7 @@ public class RobotContainer {
     private final ShooterFlywheels shooterFlywheels = new ShooterFlywheels();
     private final ShooterArm shooterArm = new ShooterArm();
     private final Climbers climbers = new Climbers();
+    private final AmpMechanism ampMechanism = new AmpMechanism();
     private final LEDSubsystem leds = new LEDSubsystem(LEDState.SLOW_BLUE_GRADIENT);
 
     /* Shuffleboard */
@@ -284,7 +285,8 @@ public class RobotContainer {
 
         ampScoreButton.onTrue(
             Commands.print("Scoring in amp")
-            .andThen(shooterArm.setToAmpPosition(true))
+            .andThen(shooterArm.setToAmpPosition(true)
+                .alongWith(ampMechanism.prepare()))
             .andThen(
                 shooterFlywheels.shootIntoAmp()
                 .alongWith(ampMechanism.guideNote()))
