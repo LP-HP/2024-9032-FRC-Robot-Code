@@ -36,6 +36,12 @@ public class AmpMechanism extends SubsystemBase {
     }
 
     private void setPos(double position) {
+        if(position > 1.0 || position < 0.0) {
+            System.out.println("Amp position " + position + " out of range!");
+
+            return;
+        }
+
         ampServoLeft.set(position);
         ampServoRight.set(1.0 - position);
     }
@@ -49,5 +55,9 @@ public class AmpMechanism extends SubsystemBase {
         return setPosFromConstant(scorePosition)
             .andThen(Commands.waitSeconds(ampScoreWait))
             .andThen(setPosFromConstant(downPosition));
+    }
+
+    public void reset() {
+        setPos(downPosition);
     }
 }

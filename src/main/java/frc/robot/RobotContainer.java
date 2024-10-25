@@ -161,6 +161,7 @@ public class RobotContainer {
         shooterArm.reset();
         shooterFlywheels.reset();
         intake.reset();
+        ampMechanism.reset();
         setRumble(0.0);
     }
 
