@@ -42,9 +42,9 @@ public final class Constants {
     }
 
     public static final class AmpMechanismConstants {
-        public static final double upPosition = 1.0;
-        public static final double downPosition = 0.1; 
-        public static final double scorePosition = 0.8;
+        public static final double upPosition = 0.2;
+        public static final double downPosition = 0.08; 
+        public static final double scorePosition = 0.15;
 
         public static final double ampScoreWait = 2.0;
         public static final double ampPrepareWait = 2.0;
