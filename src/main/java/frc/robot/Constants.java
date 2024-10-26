@@ -55,8 +55,8 @@ public final class Constants {
 
     public static final class LimelightConstants {
         public static final String limelightName = "limelight";
-        public static final int targetPipelineID = 0;
-        public static final int localizationPipelineID = 1;
+        public static final int targetPipelineID = 1;
+        public static final int localizationPipelineID = 0;
         public static final boolean startInLocalization = false;
 
         /* Distance Constants */

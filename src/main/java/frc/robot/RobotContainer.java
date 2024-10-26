@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -368,10 +369,14 @@ public class RobotContainer {
 
         /* State Triggers */
         intakeHasNoteTrigger.onTrue(leds.setState(LEDState.ORANGE_GRADIENT));
-        intakeHasNoteTrigger.onFalse(leds.setState(LEDState.FAST_BLUE_GRADIENT));
+        intakeHasNoteTrigger.onFalse(
+            new ConditionalCommand(leds.setState(LEDState.FAST_BLUE_GRADIENT), leds.setState(LEDState.SLOW_BLUE_GRADIENT), enabledTrigger::getAsBoolean)
+        );
 
         shooterHasNoteTrigger.onTrue(leds.setState(LEDState.GREEN_GRADIENT));
-        shooterHasNoteTrigger.onFalse(leds.setState(LEDState.FAST_BLUE_GRADIENT));
+        shooterHasNoteTrigger.onFalse(
+            new ConditionalCommand(leds.setState(LEDState.FAST_BLUE_GRADIENT), leds.setState(LEDState.SLOW_BLUE_GRADIENT), enabledTrigger::getAsBoolean)
+        );
     }
 
     private Command setAndDisableRumble() {
