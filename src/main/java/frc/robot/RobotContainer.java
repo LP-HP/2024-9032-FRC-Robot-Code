@@ -45,7 +45,6 @@ public class RobotContainer {
 
     /* Mechanism Controller Buttons */
     private final Trigger enableIntakeButton = mechanismController.b().debounce(0.025);
-    private final Trigger subShot = mechanismController.y().debounce(0.025);
     private final Trigger storeNoteButton = mechanismController.a().debounce(0.025);
     private final Trigger ampScoreButton = mechanismController.rightBumper().debounce(0.025);
     private final Trigger driveToNoteButton = mechanismController.rightTrigger(0.25).debounce(0.025)
@@ -256,12 +255,6 @@ public class RobotContainer {
                 .asProxy())
             .andThen(shooterArm.setToUpPosition(false)
                 .asProxy())
-        );
-
-        subShot.onTrue(
-                shooterArm.setToAutoPosition(148.0, true)
-                .andThen(shooterFlywheels.shoot(95.0, true))
-                .withName("Shoot Subwoofer")
         );
 
         enableIntakeButton.onTrue(
