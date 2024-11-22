@@ -21,35 +21,32 @@ import static frc.robot.Constants.LocalizationPhotonVisionConstants.*;
 import java.util.Optional;
 
 public class Localization{
-    private ShuffleboardTab localizationTab;
-    private final PhotonCamera[] cameras = new PhotonCamera[nCameras];
+    private final ShuffleboardTab localizationTab;
+    private final PhotonCamera[] cameras = new PhotonCamera[kNumberCameras];
     
-    private final PhotonPoseEstimator[] photonPoseEstimators = new PhotonPoseEstimator[nCameras];
-    private SwerveDrivePoseEstimator poseEstimator;
+    private final PhotonPoseEstimator[] photonPoseEstimators = new PhotonPoseEstimator[kNumberCameras];
+    private final SwerveDrivePoseEstimator poseEstimator;
     
-    private final Field2d[] fields = new Field2d[nCameras];
-    public Localization(SwerveDrivePoseEstimator Estimator) {  
-        for(int i = 0; i < nCameras; i++){
+    private final Field2d[] fields = new Field2d[kNumberCameras];
+
+    public Localization(SwerveDrivePoseEstimator estimator) {  
+        for(int i = 0; i < kNumberCameras; i++){
             cameras[i] = new PhotonCamera(cameraNames[i]);
+            photonPoseEstimators[i] = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, cameras[i], robotToCam[i]);            
+            fields[i] = new Field2d();
         /*cameras are 0 through n-1*/
         }
 
-        for(int i = 0; i < nCameras; i++){
-            photonPoseEstimators[i] = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, cameras[i], robotToCam[i]);
-        }
-        for(int i = 0; i < nCameras; i++){
-            fields[i] = new Field2d();
-        }
         localizationTab = Shuffleboard.getTab("Localization");
         
-        poseEstimator = Estimator;
+        poseEstimator = estimator;
     }
 
     public void addCamerasToTab(ShuffleboardTab tab, int col, int row, int size) {
         /*telemetry*/
         try {
             /*change*/
-            for(int i = 0; i < nCameras; i++){
+            for(int i = 0; i < kNumberCameras; i++){
                 localizationTab.add("Field", fields[i]).withPosition(0, i*4).withSize(8, 3);
             }
             
@@ -87,24 +84,30 @@ public class Localization{
 
         return VISION_MEASUREMENT_STANDARD_DEVIATIONS.times(confidenceMultiplier);
     }
+
     public void update(Rotation2d GyroYaw, SwerveModulePosition[] ModulePositions) {
         //do for all each
-        for(int i = 0; i < nCameras; i++){
+        for(int i = 0; i < kNumberCameras; i++){
             Optional<EstimatedRobotPose> optionalEstimatedPose = photonPoseEstimators[i].update();
+
             if (optionalEstimatedPose.isPresent()) {
-                final EstimatedRobotPose estimatedPose = optionalEstimatedPose.get();          
-                poseEstimator.addVisionMeasurement(estimatedPose.estimatedPose.toPose2d(), estimatedPose.timestampSeconds,confidenceCalculator(optionalEstimatedPose.get()));
+                final EstimatedRobotPose estimatedPose = optionalEstimatedPose.get();        
+                  
+                poseEstimator.addVisionMeasurement(estimatedPose.estimatedPose.toPose2d(), estimatedPose.timestampSeconds, confidenceCalculator(estimatedPose));
                 fields[i].setRobotPose(estimatedPose.estimatedPose.toPose2d());
             }
         }
+
         poseEstimator.update(GyroYaw, ModulePositions); 
-        
     }
+
     public void resetPosition(Rotation2d gyroYaw, SwerveModulePosition[] ModulePositions, Pose2d givenPose){
         poseEstimator.resetPosition(gyroYaw, ModulePositions, givenPose);
     }
+
     public Pose2d getRobotPose(Rotation2d GyroYaw, SwerveModulePosition[] ModulePositions){
         poseEstimator.update(GyroYaw, ModulePositions); 
+        
         return poseEstimator.getEstimatedPosition();
     }
 }

@@ -97,8 +97,7 @@ public class RobotContainer {
 
         /* Add debug tab telemetry */
         debugTab.add(
-            swerve.addOptionalVisionPoseSupplier(limelight::getPoseEstimate)
-            .andThen(swerve.resetOdometryCommand(() -> limelight.getPoseEstimate().get().pose))
+            swerve.resetOdometryCommand(() -> limelight.getPoseEstimate().get().pose)
             .withName("Add pose sup")
         );
 

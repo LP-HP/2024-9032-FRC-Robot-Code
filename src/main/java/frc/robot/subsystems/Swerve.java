@@ -8,7 +8,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.ReplanningConfig;
 
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -44,13 +43,10 @@ public class Swerve extends SubsystemBase {
     private final Field2d field = new Field2d();
     private final ShuffleboardTab swerveTab = Shuffleboard.getTab("Swerve");
 
-    private Supplier<Optional<PoseEstimate>> visionSup = Optional::empty;
-
     private SimpleMotorFeedforward velocityFeedforward = new SimpleMotorFeedforward(driveKS, driveKV, driveKA);
     private SparkMaxPIDConstants velocityPID = drivePIDConstants;
-    private Localization localization;
     
-
+    private final Localization localization;
 
     public Swerve() {
         gyro = new AHRS(gyroPort);//Automatically calibrates
@@ -70,11 +66,8 @@ public class Swerve extends SubsystemBase {
         resetModulesToAbsolute();//Set integrated encoders to the absolute positions using cancoders
 
         swerveOdometry = new SwerveDrivePoseEstimator(swerveKinematics, getGyroYaw(), getModulePositions(), new Pose2d());
-        /* Set heading deviation high to only use gyro for heading */
-        swerveOdometry.setVisionMeasurementStdDevs(
-            VecBuilder.fill(0.5, 0.5, 999999999)
-        );
         localization = new Localization(swerveOdometry);
+
         /* Sets up pathplanner for auto path following */
         AutoBuilder.configureHolonomic(
                 this::getPose,
@@ -131,8 +124,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public Command getVisionLocalizationAuto(String autoName, Supplier<Optional<PoseEstimate>> visionSup) {
-        return addOptionalVisionPoseSupplier(visionSup)
-            .andThen(AutoBuilder.buildAuto(autoName));
+        return AutoBuilder.buildAuto(autoName);
     }
 
     private void updateConstantsFromDashboard(GenericEntry kS, GenericEntry kV, GenericEntry kP, GenericEntry kD) {
@@ -242,15 +234,9 @@ public class Swerve extends SubsystemBase {
         }
     }
 
-    public Command addOptionalVisionPoseSupplier(Supplier<Optional<PoseEstimate>> poseSupplier) {
-        return runOnce(() -> visionSup = poseSupplier);
-    }
-
-
     @Override
     public void periodic() {
-       
-        localization.update(getGyroYaw(),getModulePositions());
+        localization.update(getGyroYaw(), getModulePositions());
         /* Only update vision if an update is provided */
         field.setRobotPose(getPose());//Update field view
     }

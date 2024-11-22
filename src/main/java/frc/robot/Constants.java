@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -75,10 +76,10 @@ public final class Constants {
         public static final double mountingAngle = Units.degreesToRadians(-18.0); 
     }
     public static final class LocalizationPhotonVisionConstants{
-        public static final int nCameras = 4; /*!!!manually add ncameras cameras!!!*/
-        public static final String[] cameraNames = new String[nCameras]; //manually add ncameras cameras
+        public static final int kNumberCameras = 4; /*!!!manually add ncameras cameras!!!*/
+        public static final String[] cameraNames = new String[kNumberCameras]; //manually add ncameras cameras
         //0 to n-1
-        public static final Transform3d[] robotToCam = new Transform3d[nCameras];
+        public static final Transform3d[] robotToCam = new Transform3d[kNumberCameras];
         static {
             cameraNames[0] = "camera0";
             cameraNames[1] = "camera1";
@@ -98,7 +99,9 @@ public final class Constants {
         public static final double DISTANCE_WEIGHT = 7;
         public static final int TAG_PRESENCE_WEIGHT = 10;
         
-        public static final Matrix<N3, N1> VISION_MEASUREMENT_STANDARD_DEVIATIONS = Matrix.mat(Nat.N3(),Nat.N1()).fill(
+        public static final Matrix<N3, N1> VISION_MEASUREMENT_STANDARD_DEVIATIONS = MatBuilder.fill(
+            Nat.N3(), 
+            Nat.N1(),
             1, //x
             1, //y
             1 * Math.PI //theta
