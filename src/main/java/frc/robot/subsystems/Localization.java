@@ -22,27 +22,33 @@ import java.util.Optional;
 
 public class Localization{
     private final ShuffleboardTab localizationTab;
-    private final PhotonCamera[] cameras = new PhotonCamera[kNumberCameras];
-    
-    private final PhotonPoseEstimator[] photonPoseEstimators = new PhotonPoseEstimator[kNumberCameras];
-    private final SwerveDrivePoseEstimator poseEstimator;
-    
     private final Field2d[] fields = new Field2d[kNumberCameras];
 
-    public Localization(SwerveDrivePoseEstimator estimator) {  
+    private final PhotonCamera[] cameras = new PhotonCamera[kNumberCameras];
+    private final PhotonPoseEstimator[] photonPoseEstimators = new PhotonPoseEstimator[kNumberCameras];
+
+    private final SwerveDrivePoseEstimator swervePoseEstimator;
+    
+    public Localization(SwerveDrivePoseEstimator swervePoseEstimator) {  
         for(int i = 0; i < kNumberCameras; i++){
-            cameras[i] = new PhotonCamera(cameraNames[i]);
-            photonPoseEstimators[i] = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, cameras[i], robotToCam[i]);            
+            cameras[i] = new PhotonCamera(kCameraNames[i]);
+            photonPoseEstimators[i] = new PhotonPoseEstimator(
+                kAprilTagFieldLayout, 
+                PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, 
+                cameras[i], 
+                kRobotToCameraTransforms[i]
+            );   
+
             fields[i] = new Field2d();
-        /*cameras are 0 through n-1*/
+            /*cameras are 0 through n-1*/
         }
 
         localizationTab = Shuffleboard.getTab("Localization");
         
-        poseEstimator = estimator;
+        this.swervePoseEstimator = swervePoseEstimator;
     }
 
-    public void addCamerasToTab(ShuffleboardTab tab, int col, int row, int size) {
+    private void addCamerasToTab(ShuffleboardTab tab, int col, int row, int size) {//TODO review and implement this method
         /*telemetry*/
         try {
             /*change*/
@@ -56,7 +62,7 @@ public class Localization{
         }
     }
     
-    private Matrix<N3, N1> confidenceCalculator(EstimatedRobotPose estimation) {
+    private Matrix<N3, N1> confidenceCalculator(EstimatedRobotPose estimation) {//TODO review this method
         double smallestDistance = Double.POSITIVE_INFINITY;
         for (var target : estimation.targetsUsed) {
         var t3d = target.getBestCameraToTarget();
@@ -69,46 +75,51 @@ public class Localization{
             : Math.max(
                 1,
                 (estimation.targetsUsed.get(0).getPoseAmbiguity()
-                    + POSE_AMBIGUITY_SHIFTER)
-                    * POSE_AMBIGUITY_MULTIPLIER);
+                    + kPoseAmbiguityOffset)
+                    * kPoseAmbiguityMultiplier);
         //if there is 1 
         double confidenceMultiplier = Math.max(
             1,
             (Math.max(
                 1,
-                Math.max(0, smallestDistance - NOISY_DISTANCE_METERS)
-                    * DISTANCE_WEIGHT)
+                Math.max(0, smallestDistance - kNoisyDistanceMeters)
+                    * kDistanceWeight)
                 * poseAmbiguityFactor)
                 / (1
-                    + ((estimation.targetsUsed.size() - 1) * TAG_PRESENCE_WEIGHT)));
+                    + ((estimation.targetsUsed.size() - 1) * kTagPresenceWeight)));
 
-        return VISION_MEASUREMENT_STANDARD_DEVIATIONS.times(confidenceMultiplier);
+        return kVisionStandardDeviations.times(confidenceMultiplier);
     }
 
-    public void update(Rotation2d GyroYaw, SwerveModulePosition[] ModulePositions) {
-        //do for all each
+    public void update(Rotation2d gyroYaw, SwerveModulePosition[] modulePositions) {
+        /* Update each photonPoseEstimator and add the measurement to the swerve one */
         for(int i = 0; i < kNumberCameras; i++){
             Optional<EstimatedRobotPose> optionalEstimatedPose = photonPoseEstimators[i].update();
 
             if (optionalEstimatedPose.isPresent()) {
-                final EstimatedRobotPose estimatedPose = optionalEstimatedPose.get();        
+                EstimatedRobotPose estimatedPose = optionalEstimatedPose.get();        
                   
-                poseEstimator.addVisionMeasurement(estimatedPose.estimatedPose.toPose2d(), estimatedPose.timestampSeconds, confidenceCalculator(estimatedPose));
+                swervePoseEstimator.addVisionMeasurement(
+                    estimatedPose.estimatedPose.toPose2d(), 
+                    estimatedPose.timestampSeconds, 
+                    confidenceCalculator(estimatedPose)
+                );
+
                 fields[i].setRobotPose(estimatedPose.estimatedPose.toPose2d());
             }
         }
 
-        poseEstimator.update(GyroYaw, ModulePositions); 
+        swervePoseEstimator.update(gyroYaw, modulePositions); 
     }
 
-    public void resetPosition(Rotation2d gyroYaw, SwerveModulePosition[] ModulePositions, Pose2d givenPose){
-        poseEstimator.resetPosition(gyroYaw, ModulePositions, givenPose);
+    public void resetPosition(Rotation2d gyroYaw, SwerveModulePosition[] modulePositions, Pose2d givenPose){
+        swervePoseEstimator.resetPosition(gyroYaw, modulePositions, givenPose);
     }
 
-    public Pose2d getRobotPose(Rotation2d GyroYaw, SwerveModulePosition[] ModulePositions){
-        poseEstimator.update(GyroYaw, ModulePositions); 
+    public Pose2d getRobotPose(Rotation2d gyroYaw, SwerveModulePosition[] modulePositions){
+        swervePoseEstimator.update(gyroYaw, modulePositions);//TODO Maybe don't update here 
         
-        return poseEstimator.getEstimatedPosition();
+        return swervePoseEstimator.getEstimatedPosition();
     }
 }
    

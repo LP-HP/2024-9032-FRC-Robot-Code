@@ -10,6 +10,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -77,39 +78,38 @@ public final class Constants {
     }
     public static final class LocalizationPhotonVisionConstants{
         public static final int kNumberCameras = 4; /*!!!manually add ncameras cameras!!!*/
-        public static final String[] cameraNames = new String[kNumberCameras]; //manually add ncameras cameras
-        //0 to n-1
-        public static final Transform3d[] robotToCam = new Transform3d[kNumberCameras];
-        static {
-            cameraNames[0] = "camera0";
-            cameraNames[1] = "camera1";
-            cameraNames[2] = "camera2";
-            cameraNames[3] = "camera3";
-            
-            robotToCam[0] = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
-            robotToCam[1] = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
-            robotToCam[2] = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
-            robotToCam[3] = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
-        }
-        /*6 under may need to be tuned */
-        public static final double APRILTAG_AMBIGUITY_THRESHOLD = 0.2;
-        public static final double POSE_AMBIGUITY_SHIFTER = 0.2;
-        public static final double POSE_AMBIGUITY_MULTIPLIER = 4;
-        public static final double NOISY_DISTANCE_METERS = 2.5;
-        public static final double DISTANCE_WEIGHT = 7;
-        public static final int TAG_PRESENCE_WEIGHT = 10;
+
+        public static final String[] kCameraNames = new String[kNumberCameras]; //TODO manually add ncameras cameras
+        public static final Transform3d[] kRobotToCameraTransforms = new Transform3d[kNumberCameras];
         
-        public static final Matrix<N3, N1> VISION_MEASUREMENT_STANDARD_DEVIATIONS = MatBuilder.fill(
-            Nat.N3(), 
-            Nat.N1(),
+        /* Indexed 0 to n-1 */
+        static {
+            kCameraNames[0] = "camera0";
+            kCameraNames[1] = "camera1";
+            kCameraNames[2] = "camera2";
+            kCameraNames[3] = "camera3";
+            
+            kRobotToCameraTransforms[0] = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
+            kRobotToCameraTransforms[1] = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
+            kRobotToCameraTransforms[2] = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
+            kRobotToCameraTransforms[3] = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0));
+        }
+        //TODO all under need to be tuned 
+        public static final double kAmbiguityThreshold = 0.2;
+        public static final double kPoseAmbiguityOffset = 0.2;
+        public static final double kPoseAmbiguityMultiplier = 4;
+        public static final double kNoisyDistanceMeters = 2.5;
+        public static final double kDistanceWeight = 7;
+        public static final int kTagPresenceWeight = 10;
+        
+        public static final Matrix<N3, N1> kVisionStandardDeviations = VecBuilder.fill(
             1, //x
             1, //y
             1 * Math.PI //theta
             //nums can't be < 1
         );
 
-
-        public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+        public static final AprilTagFieldLayout kAprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
     }
     /* Using CANIds 13-14 - 2 motors */
     public static final class IntakeConstants {

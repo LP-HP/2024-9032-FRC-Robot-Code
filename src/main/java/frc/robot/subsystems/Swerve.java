@@ -36,7 +36,6 @@ import frc.robot.util.SparkMaxConstants.SparkMaxPIDConstants;
 import static frc.robot.Constants.SwerveConstants.*;
 
 public class Swerve extends SubsystemBase {
-    private final SwerveDrivePoseEstimator swerveOdometry;
     private final SwerveModule[] swerveMods;
     private final AHRS gyro;
 
@@ -65,7 +64,7 @@ public class Swerve extends SubsystemBase {
         Timer.delay(1.0);
         resetModulesToAbsolute();//Set integrated encoders to the absolute positions using cancoders
 
-        swerveOdometry = new SwerveDrivePoseEstimator(swerveKinematics, getGyroYaw(), getModulePositions(), new Pose2d());
+        var swerveOdometry = new SwerveDrivePoseEstimator(swerveKinematics, getGyroYaw(), getModulePositions(), new Pose2d());
         localization = new Localization(swerveOdometry);
 
         /* Sets up pathplanner for auto path following */
