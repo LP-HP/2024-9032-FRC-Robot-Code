@@ -116,9 +116,7 @@ public class Localization{
         swervePoseEstimator.resetPosition(gyroYaw, modulePositions, givenPose);
     }
 
-    public Pose2d getRobotPose(Rotation2d gyroYaw, SwerveModulePosition[] modulePositions){
-        swervePoseEstimator.update(gyroYaw, modulePositions);//TODO Maybe don't update here 
-        
+    public Pose2d getRobotPose(Rotation2d gyroYaw, SwerveModulePosition[] modulePositions){        
         return swervePoseEstimator.getEstimatedPosition();
     }
 }
