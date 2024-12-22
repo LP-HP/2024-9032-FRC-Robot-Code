@@ -36,30 +36,31 @@ public class LEDSubsystem extends SubsystemBase {
         })
         .ignoringDisable(true);
     }
-
+    int redGreen = 0;
+    int inc = 0;
     @Override
     public void periodic() {
         switch (currentState) {
             case RAINBOW:
-                rainbow();
-                break;
             case FAST_BLUE_GRADIENT:
-                gradient(100, 10);
-                break;
             case GREEN_GRADIENT:
-                gradient(238, 5);
-                break;
             case SLOW_BLUE_GRADIENT:
-                gradient(119, 5);
-                break;
             case ORANGE_GRADIENT:
-                gradient(24, 15);
-                break;
             case RED_GRADIENT:
-                gradient(354, 3);
-                break;
-            default:
-                break;
+            default: 
+            inc++;
+            if(inc%10 == 0){
+                inc %= 10;
+                if(redGreen == 0){redGreen = 1;} else{redGreen = 0;}
+                for(int i = 0; i < ledBuffer.getLength(); i++) {
+                    if(i%2==redGreen){
+                        ledBuffer.setRGB(i,255,0,0);
+                    } else{
+                        ledBuffer.setRGB(i,0,255,0);
+                    }
+                }
+            } 
+            
         }
     }
 
